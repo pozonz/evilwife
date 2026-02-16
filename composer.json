@@ -1,0 +1,21 @@
+{
+  "name": "pozoltd/evilwife",
+  "description": "CMS",
+  "type": "symfony-bundle",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Weida Xue",
+      "email": "luckyweida@gmail.com"
+    }
+  ],
+  "require": {   
+  },
+  "require-dev": {
+  },
+  "autoload": {
+    "psr-4": {
+      "EvilWife\\": ""
+    }
+  }
+}
