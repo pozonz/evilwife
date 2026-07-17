@@ -1,6 +1,6 @@
 <?php
 
-namespace EvilWife\_Core\Service;
+namespace Pozo\EvilWife\_Core\Service;
 
 class UtilsService
 {
@@ -12,7 +12,7 @@ class UtilsService
     {
         $fullClassNames = [
             "\\App\\ORM\\{$className}",
-            "\\EvilWife\\_Core\\ORM\\{$className}",
+            "\\Pozo\\EvilWife\\_Core\\ORM\\{$className}",
         ];
         foreach ($fullClassNames as $fullClassName) {
             if (class_exists($fullClassName)) {
@@ -43,7 +43,7 @@ class UtilsService
     {
         $fullClassNames = [
             "\\App\\ORM\\Model\\{$className}Model",
-            "\\EvilWife\\_Core\\ORM\\Model\\{$className}Model",
+            "\\Pozo\\EvilWife\\_Core\\ORM\\Model\\{$className}Model",
         ];
         foreach ($fullClassNames as $fullClassName) {
             if (class_exists($fullClassName)) {

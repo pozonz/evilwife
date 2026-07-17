@@ -1,6 +1,6 @@
 <?php
 
-namespace EvilWife\Cms\Controller;
+namespace Pozo\EvilWife\Cms\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;

@@ -1,6 +1,6 @@
 <?php
 
-namespace EvilWife;
+namespace Pozo\EvilWife;
 
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
 

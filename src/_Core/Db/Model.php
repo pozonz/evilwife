@@ -1,12 +1,12 @@
 <?php
 
-namespace EvilWife\_Core\Db;
+namespace Pozo\EvilWife\_Core\Db;
 
 use Cocur\Slugify\Slugify;
 use Doctrine\DBAL\Connection;
-use EvilWife\_Core\Db\BaseORM;
-use EvilWife\_Core\Service\ModelService;
-use EvilWife\_Core\Service\UtilsService;
+use Pozo\EvilWife\_Core\Db\BaseORM;
+use Pozo\EvilWife\_Core\Service\ModelService;
+use Pozo\EvilWife\_Core\Service\UtilsService;
 use Ramsey\Uuid\Uuid;
 
 class Model extends BaseORM

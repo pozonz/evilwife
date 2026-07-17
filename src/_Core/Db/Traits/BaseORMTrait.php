@@ -1,10 +1,10 @@
 <?php
 
-namespace EvilWife\_Core\Db\Traits;
+namespace Pozo\EvilWife\_Core\Db\Traits;
 
 use Cocur\Slugify\Slugify;
 use Doctrine\DBAL\Connection;
-use EvilWife\_Core\Service\UtilsService;
+use Pozo\EvilWife\_Core\Service\UtilsService;
 
 trait BaseORMTrait
 {

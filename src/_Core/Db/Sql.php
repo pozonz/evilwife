@@ -1,6 +1,6 @@
 <?php
 
-namespace EvilWife\_Core\Db;
+namespace Pozo\EvilWife\_Core\Db;
 
 use Doctrine\DBAL\Connection;
 

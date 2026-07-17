@@ -1,6 +1,6 @@
 <?php
 
-namespace EvilWife\_Core\Service;
+namespace Pozo\EvilWife\_Core\Service;
 
 use BlueM\Tree;
 use Cocur\Slugify\Slugify;

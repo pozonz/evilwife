@@ -1,12 +1,12 @@
 <?php
 
-namespace EvilWife\_Core\Service;
+namespace Pozo\EvilWife\_Core\Service;
 
 use BlueM\Tree;
 use Cocur\Slugify\Slugify;
 use Doctrine\DBAL\Connection;
-use EvilWife\_Core\Db\Sql;
-use EvilWife\_Core\Db\Model;
+use Pozo\EvilWife\_Core\Db\Sql;
+use Pozo\EvilWife\_Core\Db\Model;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 class ModelService

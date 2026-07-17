@@ -1,10 +1,10 @@
 <?php
 
-namespace EvilWife\Cms\Security;
+namespace Pozo\EvilWife\Cms\Security;
 
 use Doctrine\DBAL\Connection;
-use EvilWife\_Core\ORM\User;
-use EvilWife\_Core\Service\UtilsService;
+use Pozo\EvilWife\_Core\ORM\User;
+use Pozo\EvilWife\_Core\Service\UtilsService;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;

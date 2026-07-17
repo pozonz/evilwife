@@ -1,8 +1,8 @@
 <?php
 
-namespace EvilWife\_Core\ORM\Traits;
+namespace Pozo\EvilWife\_Core\ORM\Traits;
 
-use EvilWife\_Core\Service\UtilsService;
+use Pozo\EvilWife\_Core\Service\UtilsService;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 trait UserTrait

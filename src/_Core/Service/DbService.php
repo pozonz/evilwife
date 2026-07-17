@@ -1,6 +1,6 @@
 <?php
 
-namespace EvilWife\_Core\Service;
+namespace Pozo\EvilWife\_Core\Service;
 
 use Doctrine\DBAL\Connection;
 use ExWife\Engine\Cms\_Core\Service\UtilsService;
