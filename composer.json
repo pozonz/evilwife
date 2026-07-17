@@ -9,7 +9,8 @@
       "email": "luckyweida@gmail.com"
     }
   ],
-  "require": {   
+  "require": { 
+    "cocur/slugify": "^4.7" 
   },
   "require-dev": {
   },
