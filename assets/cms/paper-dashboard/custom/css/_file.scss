@@ -1,0 +1,129 @@
+$red: #D13D46;
+$links: #ef8157;
+$body-copy: #454A51;
+$color-grey1: #F3F5F9;
+$divider: 1px solid #e5e5e5;
+
+.asset-edit-single {
+  .doccode,
+  .asset-path {
+    //font-size: .5em;
+    margin: 0;
+    overflow: hidden;
+    font-weight: normal;
+  }
+  .asset-path {
+    margin-top: .5em;
+    margin-bottom: 1em;
+  }
+  .asset-parent-folder {
+    position: absolute;
+    top: 5.5em;
+    right: .5em;
+    width: 18em;
+    text-align: right;
+
+    label {
+      display: inline-block;
+      vertical-align: top;
+      margin: 0 -4px 0 0;
+      vertical-align: middle;
+      /*width: 30%;*/
+      padding: 0 1em 0 0;
+      display: none;
+    }
+    select {
+      display: inline-block;
+      vertical-align: top;
+      margin: 0 -4px 0 0;
+      width: 75%;
+      vertical-align: middle;
+      margin-bottom: 0;
+    }
+  }
+  .folderPickPreviewWrap {
+    .folderName {
+      display: inline-block;
+      vertical-align: top;
+      margin: 0 -4px 0 0;
+      white-space: nowrap;
+      /*display: block;*/
+      overflow: hidden;
+      width: 11.9em;
+      margin-right: .5em;
+      text-align: left;
+      text-overflow: ellipsis;
+    }
+  }
+  .asset-record-fields {
+    width: 50%;
+    display: inline-block;
+    vertical-align: top;
+    margin: 0 -4px 0 0;
+    padding: 0 3em 0 0;
+
+    .orm-widget.form-group.text {
+      width: 100%;
+      margin-right: 0;
+    }
+  }
+  .asset-image-area {
+    width: 50%;
+    display: inline-block;
+    vertical-align: top;
+    margin: 0 -4px 0 0;
+
+    .img-wrap {
+      margin: 0 0 2em;
+    }
+    img {
+      display: block;
+      margin: 0 auto;
+      max-width: 100%;
+      max-height: 20em;
+    }
+  }
+  .asset-detail {
+    display: block;
+    margin: 0 0 2em;
+  }
+  .asset-meta {
+    margin-top: 2em;
+  }
+  .formMetadata,
+  .asset-image-meta {
+    color: #999;
+    font-size: .95em;
+  }
+  .asset-image-meta {
+    float: right;
+    text-align: right;
+
+    li {
+      a {
+        display: inline-block;
+        padding: 0;
+      }
+    }
+
+    .file-name .icon {
+      background: url('./images/file/icon-download.png') no-repeat left top;
+      display: inline-block;
+      vertical-align: top;
+      margin: 0 -4px 0 0;
+      margin: 0 0 0 .5em;
+      vertical-align: middle;
+      height: 14px;
+      width: 11px;
+    }
+  }
+  .buttons {
+    float: left;
+
+    .button {
+      display: block;
+      margin-bottom: .5em;
+    }
+  }
+}
+

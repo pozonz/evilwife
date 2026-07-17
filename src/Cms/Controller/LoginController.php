@@ -17,12 +17,10 @@ class LoginController extends AbstractController
             return $this->redirectToRoute('manage_dashboard');
         }
 
-        $error = $authUtils->getLastAuthenticationError();
-        $errorMessage = $error ? $error->getMessageKey() : null;
-        return new Response(sprintf(
-            '<form method="post" action="/manage/login_check">%s<input name="_username" placeholder="Username"><input type="password" name="_password" placeholder="Password"><button>Login</button></form>',
-            $errorMessage ? '<p style="color:red">' . $errorMessage . '</p>' : ''
-        ));
+        return $this->render('@EvilWife/login.twig', [
+            'last_username' => $authUtils->getLastUsername(),
+            'error' => $authUtils->getLastAuthenticationError()?->getMessageKey(),
+        ]);
     }
 
     #[Route('/manage/login_check', name: 'manage_login_check')]

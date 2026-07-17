@@ -1,0 +1,250 @@
+$links: #4087F1;
+
+.page-category {
+	input {
+		display: none;
+	}
+	label {
+		display: inline-block;
+		margin: 0 3px 8px 0;
+		color: $links;
+		cursor: pointer;
+		border: 1px solid #e5e5e5;
+		transition: all .1s ease-in-out;
+		text-align: left;
+		padding: .5em;
+		min-width: 13em;
+		border-radius: 4px;
+		background: white;
+
+		.item-title {
+			display: inline-block;
+			vertical-align: middle;
+			padding-right: 1em;
+			overflow: hidden;
+			height: 1.7em;
+		}
+
+	}
+	label:hover {
+		background: #f9f9f9;
+
+		.dd-empty {
+		}
+	}
+	.number {
+		color: #999;
+		font-weight: normal;
+		margin: 0 0 0 .5em;
+		font-size: .9em;
+	}
+	input:checked + label {
+		background: $links;
+		border-color: $links;
+		color: #fff !important;
+
+		.number {
+			color: lighten($links, 30%);
+			padding-right: 5px;
+		}
+	}
+	.dd {
+		display: inline-block;
+		vertical-align: middle;
+		height: 3em;
+		width: 3em;
+		margin: 0 .5em 0 0;
+		background: rgba(red($links), green($links), blue($links), .2);
+		overflow: hidden !important;
+		border: 1px dashed lighten($links, 20%);
+	}
+	.dd-placeholder {
+		opacity: 1;
+	}
+	.dd-placeholder,
+	.dd-empty {
+		background: none;
+		min-height: 0;
+	}
+	.dd-empty {
+		border: none;
+		text-align: center;
+		padding: 1em 1.5em;
+	}
+	.other {
+		.dd-empty {
+			min-width: 100px;
+		}
+		.dd-placeholder,
+		.dd-list {
+			display: none;
+		}
+	}
+
+}
+
+.dd, .dd-dragel {
+	position: relative
+}
+
+.dd-dragel{
+	transform: translateY(-43.22px);
+	opacity: .85;
+}
+
+.dd-placeholder{
+	min-height: 43.22px;
+}
+
+.dd button, .dd-dragel button {
+	position: absolute;
+	left: 0;
+	height: 100%;
+	z-index: 1;
+	padding: 0;
+	text-indent: -5000px;
+	overflow: hidden;
+	width: 3.4em;
+	top: 0;
+	border-radius: 0;
+	border: none;
+	background: #fff url('./images/nestable/icon-nestable-active.png') no-repeat 16px 1.1em;
+	box-shadow: none;
+	border-right: 1px solid #e5e5e5;
+	border-bottom: none;
+}
+
+.dd button:hover, .dd-dragel button:hover {
+	opacity: 1
+}
+
+.dd .delete, .dd-dragel .delete, .dd .edit, .dd-dragel .edit, .dd .state, .dd-dragel .state {
+	position: absolute;
+	right: .5em;
+	top: -.5em;
+	z-index: 1;
+}
+
+.dd .edit, .dd-dragel .edit {
+	right: 2.3em
+}
+
+.dd .state, .dd-dragel .state {
+	right: 4.1em
+}
+
+.dd-list {
+	margin: 0;
+	list-style-type: none;
+	padding: 0
+}
+
+.dd-item {
+	border-bottom: 1px solid #ddd;
+	padding: .6em 0 .6em 1em;
+	transition: background-color .1s ease-in-out 0s;
+	position: relative;
+
+}
+
+.dd-item .child-num {
+	color: #999;
+	margin-left: .6em;
+	font-weight: normal;
+	font-size: .85em
+}
+.dd3-content {
+	position: relative;
+	margin-left: 3em;
+	padding-right: 8em;
+}
+.dd3-content__title {
+	//font-size: .95em;
+	//font-weight: bold;
+	margin-right: .5em;
+}
+.dd-item__link-url {
+	display: block;
+	font-weight: 400;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	font-size: 0.85em;
+	color: #888;
+
+	&:hover,&:focus {
+		color: $links;
+	}
+}
+.dd-handle {
+	display: block;
+	z-index: 0;
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	cursor: move
+}
+
+.dd-collapsed {
+	transition: background-color .1s ease-in-out 0s
+}
+
+.dd-collapsed button {
+	background-color: #fff;
+	background-image: url('./images/nestable/icon-nestable.png')
+}
+
+
+
+.dd-list .dd-list {
+	border: 1px solid #e5e5e5;
+	margin: 1em 1em 1em 4em
+}
+
+.dd-list .dd-list span {
+}
+
+.dd-list .dd-list .child-num {
+	margin-left: .6em
+}
+
+.dd-list .dd-list li:last-child {
+	border: none
+}
+
+.dd-list .dd-list .dd-item {
+	background: #fff;
+	margin-bottom: 0
+}
+
+.dd-placeholder, .dd-empty {
+	display: block;
+	position: relative;
+	border: 1px dashed #7ab3e2;
+	min-height: 43.22px;
+	background-color: #f6f6f6;
+	background: #e3f1fd
+}
+.dd-item__hide-from-nav {
+	background-color: $links;
+	color: #fff;
+	border-radius: 3px;
+	padding: 0.15em 0.4em .1em;
+	display: inline-block;
+	font-size: 0.72em;
+	font-weight: normal;
+}
+.dd-dragel {
+	position: absolute;
+	pointer-events: none;
+	z-index: 9999;
+	display: block;
+	border: 1px solid #bbb;
+	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15)
+}
+
+.dd-dragel>.dd3-item>.dd3-content {
+	margin: 0
+}
