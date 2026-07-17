@@ -3,6 +3,7 @@
 namespace EvilWife\Cms\Security;
 
 use Doctrine\DBAL\Connection;
+use EvilWife\_Core\ORM\User;
 use EvilWife\_Core\Service\UtilsService;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
@@ -17,27 +18,15 @@ class UserProvider implements UserProviderInterface
 
     public function loadUserByIdentifier(string $identifier): UserInterface
     {
-        if ($identifier == 'NONE_PROVIDED') {
-            throw new UsernameNotFoundException(
-                sprintf('Please enter a username')
-            );
-        }
-
         $fullClass = UtilsService::getFullClassFromName('User');
         $user = $fullClass::data($this->connection, [
-            'whereSql' => "m.title = ?",
+            'whereSql' => 'm.title = ?',
             'params' => [$identifier],
             'oneOrNull' => 1,
-            'limit' => 1,
-            'debug' => 1,
         ]);
 
         if (!$user) {
             throw new UserNotFoundException(sprintf('Username "%s" does not exist.', $identifier));
-        }
-
-        if ($user->getStatus() !== 1) {
-            throw new UserNotFoundException(sprintf('User "%s" is disabled.', $identifier));
         }
 
         return $user;

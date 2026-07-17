@@ -2,32 +2,20 @@
 
 namespace EvilWife\_Core\ORM\Traits;
 
-use ExWife\Engine\_Core\Service\CmsService;
-use ExWife\Engine\_Core\Service\UtilsService;
-use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
+use EvilWife\_Core\Service\UtilsService;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 trait UserTrait
 {
-    /**
-     * @param array $options
-     * @return string|null
-     * @throws \Doctrine\DBAL\Driver\Exception
-     */
     public function save($options = [])
     {
         if ($this->passwordInput) {
-            $encoder = new MessageDigestPasswordEncoder();
-            $this->password = $encoder->encodePassword($this->passwordInput, '');
+            $this->password = password_hash($this->passwordInput, PASSWORD_BCRYPT);
             $this->passwordInput = null;
         }
         return parent::save($options);
     }
 
-    /**
-     * @param UserInterface $user
-     * @return bool
-     */
     public function isEqualTo(UserInterface $user): bool
     {
         $fullClass = UtilsService::getFullClassFromName('User');
@@ -36,95 +24,59 @@ trait UserTrait
         }
 
         if ($this->getPassword() !== $user->getPassword()) {
-
             return false;
         }
 
-        if ($this->getSalt() !== $user->getSalt()) {
-            return false;
-        }
-
-        if ($this->getUsername() !== $user->getUsername()) {
+        if ($this->getUserIdentifier() !== $user->getUserIdentifier()) {
             return false;
         }
 
         return true;
     }
 
-    /**
-     * @return string[]
-     */
     public function getRoles(): array
     {
         return ['ROLE_ADMIN'];
     }
 
-    /**
-     * @return mixed
-     */
     public function getId()
     {
         return $this->id;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getPassword()
+    public function getPassword(): ?string
     {
         return $this->password;
     }
 
-    /**
-     * @return string
-     */
-    public function getSalt()
-    {
-        return '';
-    }
-
     public function getUserIdentifier(): string
     {
-        return $this->title;
+        return (string) $this->title;
     }
 
-    /**
-     * @return $this
-     */
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
-        return $this;
+        $this->passwordInput = null;
     }
 
-    /**
-     * @return string
-     */
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize($this->jsonSerialize());
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'password' => $this->password,
+        ];
     }
 
-    /**
-     * @param $serialized
-     * @throws \Doctrine\DBAL\Exception
-     */
-    public function unserialize($serialized)
+    public function __unserialize(array $data): void
     {
-        $obj = unserialize($serialized);
-        foreach ($obj as $idx => $itm) {
-            $this->$idx = $itm;
-        }
-
-        $this->_connection = \Doctrine\DBAL\DriverManager::getConnection(array(
-            'url' => getenv('DATABASE_URL'),
-        ), new \Doctrine\DBAL\Configuration());
+        $this->id = $data['id'];
+        $this->title = $data['title'];
+        $this->password = $data['password'];
     }
 
-    /**
-     * @return mixed
-     */
     public function objAccessibleSections()
     {
-        return json_decode($this->accessibleSections ?: '[]');
+        return json_decode($this->accessibleSections ?? '[]');
     }
 }

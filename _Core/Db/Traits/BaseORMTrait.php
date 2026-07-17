@@ -199,9 +199,7 @@ trait BaseORMTrait
             exit;
         }
 
-        $stmt = $connection->prepare($sql);
-        $stmt->executeQuery($options['params']);
-        $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $result = $connection->executeQuery($sql, $options['params'])->fetchAllAssociative();
 
         if ($options['orm']) {
             $orms = [];
@@ -307,8 +305,7 @@ trait BaseORMTrait
 
         try {
 
-            $stmt = $this->_connection->prepare($sql);
-            $stmt->execute($params);
+            $this->_connection->executeStatement($sql, $params);
             if (!$this->id) {
                 $this->id = $this->_connection->lastInsertId();
             }
@@ -347,8 +344,7 @@ trait BaseORMTrait
         $tableName = $model->getTableName();
 
         $sql = "DELETE FROM `{$tableName}` WHERE id = ?";
-        $stmt = $this->_connection->prepare($sql);
-        return $stmt->execute(array($this->id));
+        return $this->_connection->executeStatement($sql, [$this->id]);
     }
 
     /**

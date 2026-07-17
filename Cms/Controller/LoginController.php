@@ -17,9 +17,11 @@ class LoginController extends AbstractController
             return $this->redirectToRoute('manage_dashboard');
         }
 
+        $error = $authUtils->getLastAuthenticationError();
+        $errorMessage = $error ? $error->getMessageKey() : null;
         return new Response(sprintf(
             '<form method="post" action="/manage/login_check">%s<input name="_username" placeholder="Username"><input type="password" name="_password" placeholder="Password"><button>Login</button></form>',
-            $authUtils->getLastAuthenticationError() ? '<p style="color:red">' . $authUtils->getLastAuthenticationError()->getMessageKey() . '</p>' : ''
+            $errorMessage ? '<p style="color:red">' . $errorMessage . '</p>' : ''
         ));
     }
 
