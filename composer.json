@@ -10,6 +10,9 @@
     }
   ],
   "require": { 
+    "cocur/slugify": "^4.7",
+    "ramsey/uuid": "^4.9",
+    "symfony/webpack-encore-bundle": "*"
   },
   "require-dev": {
   },
