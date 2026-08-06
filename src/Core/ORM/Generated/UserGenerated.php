@@ -1,9 +1,9 @@
 <?php
 
-namespace Pozo\EvilWife\_Core\ORM\Generated;
+namespace Pozo\EvilWife\Core\ORM\Generated;
 
-use Pozo\EvilWife\_Core\Db\Traits\BaseORMTrait;
-use Pozo\EvilWife\_Core\Db\BaseORM;
+use Pozo\EvilWife\Core\Db\Traits\BaseORMTrait;
+use Pozo\EvilWife\Core\Db\BaseORM;
 
 class UserGenerated extends BaseORM
 {

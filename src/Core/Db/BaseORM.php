@@ -1,12 +1,12 @@
 <?php
 
-namespace Pozo\EvilWife\_Core\Db;
+namespace Pozo\EvilWife\Core\Db;
 
 use Cocur\Slugify\Slugify;
 use Doctrine\DBAL\Connection;
 
-use Pozo\EvilWife\_Core\Db\Traits\BaseORMTrait;
-use Pozo\EvilWife\_Core\Service\UtilsService;
+use Pozo\EvilWife\Core\Db\Traits\BaseORMTrait;
+use Pozo\EvilWife\Core\Service\UtilsService;
 use Ramsey\Uuid\Uuid;
 
 abstract class BaseORM implements \JsonSerializable

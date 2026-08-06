@@ -1,6 +1,6 @@
 <?php
 
-namespace Pozo\EvilWife\_Core\Service;
+namespace Pozo\EvilWife\Portal\Cms\Service;
 
 use BlueM\Tree;
 use Cocur\Slugify\Slugify;

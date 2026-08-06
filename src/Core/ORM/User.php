@@ -1,9 +1,9 @@
 <?php
 
-namespace Pozo\EvilWife\_Core\ORM;
+namespace Pozo\EvilWife\Core\ORM;
 
-use Pozo\EvilWife\_Core\ORM\Generated\UserGenerated;
-use Pozo\EvilWife\_Core\ORM\Traits\UserTrait;
+use Pozo\EvilWife\Core\ORM\Generated\UserGenerated;
+use Pozo\EvilWife\Core\ORM\Traits\UserTrait;
 use Symfony\Component\Security\Core\User\EquatableInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;

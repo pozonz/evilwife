@@ -1,9 +1,9 @@
 <?php
 
-namespace Pozo\EvilWife\_Core\ORM\Model;
+namespace Pozo\EvilWife\Core\ORM\Model;
 
 use Doctrine\DBAL\Connection;
-use Pozo\EvilWife\_Core\Db\Model;
+use Pozo\EvilWife\Core\Db\Model;
 
 class UserModel extends Model
 {

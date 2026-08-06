@@ -1,6 +1,6 @@
 <?php
 
-namespace Pozo\EvilWife\Cms\Controller;
+namespace Pozo\EvilWife\Portal\Cms\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -38,7 +38,9 @@ class LoginController extends AbstractController
     #[Route('/manage/dashboard', name: 'manage_dashboard')]
     public function dashboard(): Response
     {
-        return new Response('Welcome to the CMS dashboard, ' . $this->getUser()?->getUserIdentifier());
+        return $this->render('@EvilWife/dashboard.twig', [
+            'username' => $this->getUser()?->getUserIdentifier(),
+        ]);
     }
 
     #[Route('/manage/{path}', name: 'manage_catch_all', requirements: ['path' => '.*'], priority: -100)]
