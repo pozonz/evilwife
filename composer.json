@@ -11,7 +11,11 @@
   ],
   "require": { 
     "cocur/slugify": "^4.7",
+    "endroid/qr-code": "^6.0",
     "ramsey/uuid": "^4.9",
+    "scheb/2fa-backup-code": "^8.6",
+    "scheb/2fa-bundle": "^8.6",
+    "scheb/2fa-totp": "^8.6",
     "symfony/webpack-encore-bundle": "^2.4"
   },
   "require-dev": {

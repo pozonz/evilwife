@@ -38,5 +38,20 @@ class UserGenerated extends BaseORM
      * #pz text COLLATE utf8mb4_unicode_ci DEFAULT NULL
      */
     public $accessibleSections;
+
+    /**
+     * #pz text COLLATE utf8mb4_unicode_ci DEFAULT NULL
+     */
+    public $totpSecret;
+
+    /**
+     * #pz text COLLATE utf8mb4_unicode_ci DEFAULT NULL
+     */
+    public $totpEnabled;
+
+    /**
+     * #pz text COLLATE utf8mb4_unicode_ci DEFAULT NULL
+     */
+    public $backupCodes;
    
 }

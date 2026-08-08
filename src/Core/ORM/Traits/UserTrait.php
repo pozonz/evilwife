@@ -3,6 +3,8 @@
 namespace Pozo\EvilWife\Core\ORM\Traits;
 
 use Pozo\EvilWife\Core\Service\UtilsService;
+use Scheb\TwoFactorBundle\Model\Totp\TotpConfiguration;
+use Scheb\TwoFactorBundle\Model\Totp\TotpConfigurationInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 trait UserTrait
@@ -78,5 +80,95 @@ trait UserTrait
     public function objAccessibleSections()
     {
         return json_decode($this->accessibleSections ?? '[]');
+    }
+
+    public function isTotpAuthenticationEnabled(): bool
+    {
+        return $this->isTwoFactorEnabled() && !empty($this->totpSecret);
+    }
+
+    public function getTotpAuthenticationUsername(): string
+    {
+        return $this->getUserIdentifier();
+    }
+
+    public function getTotpAuthenticationConfiguration(): ?TotpConfigurationInterface
+    {
+        if (empty($this->totpSecret)) {
+            return null;
+        }
+
+        return new TotpConfiguration(
+            $this->totpSecret,
+            TotpConfiguration::ALGORITHM_SHA1,
+            30,
+            6
+        );
+    }
+
+    public function isTwoFactorEnabled(): bool
+    {
+        return in_array($this->totpEnabled, [1, '1', true], true);
+    }
+
+    public function enableTwoFactor(string $secret): void
+    {
+        $this->totpSecret = $secret;
+        $this->totpEnabled = '1';
+    }
+
+    public function disableTwoFactor(): void
+    {
+        $this->totpSecret = null;
+        $this->totpEnabled = '0';
+        $this->backupCodes = null;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function getBackupCodesArray(): array
+    {
+        $codes = json_decode($this->backupCodes ?? '[]', true);
+
+        return is_array($codes) ? array_values($codes) : [];
+    }
+
+    /**
+     * @param list<string> $plainCodes
+     * @return list<string>
+     */
+    public function replaceBackupCodes(array $plainCodes): array
+    {
+        $hashed = [];
+        foreach ($plainCodes as $code) {
+            $hashed[] = password_hash($code, PASSWORD_BCRYPT);
+        }
+        $this->backupCodes = json_encode(array_values($hashed));
+
+        return array_values($plainCodes);
+    }
+
+    public function isBackupCode(string $code): bool
+    {
+        foreach ($this->getBackupCodesArray() as $hashed) {
+            if (is_string($hashed) && password_verify($code, $hashed)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function invalidateBackupCode(string $code): void
+    {
+        $remaining = [];
+        foreach ($this->getBackupCodesArray() as $hashed) {
+            if (is_string($hashed) && password_verify($code, $hashed)) {
+                continue;
+            }
+            $remaining[] = $hashed;
+        }
+        $this->backupCodes = json_encode(array_values($remaining));
     }
 }

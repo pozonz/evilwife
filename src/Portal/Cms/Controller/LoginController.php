@@ -13,7 +13,7 @@ class LoginController extends AbstractController
     #[Route('/manage/login', name: 'manage_login')]
     public function login(AuthenticationUtils $authUtils): Response
     {
-        if ($this->getUser()) {
+        if ($this->isGranted('IS_AUTHENTICATED_FULLY')) {
             return $this->redirectToRoute('manage_dashboard');
         }
 

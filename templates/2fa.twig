@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Two-factor authentication - Evil Wife</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/styles/overlayscrollbars.min.css" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@4.0.0/dist/css/adminlte.min.css" />
+  </head>
+  <body class="login-page bg-body-secondary">
+    <main class="login-box">
+      <div class="card card-outline card-primary">
+        <div class="card-header">
+          <h1 class="mb-0 text-center"><b>Evil</b> Wife</h1>
+        </div>
+        <div class="card-body login-card-body">
+          <p class="login-box-msg">Enter the code from your authenticator app</p>
+
+          {% if authenticationError %}
+            <div class="alert alert-danger">{{ authenticationError|trans(authenticationErrorData, 'SchebTwoFactorBundle') }}</div>
+          {% endif %}
+
+          {% if availableTwoFactorProviders|length > 1 %}
+            <p class="mb-3">
+              {{ "choose_provider"|trans({}, 'SchebTwoFactorBundle') }}:
+              {% for provider in availableTwoFactorProviders %}
+                <a href="{{ path('2fa_login', {preferProvider: provider}) }}">{{ provider }}</a>{% if not loop.last %}, {% endif %}
+              {% endfor %}
+            </p>
+          {% endif %}
+
+          <form action="{{ checkPathUrl ? checkPathUrl : path(checkPathRoute) }}" method="post">
+            {% if isCsrfProtectionEnabled %}
+              <input type="hidden" name="{{ csrfParameterName }}" value="{{ csrf_token(csrfTokenId) }}" />
+            {% endif %}
+
+            <div class="input-group mb-3">
+              <div class="form-floating">
+                <input
+                  id="_auth_code"
+                  type="text"
+                  name="{{ authCodeParameterName }}"
+                  class="form-control"
+                  placeholder=""
+                  autocomplete="one-time-code"
+                  inputmode="numeric"
+                  pattern="[0-9]*"
+                  autofocus
+                />
+                <label for="_auth_code">Authentication code</label>
+              </div>
+              <div class="input-group-text">
+                <span class="bi bi-shield-lock"></span>
+              </div>
+            </div>
+
+            {% if displayTrustedOption %}
+              <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="_trusted" name="{{ trustedParameterName }}" />
+                <label class="form-check-label" for="_trusted">{{ "trusted"|trans({}, 'SchebTwoFactorBundle') }}</label>
+              </div>
+            {% endif %}
+
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary">Verify</button>
+            </div>
+          </form>
+
+          <p class="mt-3 mb-0">
+            <a href="{{ logoutPath }}">Cancel and sign out</a>
+          </p>
+        </div>
+      </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/admin-lte@4.0.0/dist/js/adminlte.min.js"></script>
+  </body>
+</html>

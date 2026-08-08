@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Two-factor authentication - Evil Wife</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@4.0.0/dist/css/adminlte.min.css" />
+  </head>
+  <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+    <div class="app-wrapper">
+      <main class="app-main">
+        <div class="app-content-header">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-sm-6">
+                <h3 class="mb-0">Two-factor authentication</h3>
+              </div>
+              <div class="col-sm-6 text-end">
+                <a href="{{ path('manage_dashboard') }}" class="btn btn-outline-secondary btn-sm">Back to dashboard</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="app-content">
+          <div class="container-fluid">
+            {% for label, messages in app.flashes %}
+              {% for message in messages %}
+                <div class="alert alert-{{ label == 'error' ? 'danger' : label }}">{{ message }}</div>
+              {% endfor %}
+            {% endfor %}
+
+            {% if backup_codes %}
+              <div class="alert alert-warning">
+                <strong>Store these backup codes now.</strong> They will not be shown again.
+                <ul class="mb-0 mt-2 font-monospace">
+                  {% for code in backup_codes %}
+                    <li>{{ code }}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+            {% endif %}
+
+            {% if enabled %}
+              <div class="card card-outline card-success mb-3">
+                <div class="card-body">
+                  <p class="mb-0"><i class="bi bi-shield-check"></i> Two-factor authentication is <strong>enabled</strong>.</p>
+                </div>
+              </div>
+
+              <div class="card mb-3">
+                <div class="card-header">
+                  <h3 class="card-title">Backup codes</h3>
+                </div>
+                <div class="card-body">
+                  <p>Generate a new set of one-time backup codes. Previous codes will stop working.</p>
+                  <form action="{{ path('manage_2fa_regenerate_backup') }}" method="post">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('manage_2fa_regenerate_backup') }}" />
+                    <button type="submit" class="btn btn-outline-primary">Regenerate backup codes</button>
+                  </form>
+                </div>
+              </div>
+
+              <div class="card card-outline card-danger">
+                <div class="card-header">
+                  <h3 class="card-title">Disable two-factor authentication</h3>
+                </div>
+                <div class="card-body">
+                  <form action="{{ path('manage_2fa_disable') }}" method="post">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('manage_2fa_disable') }}" />
+                    <div class="mb-3">
+                      <label for="password" class="form-label">Confirm with your password</label>
+                      <input type="password" class="form-control" id="password" name="password" autocomplete="current-password" required />
+                    </div>
+                    <button type="submit" class="btn btn-danger">Disable 2FA</button>
+                  </form>
+                </div>
+              </div>
+            {% else %}
+              <div class="card card-outline card-primary">
+                <div class="card-header">
+                  <h3 class="card-title">Enable authenticator app</h3>
+                </div>
+                <div class="card-body">
+                  <p>Scan this QR code with Google Authenticator, 1Password, Authy, or a similar app.</p>
+                  <div class="mb-3">
+                    <img src="{{ qr_data_uri }}" alt="Two-factor QR code" width="220" height="220" />
+                  </div>
+                  <p class="text-muted">Or enter this secret manually:</p>
+                  <p class="font-monospace"><strong>{{ secret }}</strong></p>
+
+                  <form action="{{ path('manage_2fa_enable') }}" method="post" class="mt-4">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('manage_2fa_enable') }}" />
+                    <div class="mb-3" style="max-width: 320px;">
+                      <label for="auth_code" class="form-label">Enter a code from the app to confirm</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="auth_code"
+                        name="auth_code"
+                        autocomplete="one-time-code"
+                        inputmode="numeric"
+                        pattern="[0-9]*"
+                        required
+                      />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Enable 2FA</button>
+                  </form>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>
