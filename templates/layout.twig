@@ -1,3 +1,140 @@
+{% set cms_nav_tree = [
+    {
+        heading: 'Home',
+        items: [
+            { label: 'Home', href: '#', current: true },
+        ],
+    },
+    {
+        heading: 'Main Nav',
+        items: [
+            {
+                label: 'What we do',
+                children: [
+                    { label: 'Our work', href: '#' },
+                    { label: 'Campaigns', href: '#' },
+                    { label: 'Education', href: '#',children: [
+                    { label: 'Our work', href: '#' },
+                    { label: 'Campaigns', href: '#' },
+                    { label: 'Education', href: '#' },
+                ], },
+                ],
+            },
+            {
+                label: 'How you can help',
+                children: [
+                    { label: 'Volunteer', href: '#' },
+                    { label: 'Foster', href: '#' },
+                    { label: 'Fundraise', href: '#' },
+                ],
+            },
+            {
+                label: 'Advice & welfare',
+                children: [
+                    { label: 'Pet care', href: '#' },
+                    { label: 'Lost & found', href: '#' },
+                    { label: 'Report cruelty', href: '#' },
+                ],
+            },
+            { label: 'News & events', href: '#' },
+            {
+                label: 'Op Shops',
+                children: [
+                    { label: 'Find a store', href: '#' },
+                    { label: 'Donate goods', href: '#' },
+                ],
+            },
+            {
+                label: 'About',
+                children: [
+                    { label: 'Our story', href: '#' },
+                    { label: 'People', href: '#' },
+                    { label: 'Careers', href: '#' },
+                ],
+            },
+            { label: 'Contact', href: '#' },
+        ],
+    },
+    {
+        heading: 'Footer Nav',
+        items: [
+            { label: 'Website terms & conditions', href: '#' },
+            { label: 'Privacy', href: '#' },
+        ],
+    },
+    {
+        heading: 'Header Adopt',
+        items: [
+            {
+                label: 'Adopt',
+                children: [
+                    { label: 'Dogs', href: '#' },
+                    { label: 'Cats', href: '#' },
+                    { label: 'Other animals', href: '#' },
+                ],
+            },
+        ],
+    },
+    {
+        heading: 'Header Donate',
+        items: [
+            {
+                label: 'Ways to Donate',
+                id: 'nav-donate',
+                children: [
+                    { label: 'One-off gift', href: '#' },
+                    { label: 'Monthly giving', href: '#' },
+                    { label: 'Leave a gift in your will', href: '#' },
+                ],
+            },
+        ],
+    },
+] %}
+
+{#-
+  cms_nav_tree(sections, tree_id)
+  sections[]: { heading, items[] }
+  items[]:    { label, href, current, expanded, id, children[] }
+-#}
+{% macro cms_nav_items(items, tree_id, nested) %}
+    {% import _self as nav %}
+    <ul class="nav flex-column{{ nested ? ' nav-sub' : '' }}">
+        {% for item in items %}
+            {% set children = item.children|default([]) %}
+            {% set is_current = item.current|default(false) %}
+            {% set is_expanded = item.expanded|default(false) %}
+            {% set href = item.href|default('#') %}
+            <li class="nav-item">
+                {% if children|length %}
+                    {% set collapse_id = item.id|default('nav-' ~ item.label|lower|replace({' & ': '-', '&': '', ' ': '-'})) %}
+                    <a class="nav-link nav-toggle px-1 py-1{{ is_current ? ' active' : '' }}" href="#{{ collapse_id }}" data-bs-toggle="collapse" role="button" aria-expanded="{{ is_expanded ? 'true' : 'false' }}" aria-controls="{{ collapse_id }}"{% if is_current %} aria-current="page"{% endif %}>
+                        <span>{{ item.label }}</span>
+                        <i class="fa-solid fa-chevron-down nav-chevron" aria-hidden="true"></i>
+                    </a>
+                    <div class="collapse{{ is_expanded ? ' show' : '' }}" id="{{ collapse_id }}" data-bs-parent="#{{ tree_id }}">
+                        {{ nav.cms_nav_items(children, tree_id, true) }}
+                    </div>
+                {% else %}
+                    <a class="nav-link px-1 py-1{{ is_current ? ' active' : '' }}" href="{{ href }}"{% if is_current %} aria-current="page"{% endif %}>{{ item.label }}</a>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% endmacro %}
+
+{% macro cms_nav_tree(sections, tree_id) %}
+    {% import _self as nav %}
+    {% for section in sections %}
+        <div{% if not loop.last %} class="mb-3"{% endif %}>
+            {% if section.heading|default('') %}
+                <div class="cms-nav-heading">{{ section.heading }}</div>
+            {% endif %}
+            {{ nav.cms_nav_items(section.items|default([]), tree_id, false) }}
+        </div>
+    {% endfor %}
+{% endmacro %}
+
+{% import _self as cms_nav %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -215,126 +352,7 @@
 
             <div class="cms-body">
                 <nav class="cms-nav-tree bg-body border-end p-3" id="cmsNavTree">
-                    <div class="mb-3">
-                        <div class="cms-nav-heading">Home</div>
-                        <ul class="nav flex-column">
-                            <li class="nav-item"><a class="nav-link px-1 py-1" href="#" aria-current="page">Home</a></li>
-                        </ul>
-                    </div>
-                    <div class="mb-3">
-                        <div class="cms-nav-heading">Main Nav</div>
-                        <ul class="nav flex-column">
-                            <li class="nav-item">
-                                <a class="nav-link nav-toggle px-1 py-1" href="#nav-what-we-do" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="nav-what-we-do">
-                                    <span>What we do</span>
-                                    <i class="fa-solid fa-chevron-down nav-chevron" aria-hidden="true"></i>
-                                </a>
-                                <div class="collapse" id="nav-what-we-do" data-bs-parent="#cmsNavTree">
-                                    <ul class="nav flex-column nav-sub">
-                                        <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Our work</a></li>
-                                        <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Campaigns</a></li>
-                                        <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Education</a></li>
-                                    </ul>
-                                </div>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link nav-toggle px-1 py-1" href="#nav-how-you-can-help" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="nav-how-you-can-help">
-                                    <span>How you can help</span>
-                                    <i class="fa-solid fa-chevron-down nav-chevron" aria-hidden="true"></i>
-                                </a>
-                                <div class="collapse" id="nav-how-you-can-help" data-bs-parent="#cmsNavTree">
-                                    <ul class="nav flex-column nav-sub">
-                                        <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Volunteer</a></li>
-                                        <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Foster</a></li>
-                                        <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Fundraise</a></li>
-                                    </ul>
-                                </div>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link nav-toggle px-1 py-1" href="#nav-advice-welfare" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="nav-advice-welfare">
-                                    <span>Advice &amp; welfare</span>
-                                    <i class="fa-solid fa-chevron-down nav-chevron" aria-hidden="true"></i>
-                                </a>
-                                <div class="collapse" id="nav-advice-welfare" data-bs-parent="#cmsNavTree">
-                                    <ul class="nav flex-column nav-sub">
-                                        <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Pet care</a></li>
-                                        <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Lost &amp; found</a></li>
-                                        <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Report cruelty</a></li>
-                                    </ul>
-                                </div>
-                            </li>
-                            <li class="nav-item"><a class="nav-link px-1 py-1" href="#">News &amp; events</a></li>
-                            <li class="nav-item">
-                                <a class="nav-link nav-toggle px-1 py-1" href="#nav-op-shops" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="nav-op-shops">
-                                    <span>Op Shops</span>
-                                    <i class="fa-solid fa-chevron-down nav-chevron" aria-hidden="true"></i>
-                                </a>
-                                <div class="collapse" id="nav-op-shops" data-bs-parent="#cmsNavTree">
-                                    <ul class="nav flex-column nav-sub">
-                                        <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Find a store</a></li>
-                                        <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Donate goods</a></li>
-                                    </ul>
-                                </div>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link nav-toggle px-1 py-1" href="#nav-about" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="nav-about">
-                                    <span>About</span>
-                                    <i class="fa-solid fa-chevron-down nav-chevron" aria-hidden="true"></i>
-                                </a>
-                                <div class="collapse" id="nav-about" data-bs-parent="#cmsNavTree">
-                                    <ul class="nav flex-column nav-sub">
-                                        <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Our story</a></li>
-                                        <li class="nav-item"><a class="nav-link px-1 py-1" href="#">People</a></li>
-                                        <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Careers</a></li>
-                                    </ul>
-                                </div>
-                            </li>
-                            <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Contact</a></li>
-                        </ul>
-                    </div>
-                    <div class="mb-3">
-                        <div class="cms-nav-heading">Footer Nav</div>
-                        <ul class="nav flex-column">
-                            <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Website terms &amp; conditions</a></li>
-                            <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Privacy</a></li>
-                        </ul>
-                    </div>
-                    <div class="mb-3">
-                        <div class="cms-nav-heading">Header Adopt</div>
-                        <ul class="nav flex-column">
-                            <li class="nav-item">
-                                <a class="nav-link nav-toggle px-1 py-1" href="#nav-adopt" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="nav-adopt">
-                                    <span>Adopt</span>
-                                    <i class="fa-solid fa-chevron-down nav-chevron" aria-hidden="true"></i>
-                                </a>
-                                <div class="collapse" id="nav-adopt" data-bs-parent="#cmsNavTree">
-                                    <ul class="nav flex-column nav-sub">
-                                        <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Dogs</a></li>
-                                        <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Cats</a></li>
-                                        <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Other animals</a></li>
-                                    </ul>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                    <div>
-                        <div class="cms-nav-heading">Header Donate</div>
-                        <ul class="nav flex-column">
-                            <li class="nav-item">
-                                <a class="nav-link nav-toggle px-1 py-1" href="#nav-donate" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="nav-donate">
-                                    <span>Ways to Donate</span>
-                                    <i class="fa-solid fa-chevron-down nav-chevron" aria-hidden="true"></i>
-                                </a>
-                                <div class="collapse" id="nav-donate" data-bs-parent="#cmsNavTree">
-                                    <ul class="nav flex-column nav-sub">
-                                        <li class="nav-item"><a class="nav-link px-1 py-1" href="#">One-off gift</a></li>
-                                        <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Monthly giving</a></li>
-                                        <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Leave a gift in your will</a></li>
-                                    </ul>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
+                    {{ cms_nav.cms_nav_tree(cms_nav_tree, 'cmsNavTree') }}
                 </nav>
 
                 <main class="cms-main">
