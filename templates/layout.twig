@@ -1,137 +1,177 @@
-{% set cms_nav_tree = [
-    {
-        heading: 'Home',
-        items: [
-            { label: 'Home', href: '#', current: true },
-        ],
-    },
-    {
-        heading: 'Main Nav',
-        items: [
-            {
-                label: 'What we do',
-                children: [
-                    { label: 'Our work', href: '#' },
-                    { label: 'Campaigns', href: '#' },
-                    { label: 'Education', href: '#',children: [
-                    { label: 'Our work', href: '#' },
-                    { label: 'Campaigns', href: '#' },
-                    { label: 'Education', href: '#' },
-                ], },
-                ],
-            },
-            {
-                label: 'How you can help',
-                children: [
-                    { label: 'Volunteer', href: '#' },
-                    { label: 'Foster', href: '#' },
-                    { label: 'Fundraise', href: '#' },
-                ],
-            },
-            {
-                label: 'Advice & welfare',
-                children: [
-                    { label: 'Pet care', href: '#' },
-                    { label: 'Lost & found', href: '#' },
-                    { label: 'Report cruelty', href: '#' },
-                ],
-            },
-            { label: 'News & events', href: '#' },
-            {
-                label: 'Op Shops',
-                children: [
-                    { label: 'Find a store', href: '#' },
-                    { label: 'Donate goods', href: '#' },
-                ],
-            },
-            {
-                label: 'About',
-                children: [
-                    { label: 'Our story', href: '#' },
-                    { label: 'People', href: '#' },
-                    { label: 'Careers', href: '#' },
-                ],
-            },
-            { label: 'Contact', href: '#' },
-        ],
-    },
-    {
-        heading: 'Footer Nav',
-        items: [
-            { label: 'Website terms & conditions', href: '#' },
-            { label: 'Privacy', href: '#' },
-        ],
-    },
-    {
-        heading: 'Header Adopt',
-        items: [
-            {
-                label: 'Adopt',
-                children: [
-                    { label: 'Dogs', href: '#' },
-                    { label: 'Cats', href: '#' },
-                    { label: 'Other animals', href: '#' },
-                ],
-            },
-        ],
-    },
-    {
-        heading: 'Header Donate',
-        items: [
-            {
-                label: 'Ways to Donate',
-                id: 'nav-donate',
-                children: [
-                    { label: 'One-off gift', href: '#' },
-                    { label: 'Monthly giving', href: '#' },
-                    { label: 'Leave a gift in your will', href: '#' },
-                ],
-            },
-        ],
-    },
-] %}
+{% set cmsNavTree = {
+    id: 'cms-nav-root',
+    children: [
+        {
+            id: 'home-section',
+            title: 'Home',
+            children: [
+                { id: 'home', title: 'Home', url: '#' },
+            ],
+        },
+        {
+            id: 'main-nav',
+            title: 'Main Nav',
+            children: [
+                {
+                    id: 'what-we-do',
+                    title: 'What we do',
+                    url: '#',
+                    children: [
+                        { id: 'our-work', title: 'Our work', url: '#' },
+                        { id: 'campaigns', title: 'Campaigns', url: '#' },
+                        {
+                            id: 'education',
+                            title: 'Education',
+                            url: '#',
+                            children: [
+                                { id: 'workshops', title: 'Workshops', url: '#' },
+                                {
+                                    id: 'programmes',
+                                    title: 'Programmes',
+                                    url: '#',
+                                    children: [
+                                        { id: 'community', title: 'Community', url: '#' },
+                                        {
+                                            id: 'schools',
+                                            title: 'Schools',
+                                            url: '#',
+                                            children: [
+                                                { id: 'secondary', title: 'Secondary', url: '#' },
+                                                {
+                                                    id: 'primary',
+                                                    title: 'Primary',
+                                                    url: '#',
+                                                    children: [
+                                                        { id: 'classroom-visits', title: 'Classroom visits', url: '#' },
+                                                        { id: 'teacher-packs', title: 'Teacher packs', url: '#' },
+                                                    ],
+                                                },
+                                            ],
+                                        },
+                                    ],
+                                },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    id: 'how-you-can-help',
+                    title: 'How you can help',
+                    url: '#',
+                    children: [
+                        { id: 'volunteer', title: 'Volunteer', url: '#' },
+                        { id: 'foster', title: 'Foster', url: '#' },
+                        { id: 'fundraise', title: 'Fundraise', url: '#' },
+                    ],
+                },
+                {
+                    id: 'advice-welfare',
+                    title: 'Advice & welfare',
+                    url: '#',
+                    children: [
+                        { id: 'pet-care', title: 'Pet care', url: '#' },
+                        { id: 'lost-found', title: 'Lost & found', url: '#' },
+                        { id: 'report-cruelty', title: 'Report cruelty', url: '#' },
+                    ],
+                },
+                { id: 'news-events', title: 'News & events', url: '#' },
+                {
+                    id: 'op-shops',
+                    title: 'Op Shops',
+                    url: '#',
+                    children: [
+                        { id: 'find-a-store', title: 'Find a store', url: '#' },
+                        { id: 'donate-goods', title: 'Donate goods', url: '#' },
+                    ],
+                },
+                {
+                    id: 'about',
+                    title: 'About',
+                    url: '#',
+                    children: [
+                        { id: 'our-story', title: 'Our story', url: '#' },
+                        { id: 'people', title: 'People', url: '#' },
+                        { id: 'careers', title: 'Careers', url: '#' },
+                    ],
+                },
+                { id: 'contact', title: 'Contact', url: '#' },
+            ],
+        },
+        {
+            id: 'footer-nav',
+            title: 'Footer Nav',
+            children: [
+                { id: 'website-terms', title: 'Website terms & conditions', url: '#' },
+                { id: 'privacy', title: 'Privacy', url: '#' },
+            ],
+        },
+        {
+            id: 'header-adopt',
+            title: 'Header Adopt',
+            children: [
+                {
+                    id: 'adopt',
+                    title: 'Adopt',
+                    url: '#',
+                    children: [
+                        { id: 'dogs', title: 'Dogs', url: '#' },
+                        { id: 'cats', title: 'Cats', url: '#' },
+                        { id: 'other-animals', title: 'Other animals', url: '#' },
+                    ],
+                },
+            ],
+        },
+        {
+            id: 'header-donate',
+            title: 'Header Donate',
+            children: [
+                {
+                    id: 'nav-donate',
+                    title: 'Ways to Donate',
+                    url: '#',
+                    children: [
+                        { id: 'one-off-gift', title: 'One-off gift', url: '#' },
+                        { id: 'monthly-giving', title: 'Monthly giving', url: '#' },
+                        { id: 'gift-in-will', title: 'Leave a gift in your will', url: '#' },
+                    ],
+                },
+            ],
+        },
+    ],
+} %}
+{% set theNode = { id: 'home' } %}
 
-{#-
-  cms_nav_tree(sections, tree_id)
-  sections[]: { heading, items[] }
-  items[]:    { label, href, current, expanded, id, children[] }
--#}
-{% macro cms_nav_items(items, tree_id, nested) %}
-    {% import _self as nav %}
-    <ul class="nav flex-column{{ nested ? ' nav-sub' : '' }}">
-        {% for item in items %}
-            {% set children = item.children|default([]) %}
-            {% set is_current = item.current|default(false) %}
-            {% set is_expanded = item.expanded|default(false) %}
-            {% set href = item.href|default('#') %}
-            <li class="nav-item">
+{% macro nav(node, theNode, navTree, depth) %}
+    {% import _self as cms_nav %}
+    {% set children = node.children|default([]) %}
+    {% set selected = theNode and node.id|default('') == theNode.id|default('') %}
+    {% set open = selected or node.expanded|default(false) or not node.url|default('') %}
+    <li class="nav-item{{ selected ? ' active' : '' }}">
+        {% if node.url|default('') %}
+            <div class="nav-item-row">
+                <a class="nav-link px-1 py-1{{ selected ? ' active' : '' }}" href="{{ node.url }}"{% if selected %} aria-current="page"{% endif %}>
+                    {{ node.title }}
+                </a>
                 {% if children|length %}
-                    {% set collapse_id = item.id|default('nav-' ~ item.label|lower|replace({' & ': '-', '&': '', ' ': '-'})) %}
-                    <a class="nav-link nav-toggle px-1 py-1{{ is_current ? ' active' : '' }}" href="#{{ collapse_id }}" data-bs-toggle="collapse" role="button" aria-expanded="{{ is_expanded ? 'true' : 'false' }}" aria-controls="{{ collapse_id }}"{% if is_current %} aria-current="page"{% endif %}>
-                        <span>{{ item.label }}</span>
+                    <button type="button" class="nav-caret" data-bs-toggle="collapse" data-bs-target="#{{ node.id }}" aria-expanded="{{ open ? 'true' : 'false' }}" aria-controls="{{ node.id }}">
                         <i class="fa-solid fa-chevron-down nav-chevron" aria-hidden="true"></i>
-                    </a>
-                    <div class="collapse{{ is_expanded ? ' show' : '' }}" id="{{ collapse_id }}" data-bs-parent="#{{ tree_id }}">
-                        {{ nav.cms_nav_items(children, tree_id, true) }}
-                    </div>
-                {% else %}
-                    <a class="nav-link px-1 py-1{{ is_current ? ' active' : '' }}" href="{{ href }}"{% if is_current %} aria-current="page"{% endif %}>{{ item.label }}</a>
+                    </button>
                 {% endif %}
-            </li>
-        {% endfor %}
-    </ul>
-{% endmacro %}
+            </div>
+        {% else %}
+            <div class="cms-nav-heading">{{ node.title }}</div>
+        {% endif %}
 
-{% macro cms_nav_tree(sections, tree_id) %}
-    {% import _self as nav %}
-    {% for section in sections %}
-        <div{% if not loop.last %} class="mb-3"{% endif %}>
-            {% if section.heading|default('') %}
-                <div class="cms-nav-heading">{{ section.heading }}</div>
-            {% endif %}
-            {{ nav.cms_nav_items(section.items|default([]), tree_id, false) }}
-        </div>
-    {% endfor %}
+        {% if children|length %}
+            <div class="collapse{{ open ? ' show' : '' }}" id="{{ node.id }}">
+                <ul class="nav flex-column{{ node.url|default('') ? ' nav-sub' : '' }}">
+                    {% for child in children %}
+                        {{ cms_nav.nav(child, theNode, navTree, depth + 1) }}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    </li>
 {% endmacro %}
 
 {% import _self as cms_nav %}
@@ -188,48 +228,98 @@
             min-height: 0;
         }
         .cms-nav-tree {
-            width: 16rem;
+            width: 18rem;
             overflow-y: auto;
             flex-shrink: 0;
         }
-        .cms-nav-tree .nav-link { color: inherit; }
+        .cms-nav-tree ul.nav {
+            --bs-nav-link-padding-x: 0.4rem;
+            --bs-nav-link-padding-y: 0.3rem;
+            list-style: none;
+            padding-left: 0;
+            margin-bottom: 0;
+            display: flex;
+            flex-direction: column;
+            flex-wrap: nowrap;
+            width: 100%;
+        }
+        .cms-nav-tree .nav-item {
+            width: 100%;
+        }
+        .cms-nav-tree > .nav > .nav-item + .nav-item {
+            margin-top: 0.65rem;
+        }
+        .cms-nav-tree .nav-link {
+            color: inherit;
+            width: auto;
+            display: block;
+            font-size: 0.875rem;
+            line-height: 1.3;
+            text-decoration: none;
+            border-radius: 0.25rem;
+        }
         .cms-nav-tree .cms-nav-heading {
             font-size: 0.68rem;
             font-weight: 700;
             letter-spacing: 0.12em;
             text-transform: uppercase;
             color: var(--bs-secondary-color);
-            margin: 0.85rem 0 0.35rem;
+            margin: 0 0 0.25rem;
+            padding: 0 0.4rem;
             opacity: 0.9;
         }
-        .cms-nav-tree > div:first-child .cms-nav-heading {
-            margin-top: 0;
+        .cms-nav-tree .nav-item-row {
+            display: flex;
+            align-items: center;
+            gap: 0.15rem;
+            width: 100%;
+            min-width: 0;
+        }
+        .cms-nav-tree .nav-item-row > .nav-link {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+        .cms-nav-tree .nav-caret {
+            appearance: none;
+            flex: 0 0 1.5rem;
+            width: 1.5rem;
+            height: 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            border: 0;
+            border-radius: 0.25rem;
+            background: transparent;
+            color: inherit;
+            line-height: 1;
+            cursor: pointer;
         }
         .cms-nav-tree .nav-link:hover,
-        .cms-nav-tree .nav-link:focus {
+        .cms-nav-tree .nav-link:focus,
+        .cms-nav-tree .nav-caret:hover,
+        .cms-nav-tree .nav-caret:focus {
             background-color: var(--bs-tertiary-bg);
         }
+        .cms-nav-tree .nav-item.active > .nav-item-row > .nav-link,
         .cms-nav-tree .nav-link.active,
         .cms-nav-tree .nav-link[aria-current="page"] {
             color: var(--bs-body-color);
             font-weight: 600;
             background-color: var(--bs-secondary-bg);
         }
-        .cms-nav-tree .nav-toggle {
-            display: flex; align-items: center; justify-content: space-between;
-            gap: 0.5rem; width: 100%; cursor: pointer;
-        }
         .cms-nav-tree .nav-chevron {
-            font-size: 0.65rem; opacity: 0.7;
+            font-size: 0.65rem;
+            opacity: 0.7;
             transition: transform 0.2s ease;
         }
-        .cms-nav-tree .nav-toggle[aria-expanded="true"] .nav-chevron {
+        .cms-nav-tree .nav-caret[aria-expanded="true"] .nav-chevron {
             transform: rotate(180deg);
         }
         .cms-nav-tree .nav-sub {
-            padding-left: 0.85rem;
+            padding-left: 0.7rem;
             border-left: 1px solid var(--bs-border-color);
-            margin: 0.15rem 0 0.35rem 0.25rem;
+            margin: 0.1rem 0 0.2rem 0.45rem;
         }
         .cms-main {
             flex: 1; min-width: 0;
@@ -352,7 +442,11 @@
 
             <div class="cms-body">
                 <nav class="cms-nav-tree bg-body border-end p-3" id="cmsNavTree">
-                    {{ cms_nav.cms_nav_tree(cms_nav_tree, 'cmsNavTree') }}
+                    <ul class="nav flex-column">
+                        {% for child in cmsNavTree.children %}
+                            {{ cms_nav.nav(child, theNode, cmsNavTree, 0) }}
+                        {% endfor %}
+                    </ul>
                 </nav>
 
                 <main class="cms-main">
