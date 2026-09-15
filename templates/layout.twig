@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Evil Wife</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@4.0.0/dist/css/adminlte.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* Layout + grayscale depth (no primary/blue accents) */
+        .cms-shell {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: row;
+            align-items: stretch;
+        }
+        .cms-nav-icons {
+            width: 5.5rem;
+            flex-shrink: 0;
+            overflow-y: auto;
+            align-self: stretch;
+        }
+        .cms-nav-icons .nav-link {
+            display: flex; flex-direction: column; align-items: center;
+            text-align: center; font-size: 0.7rem; gap: 0.25rem;
+            padding: 0.85rem 0.35rem;
+            color: rgba(255, 255, 255, 0.55);
+        }
+        .cms-nav-icons .nav-icon {
+            font-size: 1.15rem; line-height: 1; opacity: 0.9;
+        }
+        .cms-nav-icons .nav-link:hover,
+        .cms-nav-icons .nav-link:focus {
+            color: rgba(255, 255, 255, 0.9);
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+        .cms-nav-icons .nav-link.active {
+            color: #fff;
+            background-color: rgba(255, 255, 255, 0.16);
+        }
+        .cms-main-column {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .cms-body {
+            flex: 1;
+            display: flex;
+            min-height: 0;
+        }
+        .cms-nav-tree {
+            width: 16rem;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+        .cms-nav-tree .nav-link { color: inherit; }
+        .cms-nav-tree .cms-nav-heading {
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--bs-secondary-color);
+            margin: 0.85rem 0 0.35rem;
+            opacity: 0.9;
+        }
+        .cms-nav-tree > div:first-child .cms-nav-heading {
+            margin-top: 0;
+        }
+        .cms-nav-tree .nav-link:hover,
+        .cms-nav-tree .nav-link:focus {
+            background-color: var(--bs-tertiary-bg);
+        }
+        .cms-nav-tree .nav-link.active,
+        .cms-nav-tree .nav-link[aria-current="page"] {
+            color: var(--bs-body-color);
+            font-weight: 600;
+            background-color: var(--bs-secondary-bg);
+        }
+        .cms-nav-tree .nav-toggle {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 0.5rem; width: 100%; cursor: pointer;
+        }
+        .cms-nav-tree .nav-chevron {
+            font-size: 0.65rem; opacity: 0.7;
+            transition: transform 0.2s ease;
+        }
+        .cms-nav-tree .nav-toggle[aria-expanded="true"] .nav-chevron {
+            transform: rotate(180deg);
+        }
+        .cms-nav-tree .nav-sub {
+            padding-left: 0.85rem;
+            border-left: 1px solid var(--bs-border-color);
+            margin: 0.15rem 0 0.35rem 0.25rem;
+        }
+        .cms-main {
+            flex: 1; min-width: 0;
+            display: flex; flex-direction: column;
+            background: var(--bs-body-bg);
+        }
+        .cms-nav-icons .cms-logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.35rem;
+            padding: 0.9rem 0.35rem 0.75rem;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            color: #fff;
+        }
+        .cms-nav-icons .cms-logo:hover,
+        .cms-nav-icons .cms-logo:focus {
+            color: #fff;
+            background-color: rgba(255, 255, 255, 0.06);
+        }
+        .cms-logo-mark {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.55);
+            border-radius: 0.35rem;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            line-height: 1;
+        }
+        .cms-logo-word {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.05rem;
+            font-size: 0.55rem;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            line-height: 1.15;
+            opacity: 0.85;
+        }
+        .cms-content {
+            flex: 1; padding: 1.5rem 1.75rem;
+            display: flex; flex-direction: column;
+        }
+        .cms-content-body { flex: 1; }
+        .cms-utility-nav a { text-decoration: none; }
+        .cms-utility-nav .sep { opacity: 0.5; margin: 0 0.35rem; }
+    </style>
+</head>
+<body class="bg-body-tertiary">
+    <div class="cms-shell">
+        {# Icon rail — full height from top #}
+        <nav class="cms-nav-icons bg-dark" aria-label="Primary">
+            <a class="cms-logo" href="#" title="Evil Wife">
+                <span class="cms-logo-mark" aria-hidden="true">EW</span>
+                <span class="visually-hidden">Evil Wife</span>
+            </a>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fa-solid fa-box nav-icon" aria-hidden="true"></i>Adoption
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="#" aria-current="page">
+                        <i class="fa-solid fa-pen nav-icon" aria-hidden="true"></i>Pages
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fa-solid fa-scissors nav-icon" aria-hidden="true"></i>Snippets
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fa-solid fa-screwdriver-wrench nav-icon" aria-hidden="true"></i>Utilities
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fa-solid fa-cube nav-icon" aria-hidden="true"></i>Modules
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fa-solid fa-image nav-icon" aria-hidden="true"></i>Assets
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fa-solid fa-gear nav-icon" aria-hidden="true"></i>Admin
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="cms-main-column">
+            <header class="navbar navbar-expand bg-body border-bottom shadow-sm px-3">
+                <div class="navbar-nav ms-auto cms-utility-nav flex-row flex-wrap small">
+                    <a class="nav-link px-0" href="#">Home</a>
+                    <span class="nav-link px-0 sep">/</span>
+                    <a class="nav-link px-0" href="#">My Site</a>
+                    <span class="nav-link px-0 sep">/</span>
+                    <a class="nav-link px-0" href="#">Contact</a>
+                    <span class="nav-link px-0 sep">/</span>
+                    <a class="nav-link px-0" href="#">Change Password</a>
+                    <span class="nav-link px-0 sep">/</span>
+                    <a class="nav-link px-0" href="#">Help</a>
+                    <span class="nav-link px-0 sep">/</span>
+                    <a class="nav-link px-0" href="{{ path('manage_logout') }}">Logout</a>
+                </div>
+            </header>
+
+            <div class="cms-body">
+                <nav class="cms-nav-tree bg-body border-end p-3" id="cmsNavTree">
+                    <div class="mb-3">
+                        <div class="cms-nav-heading">Home</div>
+                        <ul class="nav flex-column">
+                            <li class="nav-item"><a class="nav-link px-1 py-1" href="#" aria-current="page">Home</a></li>
+                        </ul>
+                    </div>
+                    <div class="mb-3">
+                        <div class="cms-nav-heading">Main Nav</div>
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link nav-toggle px-1 py-1" href="#nav-what-we-do" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="nav-what-we-do">
+                                    <span>What we do</span>
+                                    <i class="fa-solid fa-chevron-down nav-chevron" aria-hidden="true"></i>
+                                </a>
+                                <div class="collapse" id="nav-what-we-do" data-bs-parent="#cmsNavTree">
+                                    <ul class="nav flex-column nav-sub">
+                                        <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Our work</a></li>
+                                        <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Campaigns</a></li>
+                                        <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Education</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link nav-toggle px-1 py-1" href="#nav-how-you-can-help" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="nav-how-you-can-help">
+                                    <span>How you can help</span>
+                                    <i class="fa-solid fa-chevron-down nav-chevron" aria-hidden="true"></i>
+                                </a>
+                                <div class="collapse" id="nav-how-you-can-help" data-bs-parent="#cmsNavTree">
+                                    <ul class="nav flex-column nav-sub">
+                                        <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Volunteer</a></li>
+                                        <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Foster</a></li>
+                                        <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Fundraise</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link nav-toggle px-1 py-1" href="#nav-advice-welfare" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="nav-advice-welfare">
+                                    <span>Advice &amp; welfare</span>
+                                    <i class="fa-solid fa-chevron-down nav-chevron" aria-hidden="true"></i>
+                                </a>
+                                <div class="collapse" id="nav-advice-welfare" data-bs-parent="#cmsNavTree">
+                                    <ul class="nav flex-column nav-sub">
+                                        <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Pet care</a></li>
+                                        <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Lost &amp; found</a></li>
+                                        <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Report cruelty</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item"><a class="nav-link px-1 py-1" href="#">News &amp; events</a></li>
+                            <li class="nav-item">
+                                <a class="nav-link nav-toggle px-1 py-1" href="#nav-op-shops" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="nav-op-shops">
+                                    <span>Op Shops</span>
+                                    <i class="fa-solid fa-chevron-down nav-chevron" aria-hidden="true"></i>
+                                </a>
+                                <div class="collapse" id="nav-op-shops" data-bs-parent="#cmsNavTree">
+                                    <ul class="nav flex-column nav-sub">
+                                        <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Find a store</a></li>
+                                        <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Donate goods</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link nav-toggle px-1 py-1" href="#nav-about" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="nav-about">
+                                    <span>About</span>
+                                    <i class="fa-solid fa-chevron-down nav-chevron" aria-hidden="true"></i>
+                                </a>
+                                <div class="collapse" id="nav-about" data-bs-parent="#cmsNavTree">
+                                    <ul class="nav flex-column nav-sub">
+                                        <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Our story</a></li>
+                                        <li class="nav-item"><a class="nav-link px-1 py-1" href="#">People</a></li>
+                                        <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Careers</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Contact</a></li>
+                        </ul>
+                    </div>
+                    <div class="mb-3">
+                        <div class="cms-nav-heading">Footer Nav</div>
+                        <ul class="nav flex-column">
+                            <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Website terms &amp; conditions</a></li>
+                            <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Privacy</a></li>
+                        </ul>
+                    </div>
+                    <div class="mb-3">
+                        <div class="cms-nav-heading">Header Adopt</div>
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link nav-toggle px-1 py-1" href="#nav-adopt" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="nav-adopt">
+                                    <span>Adopt</span>
+                                    <i class="fa-solid fa-chevron-down nav-chevron" aria-hidden="true"></i>
+                                </a>
+                                <div class="collapse" id="nav-adopt" data-bs-parent="#cmsNavTree">
+                                    <ul class="nav flex-column nav-sub">
+                                        <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Dogs</a></li>
+                                        <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Cats</a></li>
+                                        <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Other animals</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <div class="cms-nav-heading">Header Donate</div>
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link nav-toggle px-1 py-1" href="#nav-donate" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="nav-donate">
+                                    <span>Ways to Donate</span>
+                                    <i class="fa-solid fa-chevron-down nav-chevron" aria-hidden="true"></i>
+                                </a>
+                                <div class="collapse" id="nav-donate" data-bs-parent="#cmsNavTree">
+                                    <ul class="nav flex-column nav-sub">
+                                        <li class="nav-item"><a class="nav-link px-1 py-1" href="#">One-off gift</a></li>
+                                        <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Monthly giving</a></li>
+                                        <li class="nav-item"><a class="nav-link px-1 py-1" href="#">Leave a gift in your will</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+
+                <main class="cms-main">
+                    <div class="cms-content">
+                        <div class="cms-content-body">
+                            {% block main %}{% endblock %}
+                        </div>
+
+                        <footer class="mt-4 pt-3 small text-body-secondary">
+                            &copy; 2006 - {{ "now"|date("Y") }} Gravitate Ltd &middot; info@gravitate.co.nz
+                        </footer>
+                    </div>                   
+                </main>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+</body>
+</html>

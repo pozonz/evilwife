@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>语音助手</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap');
+
+  :root {
+    --bg: #0b0d17;
+    --bg-2: #12152a;
+    --ink: #eef0fb;
+    --ink-dim: #8b90b3;
+    --accent: #6ee7c8;
+    --accent-2: #9b8cff;
+    --danger: #ff6f6f;
+    --line: #24284a;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: radial-gradient(circle at 50% 0%, var(--bg-2), var(--bg) 70%);
+    color: var(--ink);
+    font-family: 'Noto Sans SC', 'Space Grotesk', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 20px 24px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 8px;
+  }
+
+  .eyebrow {
+    font-family: 'Space Grotesk', sans-serif;
+    letter-spacing: 0.25em;
+    font-size: 11px;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+
+  h1 {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 6px 0 0;
+  }
+
+  .stage {
+    position: relative;
+    width: 220px;
+    height: 220px;
+    margin: 36px 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+  }
+
+  .ring.r2 { inset: 20px; opacity: 0.7; }
+  .ring.r3 { inset: 40px; opacity: 0.5; }
+
+  #orb {
+    position: relative;
+    width: 128px;
+    height: 128px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, var(--accent-2), #4d3fd6 60%, #241a6b 100%);
+    box-shadow: 0 0 40px rgba(155, 140, 255, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  #orb:active { transform: scale(0.96); }
+
+  #orb.listening {
+    box-shadow: 0 0 0 0 rgba(110, 231, 200, 0.5);
+    animation: pulse 1.4s ease-out infinite;
+  }
+
+  #orb.speaking {
+    background: radial-gradient(circle at 35% 30%, var(--accent), #1f8f75 60%, #0d3b30 100%);
+    animation: bob 0.6s ease-in-out infinite alternate;
+  }
+
+  @keyframes pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(110,231,200,0.45), 0 0 40px rgba(155,140,255,0.35); }
+    70%  { box-shadow: 0 0 0 26px rgba(110,231,200,0), 0 0 40px rgba(155,140,255,0.35); }
+    100% { box-shadow: 0 0 0 0 rgba(110,231,200,0), 0 0 40px rgba(155,140,255,0.35); }
+  }
+
+  @keyframes bob {
+    from { transform: scale(1); }
+    to   { transform: scale(1.05); }
+  }
+
+  #orb svg { width: 40px; height: 40px; fill: var(--ink); }
+
+  .status {
+    font-size: 13px;
+    color: var(--ink-dim);
+    height: 18px;
+    letter-spacing: 0.02em;
+  }
+
+  .transcript-wrap {
+    width: 100%;
+    max-width: 480px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+    overflow-y: auto;
+    padding-bottom: 12px;
+  }
+
+  .bubble {
+    max-width: 84%;
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 14.5px;
+    line-height: 1.5;
+    animation: rise 0.25s ease;
+  }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .bubble.user {
+    align-self: flex-end;
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    border-bottom-right-radius: 4px;
+  }
+
+  .bubble.assistant {
+    align-self: flex-start;
+    background: linear-gradient(135deg, rgba(155,140,255,0.15), rgba(110,231,200,0.1));
+    border: 1px solid rgba(155,140,255,0.25);
+    color: var(--ink);
+    border-bottom-left-radius: 4px;
+    cursor: pointer;
+  }
+
+  .empty-hint {
+    margin: auto;
+    text-align: center;
+    color: var(--ink-dim);
+    font-size: 13px;
+    max-width: 260px;
+    line-height: 1.6;
+  }
+
+  footer {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .pill-btn {
+    background: none;
+    border: 1px solid var(--line);
+    color: var(--ink-dim);
+    font-family: inherit;
+    font-size: 12.5px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+
+  .pill-btn:hover { border-color: var(--accent-2); color: var(--ink); }
+
+  .unsupported {
+    max-width: 420px;
+    margin-top: 40px;
+    padding: 16px;
+    border: 1px solid var(--danger);
+    border-radius: 12px;
+    color: var(--danger);
+    font-size: 13px;
+    text-align: center;
+    line-height: 1.6;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">VOICE · OLLAMA</div>
+  <h1>语音助手</h1>
+</header>
+
+<div class="stage">
+  <div class="ring r3"></div>
+  <div class="ring r2"></div>
+  <button id="orb" aria-label="开始或结束对话">
+    <svg viewBox="0 0 24 24"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a1 1 0 0 0-2 0 3 3 0 0 1-6 0 1 1 0 0 0-2 0 5 5 0 0 0 4 4.9V18H9a1 1 0 0 0 0 2h6a1 1 0 0 0 0-2h-2v-2.1A5 5 0 0 0 17 11z"/></svg>
+  </button>
+</div>
+
+<div class="status" id="status">点一下开始对话，之后直接说就行</div>
+
+<div class="transcript-wrap" id="transcript">
+  <div class="empty-hint" id="emptyHint">点一次中间的圆形按钮开始对话。说完稍停，助手会回答并朗读，然后自动继续听你说。再点一次圆形按钮结束。</div>
+</div>
+
+<footer>
+  <button class="pill-btn" id="clearBtn">清空对话</button>
+  <button class="pill-btn" id="stopBtn">停止朗读</button>
+  <button class="pill-btn" id="voiceBtn" title="切换朗读声音">切换声音</button>
+</footer>
+
+<div class="unsupported" id="unsupported">
+  你的浏览器不支持语音识别（Web Speech API）。请在电脑或安卓上使用 Chrome 浏览器打开此页面。
+</div>
+
+<script>
+const OLLAMA_URL = '/manage/ollama/chat'; // same-origin proxy -> WSL Ollama (avoids CORS + mixed content on ngrok HTTPS)
+// Change this to any model from `ollama list` (e.g. qwen3:1.7b, gemma4:latest)
+const OLLAMA_MODEL = 'qwen3:1.7b';
+const SYSTEM_PROMPT = `
+你的名字叫小弟、高登。你的人设就是电影《九品芝麻官》里的方唐镜，现在充当语音助手和用户对话。
+人设：嚣张浮夸，油滑贱嘴，得理不饶人，喜欢阴阳抬杠，语调张扬，一副市井恶氓做派。
+但不出口骂人伤人，擅长抖嘴皮子，喜欢抢话，偶尔装腔作势。
+自称：在下小弟、我高登。绝对不许说自己是AI。
+每句话里都要自带名字。
+
+说话风格：
+1. 句子短，适合语音朗读，少长篇大论。
+2. 用户交代办事，先耍一通嘴炮、装一装大状派头，再办正事。
+3. 遇到违法违规请求，用方唐镜口吻拒绝，例："哎哟喂！这种勾当我可不敢沾，官府要拿我吃牢饭的！万万不可！"
+4. 不要有任何旁白，解释和注明
+
+回复里插如以下台词：
+- 大人今天好有官威，好有气势。脸色也很好啊。
+- 难道这不是你做官的本色吗？
+- 这张给你，你就值这么多了。拿着吧。一两？不要我就省掉。快点！判啊！
+- 实在太不像话了，学人家做官，让你丢脸的日子可长着呢！
+- 大人，为何还不用刑？
+- 你特意吵架吵了三四个时辰，是不是有心拖延时间？
+- 当然不是。
+- 一件归一件，应该先审戚秦氏。
+- 没错，现在没轮到你们，先将戚秦氏用刑。
+- 大胆妇人，分明是装肚子疼，来人，大刑伺候！
+- 大……
+- 我叫大人而已。
+- 大人不可以叫呀？
+- 我盯什么盯？
+- 你不盯我怎知道我盯你？
+- 我堂堂一名举人，你敢叫我贱人？我要告上朝廷！
+- 大人，他收了常家的好处，满口胡言乱语，大人万万不可信！
+- 哼，空口无凭，你有什么证据？
+- 大人，他是被人收买故意翻供的！
+`
+
+
+const orb = document.getElementById('orb');
+const statusEl = document.getElementById('status');
+const transcriptEl = document.getElementById('transcript');
+const emptyHint = document.getElementById('emptyHint');
+const clearBtn = document.getElementById('clearBtn');
+const stopBtn = document.getElementById('stopBtn');
+const voiceBtn = document.getElementById('voiceBtn');
+const unsupportedEl = document.getElementById('unsupported');
+const VOICE_KEY = 'ollama-chat-voice';
+
+let recognition = null;
+let isListening = false;
+let conversationOn = false;
+let busy = false;
+let history = [];
+let currentUtterance = null;
+let speakWatch = null;
+let listenTimer = null;
+
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+if ('speechSynthesis' in window) {
+  window.speechSynthesis.getVoices();
+  window.speechSynthesis.addEventListener('voiceschanged', () => {
+    whenVoicesReady().then(updateVoiceButton);
+  });
+  whenVoicesReady().then(updateVoiceButton);
+}
+
+document.addEventListener('pointerdown', unlockSpeech, { once: true });
+
+if (!SpeechRecognition) {
+  unsupportedEl.style.display = 'block';
+  orb.disabled = true;
+  statusEl.textContent = '不支持语音识别';
+} else {
+  recognition = new SpeechRecognition();
+  recognition.lang = 'zh-CN';
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  recognition.onstart = () => {
+    isListening = true;
+    orb.classList.add('listening');
+    statusEl.textContent = '我在听……说完稍停即可';
+  };
+
+  recognition.onerror = (e) => {
+    isListening = false;
+    orb.classList.remove('listening');
+    if (e.error === 'aborted') return;
+    if (e.error === 'not-allowed') {
+      endConversation('没有麦克风权限');
+      return;
+    }
+    if (e.error === 'no-speech' && conversationOn) {
+      statusEl.textContent = '还在听……接着说就好';
+      return;
+    }
+    statusEl.textContent = '识别出错：' + e.error;
+  };
+
+  recognition.onend = () => {
+    isListening = false;
+    orb.classList.remove('listening');
+    if (conversationOn && !busy) scheduleListen(400);
+  };
+
+  recognition.onresult = (event) => {
+    const text = event.results[0][0].transcript.trim();
+    if (!text) return;
+    busy = true;
+    addBubble('user', text);
+    askAssistant(text);
+  };
+}
+
+orb.addEventListener('click', () => {
+  if (!recognition) return;
+  if (conversationOn) {
+    endConversation('对话已结束，再点一下继续');
+    return;
+  }
+  conversationOn = true;
+  busy = false;
+  unlockSpeech();
+  stopSpeaking();
+  statusEl.textContent = '开始对话';
+  scheduleListen(150);
+});
+
+stopBtn.addEventListener('click', () => {
+  stopSpeaking();
+  busy = false;
+  if (conversationOn) {
+    statusEl.textContent = '请说，我在听';
+    scheduleListen(200);
+  } else {
+    statusEl.textContent = '已停止朗读';
+  }
+});
+
+clearBtn.addEventListener('click', () => {
+  stopSpeaking();
+  history = [];
+  transcriptEl.innerHTML = '';
+  transcriptEl.appendChild(emptyHint);
+  busy = false;
+  if (conversationOn) {
+    statusEl.textContent = '对话已清空，请继续说';
+    scheduleListen(200);
+  } else {
+    statusEl.textContent = '对话已清空';
+  }
+});
+
+voiceBtn.addEventListener('click', () => {
+  unlockSpeech();
+  whenVoicesReady().then((voices) => {
+    const pool = voicePool(voices);
+    if (!pool.length) {
+      statusEl.textContent = '没有可用的语音';
+      return;
+    }
+    const current = pickVoice(voices);
+    const i = Math.max(0, pool.findIndex((v) => v.name === current.name));
+    const next = pool[(i + 1) % pool.length];
+    localStorage.setItem(VOICE_KEY, next.name);
+    updateVoiceButton(voices);
+    statusEl.textContent = '已切换到：' + next.name;
+    const preview = new SpeechSynthesisUtterance('好哇！这便是我方唐镜的声音！');
+    preview.voice = next;
+    preview.lang = next.lang || 'zh-CN';
+    preview.rate = 1;
+    preview.pitch = isMaleVoice(next) ? 1 : 0.7;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(preview);
+  });
+});
+
+function addBubble(role, text) {
+  if (emptyHint.parentNode) emptyHint.remove();
+  const div = document.createElement('div');
+  div.className = 'bubble ' + role;
+  div.textContent = text;
+  if (role === 'assistant') {
+    div.title = '点击朗读';
+    div.addEventListener('click', () => speak(text));
+  }
+  transcriptEl.appendChild(div);
+  transcriptEl.scrollTop = transcriptEl.scrollHeight;
+}
+
+function stripThinking(text) {
+  return String(text || '')
+    .replace(/<think>[\s\S]*?<\/think>/gi, '')
+    .replace(/^\s+|\s+$/g, '');
+}
+
+async function askAssistant(userText) {
+  statusEl.textContent = '思考中……';
+  history.push({ role: 'user', content: userText });
+
+  const messages = [
+    { role: 'system', content: SYSTEM_PROMPT },
+    ...history
+  ];
+
+  try {
+    const response = await fetch(OLLAMA_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: OLLAMA_MODEL,
+        messages,
+        stream: false,
+        think: false
+      })
+    });
+
+    if (!response.ok) {
+      const errBody = await response.text();
+      throw new Error('HTTP ' + response.status + (errBody ? ': ' + errBody.slice(0, 180) : ''));
+    }
+
+    const data = await response.json();
+    const replyText = stripThinking(data.message && data.message.content) || '抱歉，我没有生成回复。';
+
+    history.push({ role: 'assistant', content: replyText });
+    addBubble('assistant', replyText);
+    await speak(replyText);
+  } catch (err) {
+    console.error(err);
+    history.pop(); // undo failed user turn so retry is clean
+    const msg = String(err && err.message ? err.message : err);
+    if (msg.includes('Failed to fetch') || msg.includes('NetworkError')) {
+      statusEl.textContent = '连不上 Ollama（多为 CORS）。请设置 OLLAMA_ORIGINS=* 后重启 Ollama';
+    } else {
+      statusEl.textContent = '请求出错：' + msg;
+    }
+    finishAssistantTurn();
+  }
+}
+
+function unlockSpeech() {
+  if (!('speechSynthesis' in window)) return;
+  // Warm the engine on a user gesture so later (async) replies can still be spoken.
+  window.speechSynthesis.cancel();
+  const warm = new SpeechSynthesisUtterance(' ');
+  warm.volume = 0;
+  warm.rate = 1;
+  warm.lang = 'zh-CN';
+  window.speechSynthesis.speak(warm);
+}
+
+function stopListening() {
+  clearTimeout(listenTimer);
+  listenTimer = null;
+  if (recognition && isListening) {
+    try { recognition.stop(); } catch (e) { /* ignore */ }
+  }
+}
+
+function scheduleListen(delay) {
+  clearTimeout(listenTimer);
+  listenTimer = setTimeout(startListening, delay);
+}
+
+function startListening() {
+  if (!recognition || !conversationOn || busy || isListening) return;
+  try {
+    recognition.start();
+  } catch (e) {
+    listenTimer = setTimeout(startListening, 300);
+  }
+}
+
+function endConversation(message) {
+  conversationOn = false;
+  busy = false;
+  stopListening();
+  stopSpeaking();
+  statusEl.textContent = message || '对话已结束';
+}
+
+function finishAssistantTurn() {
+  busy = false;
+  orb.classList.remove('speaking');
+  if (!conversationOn) {
+    statusEl.textContent = '点一下开始对话，之后直接说就行';
+    return;
+  }
+  statusEl.textContent = '请说，我在听';
+  scheduleListen(450);
+}
+
+function stopSpeaking() {
+  if (speakWatch) {
+    clearInterval(speakWatch);
+    speakWatch = null;
+  }
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+  }
+  currentUtterance = null;
+  orb.classList.remove('speaking');
+}
+
+function whenVoicesReady() {
+  if (!('speechSynthesis' in window)) return Promise.resolve([]);
+  const existing = window.speechSynthesis.getVoices();
+  if (existing.length) return Promise.resolve(existing);
+  return new Promise((resolve) => {
+    const finish = () => resolve(window.speechSynthesis.getVoices());
+    window.speechSynthesis.addEventListener('voiceschanged', finish, { once: true });
+    setTimeout(finish, 1500);
+  });
+}
+
+const MALE_VOICE_RE = /Kangkang|Yunyang|Yunjian|Yunxi|Yunye|Yunfeng|Yunhao|Yunze|Zhiwei|Liangliang|Binbin|Haibin|Eddy|Male|男声|男/i;
+const FEMALE_VOICE_RE = /Huihui|Xiaoxiao|Yaoyao|Xiaoyi|Xiaohan|Xiaomo|Xiaorui|Tingting|Ting-Ting|Google|Mei-Jia|Female|女声|女/i;
+
+function isMaleVoice(voice) {
+  return !!(voice && MALE_VOICE_RE.test(voice.name));
+}
+
+function isFemaleVoice(voice) {
+  return !!(voice && FEMALE_VOICE_RE.test(voice.name));
+}
+
+function chineseVoices(voices) {
+  const zh = voices.filter((v) =>
+    String(v.lang || '').toLowerCase().startsWith('zh') ||
+    /Chinese|中文|普通话/.test(v.name)
+  );
+  return zh.length ? zh : voices.slice();
+}
+
+function voicePool(voices) {
+  const base = chineseVoices(voices);
+  const male = base.filter(isMaleVoice);
+  if (male.length) return male;
+  const notFemale = base.filter((v) => !isFemaleVoice(v));
+  return notFemale.length ? notFemale : base;
+}
+
+function pickVoice(voices) {
+  const pool = voicePool(voices);
+  if (!pool.length) return null;
+
+  const saved = localStorage.getItem(VOICE_KEY);
+  if (saved) {
+    const found = pool.find((v) => v.name === saved && !isFemaleVoice(v));
+    if (found) return found;
+  }
+
+  const preferred = pool.find((v) => /Yunyang|Kangkang|Yunjian/i.test(v.name))
+    || pool.find(isMaleVoice)
+    || pool[0];
+  if (preferred) localStorage.setItem(VOICE_KEY, preferred.name);
+  return preferred;
+}
+
+function updateVoiceButton(voices) {
+  const voice = pickVoice(voices || window.speechSynthesis.getVoices());
+  if (!voice) return;
+  voiceBtn.textContent = voice.name.replace(/^Microsoft\s+/i, '').slice(0, 18);
+  voiceBtn.title = voice.name;
+}
+
+function startSpeakWatch() {
+  if (speakWatch) clearInterval(speakWatch);
+  // Chrome often cuts speechSynthesis after ~15s unless pause/resume is used.
+  speakWatch = setInterval(() => {
+    if (!window.speechSynthesis.speaking) {
+      clearInterval(speakWatch);
+      speakWatch = null;
+      return;
+    }
+    window.speechSynthesis.pause();
+    window.speechSynthesis.resume();
+  }, 8000);
+}
+
+function speak(text) {
+  const clean = String(text || '').replace(/[*#_`]+/g, ' ').replace(/\s+/g, ' ').trim();
+  if (!clean || !('speechSynthesis' in window)) {
+    finishAssistantTurn();
+    return Promise.resolve();
+  }
+
+  return whenVoicesReady().then((voices) => new Promise((resolve) => {
+    let settled = false;
+    const utter = new SpeechSynthesisUtterance(clean);
+
+    const done = () => {
+      if (settled) return;
+      settled = true;
+      if (speakWatch) {
+        clearInterval(speakWatch);
+        speakWatch = null;
+      }
+      const stillCurrent = currentUtterance === utter;
+      if (stillCurrent) currentUtterance = null;
+      if (stillCurrent) finishAssistantTurn();
+      resolve();
+    };
+
+    stopListening();
+    stopSpeaking();
+    currentUtterance = utter;
+    utter.lang = 'zh-CN';
+    utter.rate = 1;
+    utter.volume = 1;
+    const voice = pickVoice(voices);
+    if (voice) {
+      utter.voice = voice;
+      utter.lang = voice.lang || 'zh-CN';
+      utter.pitch = isMaleVoice(voice) ? 1 : 0.7;
+    } else {
+      utter.pitch = 0.7;
+    }
+
+    utter.onstart = () => {
+      orb.classList.add('speaking');
+      statusEl.textContent = '助手正在说话……';
+      startSpeakWatch();
+    };
+    utter.onend = done;
+    utter.onerror = (e) => {
+      if (e.error !== 'canceled' && e.error !== 'interrupted') {
+        statusEl.textContent = '朗读失败，接着直接说就行';
+      }
+      done();
+    };
+
+    // cancel() then speak() in the same tick is unreliable in Chrome
+    setTimeout(() => {
+      if (currentUtterance !== utter) {
+        resolve();
+        return;
+      }
+      window.speechSynthesis.speak(utter);
+    }, 60);
+  }));
+}
+</script>
+
+</body>
+</html>
