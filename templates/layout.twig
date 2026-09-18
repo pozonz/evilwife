@@ -146,10 +146,10 @@
     {% set children = node.children|default([]) %}
     {% set selected = theNode and node.id|default('') == theNode.id|default('') %}
     {% set open = selected or node.expanded|default(false) or not node.url|default('') %}
-    <li class="nav-item{{ selected ? ' active' : '' }}">
+    <li class="nav-item w-100{{ selected ? ' active' : '' }}">
         {% if node.url|default('') %}
-            <div class="nav-item-row">
-                <a class="nav-link px-1 py-1{{ selected ? ' active' : '' }}" href="{{ node.url }}"{% if selected %} aria-current="page"{% endif %}>
+            <div class="nav-item-row d-flex align-items-center w-100 min-w-0">
+                <a class="nav-link flex-grow-1 min-w-0 px-1 py-1 text-reset text-decoration-none rounded-1{{ selected ? ' active fw-semibold bg-body-secondary' : '' }}" href="{{ node.url }}"{% if selected %} aria-current="page"{% endif %}>
                     {{ node.title }}
                 </a>
                 {% if children|length %}
@@ -159,12 +159,12 @@
                 {% endif %}
             </div>
         {% else %}
-            <div class="cms-nav-heading">{{ node.title }}</div>
+            <div class="cms-nav-heading text-uppercase fw-bold text-body-secondary mb-1">{{ node.title }}</div>
         {% endif %}
 
         {% if children|length %}
             <div class="collapse{{ open ? ' show' : '' }}" id="{{ node.id }}">
-                <ul class="nav flex-column{{ node.url|default('') ? ' nav-sub' : '' }}">
+                <ul class="nav flex-column{{ node.url|default('') ? ' nav-sub border-start' : '' }}">
                     {% for child in children %}
                         {{ cms_nav.nav(child, theNode, navTree, depth + 1) }}
                     {% endfor %}
@@ -184,28 +184,14 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@4.0.0/dist/css/adminlte.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
-        /* Layout + grayscale depth (no primary/blue accents) */
-        .cms-shell {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: row;
-            align-items: stretch;
-        }
-        .cms-nav-icons {
-            width: 5.5rem;
-            flex-shrink: 0;
-            overflow-y: auto;
-            align-self: stretch;
-        }
+        .cms-nav-icons { width: 5.5rem; }
         .cms-nav-icons .nav-link {
             display: flex; flex-direction: column; align-items: center;
             text-align: center; font-size: 0.7rem; gap: 0.25rem;
             padding: 0.85rem 0.35rem;
             color: rgba(255, 255, 255, 0.55);
         }
-        .cms-nav-icons .nav-icon {
-            font-size: 1.15rem; line-height: 1; opacity: 0.9;
-        }
+        .cms-nav-icons .nav-icon { font-size: 1.15rem; line-height: 1; opacity: 0.9; }
         .cms-nav-icons .nav-link:hover,
         .cms-nav-icons .nav-link:focus {
             color: rgba(255, 255, 255, 0.9);
@@ -215,70 +201,34 @@
             color: #fff;
             background-color: rgba(255, 255, 255, 0.16);
         }
-        .cms-main-column {
-            flex: 1;
-            min-width: 0;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
+        .cms-nav-icons .cms-logo {
+            gap: 0.35rem;
+            padding: 0.9rem 0.35rem 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
         }
-        .cms-body {
-            flex: 1;
-            display: flex;
-            min-height: 0;
+        .cms-nav-icons .cms-logo:hover,
+        .cms-nav-icons .cms-logo:focus { background-color: rgba(255, 255, 255, 0.06); }
+        .cms-logo-mark {
+            width: 2.5rem; height: 2.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.55);
+            border-radius: 0.35rem;
+            font-size: 0.72rem;
+            letter-spacing: 0.04em;
         }
-        .cms-nav-tree {
-            width: 18rem;
-            overflow-y: auto;
-            flex-shrink: 0;
-        }
+        .cms-nav-tree { width: 18rem; }
         .cms-nav-tree ul.nav {
             --bs-nav-link-padding-x: 0.4rem;
             --bs-nav-link-padding-y: 0.3rem;
-            list-style: none;
-            padding-left: 0;
-            margin-bottom: 0;
-            display: flex;
-            flex-direction: column;
-            flex-wrap: nowrap;
-            width: 100%;
         }
-        .cms-nav-tree .nav-item {
-            width: 100%;
-        }
-        .cms-nav-tree > .nav > .nav-item + .nav-item {
-            margin-top: 0.65rem;
-        }
-        .cms-nav-tree .nav-link {
-            color: inherit;
-            width: auto;
-            display: block;
-            font-size: 0.875rem;
-            line-height: 1.3;
-            text-decoration: none;
-            border-radius: 0.25rem;
-        }
+        .cms-nav-tree > .nav > .nav-item + .nav-item { margin-top: 0.65rem; }
+        .cms-nav-tree .nav-link { font-size: 0.875rem; line-height: 1.3; }
         .cms-nav-tree .cms-nav-heading {
             font-size: 0.68rem;
-            font-weight: 700;
             letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: var(--bs-secondary-color);
-            margin: 0 0 0.25rem;
             padding: 0 0.4rem;
             opacity: 0.9;
         }
-        .cms-nav-tree .nav-item-row {
-            display: flex;
-            align-items: center;
-            gap: 0.15rem;
-            width: 100%;
-            min-width: 0;
-        }
-        .cms-nav-tree .nav-item-row > .nav-link {
-            flex: 1 1 auto;
-            min-width: 0;
-        }
+        .cms-nav-tree .nav-item-row { gap: 0.15rem; }
         .cms-nav-tree .nav-caret {
             appearance: none;
             flex: 0 0 1.5rem;
@@ -298,14 +248,11 @@
         .cms-nav-tree .nav-link:hover,
         .cms-nav-tree .nav-link:focus,
         .cms-nav-tree .nav-caret:hover,
-        .cms-nav-tree .nav-caret:focus {
-            background-color: var(--bs-tertiary-bg);
-        }
+        .cms-nav-tree .nav-caret:focus { background-color: var(--bs-tertiary-bg); }
         .cms-nav-tree .nav-item.active > .nav-item-row > .nav-link,
         .cms-nav-tree .nav-link.active,
         .cms-nav-tree .nav-link[aria-current="page"] {
             color: var(--bs-body-color);
-            font-weight: 600;
             background-color: var(--bs-secondary-bg);
         }
         .cms-nav-tree .nav-chevron {
@@ -313,75 +260,31 @@
             opacity: 0.7;
             transition: transform 0.2s ease;
         }
-        .cms-nav-tree .nav-caret[aria-expanded="true"] .nav-chevron {
-            transform: rotate(180deg);
-        }
+        .cms-nav-tree .nav-caret[aria-expanded="true"] .nav-chevron { transform: rotate(180deg); }
         .cms-nav-tree .nav-sub {
             padding-left: 0.7rem;
-            border-left: 1px solid var(--bs-border-color);
             margin: 0.1rem 0 0.2rem 0.45rem;
         }
-        .cms-main {
-            flex: 1; min-width: 0;
-            display: flex; flex-direction: column;
-            background: var(--bs-body-bg);
+        .cms-content { padding: 1.5rem 1.75rem; }
+        .sep { margin: 0 0.35rem; }
+        .cms-copy,
+        .cms-copy .card-title,
+        .cms-copy .form-label,
+        .cms-copy .form-control,
+        .cms-copy .btn,
+        .cms-copy .alert,
+        .cms-copy p {
+            font-size: 0.875rem;
+            line-height: 1.3;
         }
-        .cms-nav-icons .cms-logo {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 0.35rem;
-            padding: 0.9rem 0.35rem 0.75rem;
-            text-decoration: none;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-            color: #fff;
-        }
-        .cms-nav-icons .cms-logo:hover,
-        .cms-nav-icons .cms-logo:focus {
-            color: #fff;
-            background-color: rgba(255, 255, 255, 0.06);
-        }
-        .cms-logo-mark {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 2.5rem;
-            height: 2.5rem;
-            border: 1px solid rgba(255, 255, 255, 0.55);
-            border-radius: 0.35rem;
-            font-size: 0.72rem;
-            font-weight: 700;
-            letter-spacing: 0.04em;
-            line-height: 1;
-        }
-        .cms-logo-word {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.05rem;
-            font-size: 0.55rem;
-            font-weight: 700;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-            line-height: 1.15;
-            opacity: 0.85;
-        }
-        .cms-content {
-            flex: 1; padding: 1.5rem 1.75rem;
-            display: flex; flex-direction: column;
-        }
-        .cms-content-body { flex: 1; }
-        .cms-utility-nav a { text-decoration: none; }
-        .cms-utility-nav .sep { opacity: 0.5; margin: 0 0.35rem; }
     </style>
 </head>
 <body class="bg-body-tertiary">
-    <div class="cms-shell">
+    <div class="d-flex flex-row align-items-stretch min-vh-100">
         {# Icon rail — full height from top #}
-        <nav class="cms-nav-icons bg-dark" aria-label="Primary">
-            <a class="cms-logo" href="#" title="Evil Wife">
-                <span class="cms-logo-mark" aria-hidden="true">EW</span>
+        <nav class="cms-nav-icons bg-dark flex-shrink-0 overflow-y-auto align-self-stretch" aria-label="Primary">
+            <a class="cms-logo d-flex flex-column align-items-center justify-content-center text-white text-decoration-none" href="#" title="Evil Wife">
+                <span class="cms-logo-mark d-inline-flex align-items-center justify-content-center fw-bold lh-1" aria-hidden="true">EW</span>
                 <span class="visually-hidden">Evil Wife</span>
             </a>
             <ul class="nav flex-column">
@@ -423,42 +326,42 @@
             </ul>
         </nav>
 
-        <div class="cms-main-column">
+        <div class="d-flex flex-column flex-grow-1 min-w-0 min-vh-100">
             <header class="navbar navbar-expand bg-body border-bottom shadow-sm px-3">
-                <div class="navbar-nav ms-auto cms-utility-nav flex-row flex-wrap small">
+                <div class="navbar-nav ms-auto flex-row flex-wrap small">
                     <a class="nav-link px-0" href="#">Home</a>
-                    <span class="nav-link px-0 sep">/</span>
+                    <span class="nav-link px-0 sep opacity-50">/</span>
                     <a class="nav-link px-0" href="#">My Site</a>
-                    <span class="nav-link px-0 sep">/</span>
+                    <span class="nav-link px-0 sep opacity-50">/</span>
                     <a class="nav-link px-0" href="#">Contact</a>
-                    <span class="nav-link px-0 sep">/</span>
+                    <span class="nav-link px-0 sep opacity-50">/</span>
                     <a class="nav-link px-0" href="#">Change Password</a>
-                    <span class="nav-link px-0 sep">/</span>
+                    <span class="nav-link px-0 sep opacity-50">/</span>
                     <a class="nav-link px-0" href="#">Help</a>
-                    <span class="nav-link px-0 sep">/</span>
+                    <span class="nav-link px-0 sep opacity-50">/</span>
                     <a class="nav-link px-0" href="{{ path('manage_logout') }}">Logout</a>
                 </div>
             </header>
 
-            <div class="cms-body">
-                <nav class="cms-nav-tree bg-body border-end p-3" id="cmsNavTree">
-                    <ul class="nav flex-column">
+            <div class="d-flex flex-grow-1 min-h-0">
+                <nav class="cms-nav-tree bg-body border-end p-3 flex-shrink-0 overflow-y-auto" id="cmsNavTree">
+                    <ul class="nav flex-column flex-nowrap w-100">
                         {% for child in cmsNavTree.children %}
                             {{ cms_nav.nav(child, theNode, cmsNavTree, 0) }}
                         {% endfor %}
                     </ul>
                 </nav>
 
-                <main class="cms-main">
-                    <div class="cms-content">
-                        <div class="cms-content-body">
+                <main class="d-flex flex-column flex-grow-1 min-w-0 bg-body">
+                    <div class="cms-content d-flex flex-column flex-grow-1">
+                        <div class="flex-grow-1 cms-copy">
                             {% block main %}{% endblock %}
                         </div>
 
                         <footer class="mt-4 pt-3 small text-body-secondary">
                             &copy; 2006 - {{ "now"|date("Y") }} Gravitate Ltd &middot; info@gravitate.co.nz
                         </footer>
-                    </div>                   
+                    </div>
                 </main>
             </div>
         </div>

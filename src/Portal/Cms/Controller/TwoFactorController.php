@@ -9,6 +9,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
+use Symfony\Component\PasswordHasher\Hasher\MessageDigestPasswordHasher;
 
 #[IsGranted('ROLE_ADMIN')]
 class TwoFactorController extends AbstractController
@@ -107,8 +109,9 @@ class TwoFactorController extends AbstractController
             throw $this->createAccessDeniedException('Invalid CSRF token.');
         }
 
+        $legacyHasher = new MessageDigestPasswordHasher('sha512', encodeHashAsBase64: true, iterations: 5000);
         $password = (string) $request->request->get('password');
-        if ($password === '' || !password_verify($password, (string) $user->getPassword())) {
+        if ($password === '' || !$legacyHasher->verify($user->getPassword(), $password)) {
             $this->addFlash('error', 'Incorrect password.');
 
             return $this->redirectToRoute('manage_2fa_settings');

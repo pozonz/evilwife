@@ -82,9 +82,9 @@ class LoginController extends AbstractController
         ]);
     }
 
-    #[Route('/manage/{path}', name: 'manage_catch_all', requirements: ['path' => '.*'], priority: -100)]
-    public function catchAll(Request $request, string $path = ''): Response
-    {
-        return new Response(sprintf('EvilWife CMS caught: /manage/%s', $path));
-    }
+    // #[Route('/manage/{path}', name: 'manage_catch_all', requirements: ['path' => '.*'], priority: -100)]
+    // public function catchAll(Request $request, string $path = ''): Response
+    // {
+    //     return new Response(sprintf('EvilWife CMS caught: /manage/%s', $path));
+    // }
 }
