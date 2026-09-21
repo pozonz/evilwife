@@ -181,110 +181,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Evil Wife</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@4.0.0/dist/css/adminlte.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <style>
-        .cms-nav-icons { width: 5.5rem; }
-        .cms-nav-icons .nav-link {
-            display: flex; flex-direction: column; align-items: center;
-            text-align: center; font-size: 0.7rem; gap: 0.25rem;
-            padding: 0.85rem 0.35rem;
-            color: rgba(255, 255, 255, 0.55);
-        }
-        .cms-nav-icons .nav-icon { font-size: 1.15rem; line-height: 1; opacity: 0.9; }
-        .cms-nav-icons .nav-link:hover,
-        .cms-nav-icons .nav-link:focus {
-            color: rgba(255, 255, 255, 0.9);
-            background-color: rgba(255, 255, 255, 0.08);
-        }
-        .cms-nav-icons .nav-link.active {
-            color: #fff;
-            background-color: rgba(255, 255, 255, 0.16);
-        }
-        .cms-nav-icons .cms-logo {
-            gap: 0.35rem;
-            padding: 0.9rem 0.35rem 0.75rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-        }
-        .cms-nav-icons .cms-logo:hover,
-        .cms-nav-icons .cms-logo:focus { background-color: rgba(255, 255, 255, 0.06); }
-        .cms-logo-mark {
-            width: 2.5rem; height: 2.5rem;
-            border: 1px solid rgba(255, 255, 255, 0.55);
-            border-radius: 0.35rem;
-            font-size: 0.72rem;
-            letter-spacing: 0.04em;
-        }
-        .cms-nav-tree { width: 18rem; }
-        .cms-nav-tree ul.nav {
-            --bs-nav-link-padding-x: 0.4rem;
-            --bs-nav-link-padding-y: 0.3rem;
-        }
-        .cms-nav-tree > .nav > .nav-item + .nav-item { margin-top: 0.65rem; }
-        .cms-nav-tree .nav-link { font-size: 0.875rem; line-height: 1.3; }
-        .cms-nav-tree .cms-nav-heading {
-            font-size: 0.68rem;
-            letter-spacing: 0.12em;
-            padding: 0 0.4rem;
-            opacity: 0.9;
-        }
-        .cms-nav-tree .nav-item-row { gap: 0.15rem; }
-        .cms-nav-tree .nav-caret {
-            appearance: none;
-            flex: 0 0 1.5rem;
-            width: 1.5rem;
-            height: 1.5rem;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0;
-            border: 0;
-            border-radius: 0.25rem;
-            background: transparent;
-            color: inherit;
-            line-height: 1;
-            cursor: pointer;
-        }
-        .cms-nav-tree .nav-link:hover,
-        .cms-nav-tree .nav-link:focus,
-        .cms-nav-tree .nav-caret:hover,
-        .cms-nav-tree .nav-caret:focus { background-color: var(--bs-tertiary-bg); }
-        .cms-nav-tree .nav-item.active > .nav-item-row > .nav-link,
-        .cms-nav-tree .nav-link.active,
-        .cms-nav-tree .nav-link[aria-current="page"] {
-            color: var(--bs-body-color);
-            background-color: var(--bs-secondary-bg);
-        }
-        .cms-nav-tree .nav-chevron {
-            font-size: 0.65rem;
-            opacity: 0.7;
-            transition: transform 0.2s ease;
-        }
-        .cms-nav-tree .nav-caret[aria-expanded="true"] .nav-chevron { transform: rotate(180deg); }
-        .cms-nav-tree .nav-sub {
-            padding-left: 0.7rem;
-            margin: 0.1rem 0 0.2rem 0.45rem;
-        }
-        .cms-content { padding: 1.5rem 1.75rem; }
-        .sep { margin: 0 0.35rem; }
-        .cms-copy,
-        .cms-copy .card-title,
-        .cms-copy .form-label,
-        .cms-copy .form-control,
-        .cms-copy .btn,
-        .cms-copy .alert,
-        .cms-copy p {
-            font-size: 0.875rem;
-            line-height: 1.3;
-        }
-    </style>
+
+    {% block stylesheets %}
+        {{ encore_entry_link_tags('cms') }}
+    {% endblock %}
 </head>
 <body class="bg-body-tertiary">
     <div class="d-flex flex-row align-items-stretch min-vh-100">
         {# Icon rail — full height from top #}
         <nav class="cms-nav-icons bg-dark flex-shrink-0 overflow-y-auto align-self-stretch" aria-label="Primary">
             <a class="cms-logo d-flex flex-column align-items-center justify-content-center text-white text-decoration-none" href="#" title="Evil Wife">
-                <span class="cms-logo-mark d-inline-flex align-items-center justify-content-center fw-bold lh-1" aria-hidden="true">EW</span>
+                <span class="cms-logo-mark d-inline-flex align-items-center justify-content-center fw-bold lh-1" aria-hidden="true">Evil</span>
                 <span class="visually-hidden">Evil Wife</span>
             </a>
             <ul class="nav flex-column">
@@ -359,13 +266,16 @@
                         </div>
 
                         <footer class="mt-4 pt-3 small text-body-secondary">
-                            &copy; 2006 - {{ "now"|date("Y") }} Gravitate Ltd &middot; info@gravitate.co.nz
+                            &copy; 2010 - {{ "now"|date("Y") }} Evil &middot; evil@evilwife.co.nz
                         </footer>
                     </div>
                 </main>
             </div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+
+    {% block javascripts %}
+        {{ encore_entry_script_tags('cms') }}
+    {% endblock %}
 </body>
 </html>
