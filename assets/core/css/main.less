@@ -1,0 +1,163 @@
+html,body {
+    
+    
+    .cms-nav-icons {
+        width: 5.5rem;
+    
+        .nav-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            font-size: 0.7rem;
+            gap: 0.25rem;
+            padding: 0.85rem 0.35rem;
+            color: rgba(255, 255, 255, 0.55);
+    
+            &:hover,
+            &:focus {
+                color: rgba(255, 255, 255, 0.9);
+                background-color: rgba(255, 255, 255, 0.08);
+            }
+    
+            &.active {
+                color: #fff;
+                background-color: rgba(255, 255, 255, 0.16);
+            }
+        }
+    
+        .nav-icon {
+            font-size: 1.15rem;
+            line-height: 1;
+            opacity: 0.9;
+        }
+    
+        .cms-logo {
+            gap: 0.35rem;
+            padding: 0.9rem 0.35rem 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    
+            &:hover,
+            &:focus {
+                background-color: rgba(255, 255, 255, 0.06);
+            }
+        }
+    }
+    
+    .cms-logo-mark {
+        width: 2.5rem;
+        height: 2.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.55);
+        border-radius: 0.35rem;
+        font-size: 0.72rem;
+        letter-spacing: 0.04em;
+    }
+    
+    .cms-nav-tree {
+        width: 18rem;
+    
+        ul.nav {
+            --bs-nav-link-padding-x: 0.4rem;
+            --bs-nav-link-padding-y: 0.45rem;
+        }
+
+        .nav-item + .nav-item {
+            margin-top: 0.2rem;
+        }
+    
+        > .nav > .nav-item + .nav-item {
+            margin-top: 0.75rem;
+        }
+    
+        .nav-link {
+            font-size: 0.875rem;
+            line-height: 1.3;
+    
+            &:hover,
+            &:focus {
+                background-color: var(--bs-tertiary-bg);
+            }
+    
+            &.active,
+            &[aria-current="page"] {
+                color: var(--bs-body-color);
+                background-color: var(--bs-secondary-bg);
+            }
+        }
+    
+        .cms-nav-heading {
+            font-size: 0.68rem;
+            letter-spacing: 0.12em;
+            padding: 0 0.4rem;
+            margin-bottom: 0;
+            opacity: 0.9;
+        }
+    
+        .nav-item-row {
+            gap: 0.15rem;
+        }
+    
+        .nav-caret {
+            appearance: none;
+            flex: 0 0 1.5rem;
+            width: 1.5rem;
+            height: 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            border: 0;
+            border-radius: 0.25rem;
+            background: transparent;
+            color: inherit;
+            line-height: 1;
+            cursor: pointer;
+    
+            &:hover,
+            &:focus {
+                background-color: var(--bs-tertiary-bg);
+            }
+    
+            &[aria-expanded="true"] .nav-chevron {
+                transform: rotate(180deg);
+            }
+        }
+    
+        .nav-item.active > .nav-item-row > .nav-link {
+            color: var(--bs-body-color);
+            background-color: var(--bs-secondary-bg);
+        }
+    
+        .nav-chevron {
+            font-size: 0.65rem;
+            opacity: 0.7;
+            transition: transform 0.2s ease;
+        }
+    
+        .nav-sub {
+            padding-left: 0.7rem;
+            margin: 0.1rem 0 0.2rem 0.45rem;
+        }
+    }
+    
+    .cms-content {
+        padding: 1.5rem 1.75rem;
+    }
+    
+    .sep {
+        margin: 0 0.35rem;
+    }
+    
+    .cms-copy {
+        &,
+        .card-title,
+        .form-label,
+        .form-control,
+        .btn,
+        .alert,
+        p {
+            font-size: 0.875rem;
+            line-height: 1.3;
+        }
+    }  
+}

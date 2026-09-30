@@ -146,7 +146,7 @@
     {% set children = node.children|default([]) %}
     {% set selected = theNode and node.id|default('') == theNode.id|default('') %}
     {% set open = selected or node.expanded|default(false) or not node.url|default('') %}
-    <li class="nav-item w-100{{ selected ? ' active' : '' }}">
+    <li class="nav-item w-100{{ selected ? ' active' : '' }} {{ depth === 0 ? 'pt-2' : '' }}">
         {% if node.url|default('') %}
             <div class="nav-item-row d-flex align-items-center w-100 min-w-0">
                 <a class="nav-link flex-grow-1 min-w-0 px-1 py-1 text-reset text-decoration-none rounded-1{{ selected ? ' active fw-semibold bg-body-secondary' : '' }}" href="{{ node.url }}"{% if selected %} aria-current="page"{% endif %}>
@@ -159,7 +159,7 @@
                 {% endif %}
             </div>
         {% else %}
-            <div class="cms-nav-heading text-uppercase fw-bold text-body-secondary mb-1">{{ node.title }}</div>
+            <div class="cms-nav-heading text-uppercase fw-bold text-body-secondary mb-0">{{ node.title }}</div>
         {% endif %}
 
         {% if children|length %}

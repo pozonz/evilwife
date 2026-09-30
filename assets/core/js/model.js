@@ -1,5 +1,10 @@
+import $ from 'jquery';
+import 'jquery-ui/dist/jquery-ui';
+import 'jquery-ui/dist/themes/base/jquery-ui.css';
+import 'chosen-js';
+import 'chosen-js/chosen.css';
 import './main.js';
-import '../css/model.css';
+import '../css/model.less';
 
 (function ($) {
     var $table = $('.field-table');
@@ -46,4 +51,4 @@ import '../css/model.css';
             this.querySelector('.field-key').textContent = item.querySelector('.field-name-input').value;
         });
     }
-})(window.jQuery);
+})($);
