@@ -7,14 +7,14 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Model
 {
     #[Assert\NotBlank(message: 'Title is required.')]
-    public string $title;
+    public string $title = '';
 
     #[Assert\NotBlank(message: 'Class name is required.')]
     #[Assert\Regex(
         pattern: '/^[A-Z][A-Za-z0-9]*$/',
         message: 'Class name must be PascalCase, e.g. NewsArticle.',
     )]
-    public string $className;
+    public string $className = '';
 
     #[Assert\NotBlank]
     #[Assert\Choice(choices: ['Customised', 'Core', 'System'])]

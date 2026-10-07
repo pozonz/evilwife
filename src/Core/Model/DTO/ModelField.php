@@ -37,14 +37,14 @@ class ModelField
     public string $widget = 'Text';
 
     #[Assert\NotBlank(message: 'Label is required.')]
-    public string $label;
+    public string $label = '';
 
     #[Assert\NotBlank(message: 'Field name is required.')]
     #[Assert\Regex(
         pattern: '/^[a-z][A-Za-z0-9]*$/',
         message: 'Field name must be camelCase, e.g. authorName.',
     )]
-    public string $field;
+    public string $field = '';
 
     /** @var list<string> */
     #[Assert\All([new Assert\Choice(choices: self::CONSTRAINTS)])]
