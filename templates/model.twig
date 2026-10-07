@@ -22,15 +22,20 @@
 ] %}
 {% set choiceSql = "SELECT id AS `key`, title AS `value` FROM NewsAuthor WHERE `_versionOrmid` IS NULL ORDER BY `_rank`" %}
 
-{% macro field_row(widgets, widget, label, field, required, unique, removable, choice_sql) %}
-    <div class="field-item{{ widget starts with 'Choice' ? ' is-choice' : '' }}">
+{% macro field_row(widgets, widget, label, field, required, unique, removable, choice_sql, error) %}
+    <div class="field-item{{ widget starts with 'Choice' ? ' is-choice' : '' }}{{ error ? ' has-error' : '' }}">
         <select class="form-select widget-select" aria-label="Widget for {{ label }}">
             {% for w in widgets %}
                 <option{{ w == widget ? ' selected' : '' }}>{{ w }}</option>
             {% endfor %}
         </select>
         <input class="form-control field-label-input" type="text" value="{{ label }}" aria-label="Label for {{ label }}">
-        <input class="form-control field-name-input" type="text" value="{{ field }}" aria-label="Field for {{ label }}"{% if field == 'title' %} disabled{% endif %}>
+        <div class="field-name-cell min-w-0">
+            <input class="form-control field-name-input{{ error ? ' is-invalid' : '' }}" type="text" value="{{ field }}" aria-label="Field for {{ label }}"{% if field == 'title' %} disabled{% endif %}>
+            {% if error %}
+                <div class="invalid-feedback d-block">{{ error }}</div>
+            {% endif %}
+        </div>
         <select class="form-select constraints-select" multiple data-placeholder="Select constraints..." aria-label="Constraints for {{ label }}">
             <option value="required"{{ required ? ' selected' : '' }}>Required</option>
             <option value="unique"{{ unique ? ' selected' : '' }}>Unique</option>
@@ -61,7 +66,8 @@
             <div class="row g-3 mb-3">
                 <div class="col-md-6">
                     <label class="form-label" for="model-title">Title</label>
-                    <input class="form-control" id="model-title" type="text">
+                    <input class="form-control is-invalid" id="model-title" type="text">
+                    <div class="invalid-feedback">Title is required.</div>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label" for="model-class">Class name</label>
@@ -135,7 +141,7 @@
                     <div></div>
                 </div>
 
-                {{ model.field_row(widgets, 'Text', 'Title', 'title', true, true, false, choiceSql) }}
+                {{ model.field_row(widgets, 'Text', 'Title', 'title', true, true, false, choiceSql, 'Field name "title" is reserved.') }}
 
                 {% for i in 1..100 %}
                     {{ model.field_row(widgets, 'Choice', 'Author', 'author', false, false, true, choiceSql) }}

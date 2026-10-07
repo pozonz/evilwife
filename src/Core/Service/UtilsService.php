@@ -11,8 +11,8 @@ class UtilsService
     static public function getFullClassFromName($className)
     {
         $fullClassNames = [
-            "\\App\\ORM\\{$className}",
-            "\\Pozo\\EvilWife\\Core\\ORM\\{$className}",
+            "\\App\\Model\\DTO\\{$className}",
+            "\\Pozo\\EvilWife\\Core\\Model\\DTO\\{$className}",
         ];
         foreach ($fullClassNames as $fullClassName) {
             if (class_exists($fullClassName)) {
@@ -43,7 +43,7 @@ class UtilsService
     {
         $fullClassNames = [
             "\\App\\ORM\\Model\\{$className}Model",
-            "\\Pozo\\EvilWife\\Core\\ORM\\Model\\{$className}Model",
+            "\\Pozo\\EvilWife\\Core\\Model\\CMS\\{$className}Model",
         ];
         foreach ($fullClassNames as $fullClassName) {
             if (class_exists($fullClassName)) {

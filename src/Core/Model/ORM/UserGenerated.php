@@ -1,6 +1,6 @@
 <?php
 
-namespace Pozo\EvilWife\Core\ORM\Generated;
+namespace Pozo\EvilWife\Core\Model\ORM;
 
 use Pozo\EvilWife\Core\Db\Traits\BaseORMTrait;
 use Pozo\EvilWife\Core\Db\BaseORM;

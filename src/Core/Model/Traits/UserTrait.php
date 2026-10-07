@@ -1,6 +1,6 @@
 <?php
 
-namespace Pozo\EvilWife\Core\ORM\Traits;
+namespace Pozo\EvilWife\Core\Model\Traits;
 
 use Pozo\EvilWife\Core\Service\UtilsService;
 use Scheb\TwoFactorBundle\Model\Totp\TotpConfiguration;

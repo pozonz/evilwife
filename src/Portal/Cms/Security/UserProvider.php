@@ -3,7 +3,7 @@
 namespace Pozo\EvilWife\Portal\Cms\Security;
 
 use Doctrine\DBAL\Connection;
-use Pozo\EvilWife\Core\ORM\User;
+use Pozo\EvilWife\Core\Model\DTO\User;
 use Pozo\EvilWife\Core\Service\UtilsService;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
