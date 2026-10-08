@@ -1,8 +1,8 @@
 <?php
 
-namespace Pozo\EvilWife\Portal\Cms\Form;
+namespace Pozo\EvilWife\Data\Core\Model\Form;
 
-use Pozo\EvilWife\Core\Model\DTO\Model;
+use Pozo\EvilWife\Data\Core\Model\DTO\Model;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;

@@ -1,11 +1,11 @@
 <?php
 
-namespace Pozo\EvilWife\Core\Model\CMS;
+namespace Pozo\EvilWife\Data\Domain\DAO\User\Generated;
 
 use Doctrine\DBAL\Connection;
-use Pozo\EvilWife\Core\Db\Model;
+use Pozo\EvilWife\Data\Core\Repository\Model;
 
-class UserModel extends Model
+class UserCMS extends Model
 {
     public $id = '90b7f664-a831-490d-8420-d1819704323c';
    

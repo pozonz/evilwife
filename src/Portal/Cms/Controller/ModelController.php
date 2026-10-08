@@ -2,8 +2,8 @@
 
 namespace Pozo\EvilWife\Portal\Cms\Controller;
 
-use Pozo\EvilWife\Core\Model\DTO\Model;
-use Pozo\EvilWife\Portal\Cms\Form\ModelForm;
+use Pozo\EvilWife\Data\Core\Model\DTO\Model;
+use Pozo\EvilWife\Data\Core\Model\Form\ModelForm;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;

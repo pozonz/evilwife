@@ -1,6 +1,6 @@
 <?php
 
-namespace Pozo\EvilWife\Core\Model\DTO;
+namespace Pozo\EvilWife\Data\Core\Model\DTO;
 
 use Symfony\Component\Validator\Constraints as Assert;
 

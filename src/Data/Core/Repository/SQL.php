@@ -1,10 +1,10 @@
 <?php
 
-namespace Pozo\EvilWife\Core\Db;
+namespace Pozo\EvilWife\Data\Core\Repository;
 
 use Doctrine\DBAL\Connection;
 
-class Sql
+class SQL
 {
     const OLD_COLUMN_PREFIX = '____';
 

@@ -2,7 +2,7 @@
 
 namespace Pozo\EvilWife\Portal\Cms\Controller;
 
-use Pozo\EvilWife\Core\ORM\User;
+use Pozo\EvilWife\Data\Domain\DAO\User\User;
 use Pozo\EvilWife\Portal\Cms\Service\TwoFactorSetupService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;

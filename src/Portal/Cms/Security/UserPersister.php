@@ -2,7 +2,7 @@
 
 namespace Pozo\EvilWife\Portal\Cms\Security;
 
-use Pozo\EvilWife\Core\Model\DTO\User;
+use Pozo\EvilWife\Data\Domain\DAO\User\User;
 use Scheb\TwoFactorBundle\Model\PersisterInterface;
 
 class UserPersister implements PersisterInterface

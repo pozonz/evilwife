@@ -1,39 +1,36 @@
 <?php
 
-namespace Pozo\EvilWife\Core\Model\ORM;
+namespace Pozo\EvilWife\Data\Domain\DAO\User\Generated;
 
-use Pozo\EvilWife\Core\Db\Traits\BaseORMTrait;
-use Pozo\EvilWife\Core\Db\BaseORM;
+use Pozo\EvilWife\Data\Core\Repository\DAO;
 
-class UserGenerated extends BaseORM
+class UserORM extends DAO
 {
-    use BaseORMTrait;
-
     /**
      * #pz text COLLATE utf8mb4_unicode_ci DEFAULT NULL
      */
     public $title;
-   
+
     /**
      * #pz text COLLATE utf8mb4_unicode_ci DEFAULT NULL
      */
     public $passwordInput;
-   
+
     /**
      * #pz text COLLATE utf8mb4_unicode_ci DEFAULT NULL
      */
     public $password;
-   
+
     /**
      * #pz text COLLATE utf8mb4_unicode_ci DEFAULT NULL
      */
     public $name;
-   
+
     /**
      * #pz text COLLATE utf8mb4_unicode_ci DEFAULT NULL
      */
     public $email;
-   
+
     /**
      * #pz text COLLATE utf8mb4_unicode_ci DEFAULT NULL
      */
@@ -53,5 +50,4 @@ class UserGenerated extends BaseORM
      * #pz text COLLATE utf8mb4_unicode_ci DEFAULT NULL
      */
     public $backupCodes;
-   
 }

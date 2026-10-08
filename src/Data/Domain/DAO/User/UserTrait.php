@@ -1,8 +1,8 @@
 <?php
 
-namespace Pozo\EvilWife\Core\Model\Traits;
+namespace Pozo\EvilWife\Data\Domain\DAO\User;
 
-use Pozo\EvilWife\Core\Service\UtilsService;
+use Pozo\EvilWife\Data\Core\Service\UtilsService;
 use Scheb\TwoFactorBundle\Model\Totp\TotpConfiguration;
 use Scheb\TwoFactorBundle\Model\Totp\TotpConfigurationInterface;
 use Symfony\Component\Security\Core\User\UserInterface;

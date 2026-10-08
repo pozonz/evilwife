@@ -1,12 +1,12 @@
 <?php
 
-namespace Pozo\EvilWife\Core\Service;
+namespace Pozo\EvilWife\Data\Core\Service;
 
 use BlueM\Tree;
 use Cocur\Slugify\Slugify;
 use Doctrine\DBAL\Connection;
-use Pozo\EvilWife\Core\Db\Sql;
-use Pozo\EvilWife\Core\Db\Model;
+use Pozo\EvilWife\Data\Core\Repository\Model;
+use Pozo\EvilWife\Data\Core\Repository\SQL;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 class ModelService
@@ -230,7 +230,7 @@ EOD;
     public function updateDatabaseTable($model)
     {
         $tableName = $model->getTableName();
-        $db = new Sql($this->_connection, $tableName);
+        $db = new SQL($this->_connection, $tableName);
         if (!$db->exists()) {
             $db->create();
         }
@@ -244,7 +244,11 @@ EOD;
      */
     public function getOrmClassDir($model)
     {
-        return ($model->modelCategory == 1 ? __DIR__ . '/../../../../../../../src/ORM/' : __DIR__ . '/../ORM/');
+        $base = $model->modelCategory == 1
+            ? $this->_kernel->getProjectDir() . '/src/Data/Domain/DAO/'
+            : __DIR__ . '/../../Domain/DAO/';
+
+        return $base . $model->className . '/';
     }
 
     /**
@@ -253,7 +257,11 @@ EOD;
      */
     public function getOrmNamespace($model)
     {
-        return $model->modelCategory == 1 ? 'App\\ORM' : 'ExWife\\Engine\\Cms\\_Core\\ORM';
+        $base = $model->modelCategory == 1
+            ? 'App\\Data\\Domain\\DAO'
+            : 'Pozo\\EvilWife\\Data\\Domain\\DAO';
+
+        return $base . '\\' . $model->className;
     }
 
     /**

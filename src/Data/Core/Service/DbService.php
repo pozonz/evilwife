@@ -1,9 +1,8 @@
 <?php
 
-namespace Pozo\EvilWife\Core\Service;
+namespace Pozo\EvilWife\Data\Core\Service;
 
 use Doctrine\DBAL\Connection;
-use ExWife\Engine\Cms\_Core\Service\UtilsService;
 
 class DbService
 {

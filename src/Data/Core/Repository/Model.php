@@ -1,15 +1,14 @@
 <?php
 
-namespace Pozo\EvilWife\Core\Db;
+namespace Pozo\EvilWife\Data\Core\Repository;
 
 use Cocur\Slugify\Slugify;
 use Doctrine\DBAL\Connection;
-use Pozo\EvilWife\Core\Db\BaseORM;
-use Pozo\EvilWife\Core\Service\ModelService;
-use Pozo\EvilWife\Core\Service\UtilsService;
+use Pozo\EvilWife\Data\Core\Service\ModelService;
+use Pozo\EvilWife\Data\Core\Service\UtilsService;
 use Ramsey\Uuid\Uuid;
 
-class Model extends BaseORM
+class Model extends DAO
 {
     /**
      * #pz text COLLATE utf8mb4_unicode_ci NULL
@@ -77,7 +76,6 @@ class Model extends BaseORM
     public $columnsJson;
 
     /**
-     * Model constructor.
      * @param Connection $connection
      */
     public function __construct(Connection $connection)
