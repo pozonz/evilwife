@@ -5,7 +5,7 @@ import 'chosen-js';
 import 'chosen-js/chosen.css';
 import './main.js';
 import '../css/model.less';
-import { mount } from './form/render';
+import { mount } from './render/form/render';
 
 (function ($) {
     var root = document.querySelector('[data-schema-url]');

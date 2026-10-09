@@ -1,9 +1,9 @@
-import { render as text } from './render/text';
-import { render as choice } from './render/choice';
-import { render as checkbox } from './render/checkbox';
-import { render as textarea } from './render/textarea';
-import { render as collection } from './render/collection/model_field_form';
-import { childPath } from './render/util';
+import { render as text } from './types/text';
+import { render as choice } from './types/choice';
+import { render as checkbox } from './types/checkbox';
+import { render as textarea } from './types/textarea';
+import { render as collection } from './types/collection/model_field_form';
+import { childPath } from './types/util';
 
 function field(schema, path, value) {
     return ({ choice, checkbox, textarea, collection }[schema.type] || text)(schema, path, value ?? schema.value);
