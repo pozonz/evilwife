@@ -1,56 +1,5 @@
 {% extends "@EvilWife/layout.twig" %}
 
-{% set widgets = [
-    'Asset files picker',
-    'Asset picker',
-    'Checkbox',
-    'Choice',
-    'Choice multi',
-    'Choice sortable',
-    'Choice tree',
-    'Choice tree multi',
-    'Content blocks',
-    'Date & time picker',
-    'Date picker',
-    'Email',
-    'Hidden',
-    'Multiple key value pair',
-    'Password',
-    'Text',
-    'Textarea',
-    'Wysiwyg',
-] %}
-{% set choiceSql = "SELECT id AS `key`, title AS `value` FROM NewsAuthor WHERE `_versionOrmid` IS NULL ORDER BY `_rank`" %}
-
-{% macro field_row(widgets, widget, label, field, required, unique, removable, choice_sql, error) %}
-    <div class="field-item{{ widget starts with 'Choice' ? ' is-choice' : '' }}{{ error ? ' has-error' : '' }}">
-        <select class="form-select widget-select" aria-label="Widget for {{ label }}">
-            {% for w in widgets %}
-                <option{{ w == widget ? ' selected' : '' }}>{{ w }}</option>
-            {% endfor %}
-        </select>
-        <input class="form-control field-label-input" type="text" value="{{ label }}" aria-label="Label for {{ label }}">
-        <div class="field-name-cell min-w-0">
-            <input class="form-control field-name-input{{ error ? ' is-invalid' : '' }}" type="text" value="{{ field }}" aria-label="Field for {{ label }}"{% if field == 'title' %} disabled{% endif %}>
-            {% if error %}
-                <div class="invalid-feedback d-block">{{ error }}</div>
-            {% endif %}
-        </div>
-        <select class="form-select constraints-select" multiple data-placeholder="Select constraints..." aria-label="Constraints for {{ label }}">
-            <option value="required"{{ required ? ' selected' : '' }}>Required</option>
-            <option value="unique"{{ unique ? ' selected' : '' }}>Unique</option>
-        </select>
-        <div class="field-actions">
-            <button type="button" class="field-settings-btn" data-bs-toggle="modal" data-bs-target="#field-settings-modal" aria-label="Field settings">
-                <i class="fa-solid fa-ellipsis"></i>
-            </button>
-            <button type="button" aria-label="Remove" {% if not removable %}style="visibility: hidden;"{% endif %}><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <textarea class="form-control field-choice-source" rows="3" aria-label="Choice source for {{ label }}">{{ choice_sql }}</textarea>
-    </div>
-{% endmacro %}
-{% import _self as model %}
-
 {% block stylesheets %}
     {{ encore_entry_link_tags('cms-model') }}
 {% endblock %}
@@ -62,95 +11,7 @@
 {% block main %}
 <div class="model-builder d-flex align-items-start gap-3">
     <div class="fields-panel card shadow-sm">
-        <div class="card-body">
-            <div class="row g-3 mb-3">
-                <div class="col-md-6">
-                    <label class="form-label" for="model-title">Title</label>
-                    <input class="form-control is-invalid" id="model-title" type="text">
-                    <div class="invalid-feedback">Title is required.</div>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label" for="model-class">Class name</label>
-                    <input class="form-control" id="model-class" type="text">
-                </div>
-            </div>
-
-            <div class="row g-3 mb-3">
-                <div class="col-md-6">
-                    <label class="form-label" for="model-category">Model category</label>
-                    <select class="form-select" id="model-category">
-                        <option selected>Customised</option>
-                        <option>Core</option>
-                        <option>System</option>
-                    </select>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label" for="listing-type">Listing type</label>
-                    <select class="form-select" id="listing-type">
-                        <option selected>Drag &amp; Drop</option>
-                        <option>Table</option>
-                        <option>Tree</option>
-                    </select>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label" for="accesses">Accesses</label>
-                    <select class="form-select" id="accesses" name="accesses[]" multiple data-placeholder="Select accesses...">
-                        <option value="adoption">Adoption</option>
-                        <option value="pages">Pages</option>
-                        <option value="snippets">Snippets</option>
-                        <option value="utilities">Utilities</option>
-                        <option value="modules">Modules</option>
-                        <option value="assets">Assets</option>
-                        <option value="admin" selected>Admin</option>
-                    </select>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label" for="frontend-url">Frontend URL</label>
-                    <input class="form-control" id="frontend-url" type="text">
-                </div>
-            </div>
-
-            <div class="row g-3 mb-4">
-                <div class="col-md-6">
-                    <div class="form-check mb-2">
-                        <input class="form-check-input" type="checkbox" id="searchable-cms">
-                        <label class="form-check-label" for="searchable-cms">Data is searchable in CMS</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="enable-versioning">
-                        <label class="form-check-label" for="enable-versioning">Enable versioning</label>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-check mb-2">
-                        <input class="form-check-input" type="checkbox" id="searchable-frontend">
-                        <label class="form-check-label" for="searchable-frontend">Data is searchable in Frontend</label>
-                    </div>
-                    <select class="form-select w-auto ms-auto d-block" aria-label="Select listing option">
-                        <option selected>Select...</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="field-table">
-                <div class="field-grid-head">
-                    <div>Widget</div>
-                    <div>Label</div>
-                    <div>Field</div>
-                    <div>Constraints</div>
-                    <div></div>
-                </div>
-
-                {{ model.field_row(widgets, 'Text', 'Title', 'title', true, true, false, choiceSql, 'Field name "title" is reserved.') }}
-
-                {% for i in 1..100 %}
-                    {{ model.field_row(widgets, 'Choice', 'Author', 'author', false, false, true, choiceSql) }}
-                    {{ model.field_row(widgets, 'Date & time picker', 'Expiry', 'expiry', false, false, true, choiceSql) }}
-                    {{ model.field_row(widgets, 'Textarea', 'Token', 'token', false, false, true, choiceSql) }}
-                    {{ model.field_row(widgets, 'Content blocks', 'Logs', 'logs', false, false, true, choiceSql) }}
-                {% endfor %}
-            </div>
-        </div>
+        <div class="card-body js-form-root" data-schema-url="{{ path('manage_model_schema') }}"></div>
     </div>
 
     <div class="toolbar-panel card shadow-sm">
@@ -169,12 +30,12 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content shadow">
             <div class="modal-header border-0 pb-0">
-                <h2 class="modal-title" id="field-settings-title">Title</h2>
-                <span class="field-key">title</span>
+                <h2 class="modal-title" id="field-settings-title">Field</h2>
+                <span class="field-key"></span>
             </div>
             <div class="modal-body">
                 <div class="form-check mb-3">
-                    <input class="form-check-input" type="checkbox" id="field-show-listing" checked>
+                    <input class="form-check-input" type="checkbox" id="field-show-listing">
                     <label class="form-check-label" for="field-show-listing">Show in listing table</label>
                 </div>
                 <div class="mb-3">
@@ -186,7 +47,7 @@
                     <input class="form-control" id="field-col-title" type="text">
                 </div>
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="field-cms-search" checked>
+                    <input class="form-check-input" type="checkbox" id="field-cms-search">
                     <label class="form-check-label" for="field-cms-search">Queryable in CMS search</label>
                 </div>
             </div>

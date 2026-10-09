@@ -4,5 +4,4 @@ import 'bootstrap';
 import '../css/main.less';
 
 (function () {
-    console.log('main');
 })();
