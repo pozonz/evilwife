@@ -1,6 +1,6 @@
 <?php
 
-namespace Pozo\EvilWife\Data\Core\Service;
+namespace Pozo\EvilWife\Domain\Service;
 
 use Doctrine\DBAL\Connection;
 

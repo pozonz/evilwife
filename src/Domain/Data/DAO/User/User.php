@@ -1,8 +1,8 @@
 <?php
 
-namespace Pozo\EvilWife\Data\Domain\DAO\User;
+namespace Pozo\EvilWife\Domain\Data\DAO\User;
 
-use Pozo\EvilWife\Data\Domain\DAO\User\Generated\UserORM;
+use Pozo\EvilWife\Domain\Data\DAO\User\Generated\UserORM;
 use Scheb\TwoFactorBundle\Model\BackupCodeInterface;
 use Scheb\TwoFactorBundle\Model\Totp\TwoFactorInterface as TotpTwoFactorInterface;
 use Symfony\Component\Security\Core\User\EquatableInterface;

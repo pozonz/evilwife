@@ -1,9 +1,9 @@
 <?php
 
-namespace Pozo\EvilWife\Data\Domain\DAO\User\Generated;
+namespace Pozo\EvilWife\Domain\Data\DAO\User\Generated;
 
 use Doctrine\DBAL\Connection;
-use Pozo\EvilWife\Data\Core\Repository\Model;
+use Pozo\EvilWife\Domain\Repository\Model;
 
 class UserCMS extends Model
 {

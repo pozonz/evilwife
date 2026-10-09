@@ -1,10 +1,10 @@
 <?php
 
-namespace Pozo\EvilWife\Data\Core\Repository;
+namespace Pozo\EvilWife\Domain\Repository;
 
 use Cocur\Slugify\Slugify;
 use Doctrine\DBAL\Connection;
-use Pozo\EvilWife\Data\Core\Service\UtilsService;
+use Pozo\EvilWife\Domain\Service\UtilsService;
 use Ramsey\Uuid\Uuid;
 
 abstract class DAO implements \JsonSerializable

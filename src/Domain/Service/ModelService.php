@@ -1,12 +1,12 @@
 <?php
 
-namespace Pozo\EvilWife\Data\Core\Service;
+namespace Pozo\EvilWife\Domain\Service;
 
 use BlueM\Tree;
 use Cocur\Slugify\Slugify;
 use Doctrine\DBAL\Connection;
-use Pozo\EvilWife\Data\Core\Repository\Model;
-use Pozo\EvilWife\Data\Core\Repository\SQL;
+use Pozo\EvilWife\Domain\Repository\Model;
+use Pozo\EvilWife\Domain\Repository\SQL;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 class ModelService
@@ -245,8 +245,8 @@ EOD;
     public function getOrmClassDir($model)
     {
         $base = $model->modelCategory == 1
-            ? $this->_kernel->getProjectDir() . '/src/Data/Domain/DAO/'
-            : __DIR__ . '/../../Domain/DAO/';
+            ? $this->_kernel->getProjectDir() . '/src/Domain/Data/DAO/'
+            : __DIR__ . '/../Data/DAO/';
 
         return $base . $model->className . '/';
     }
@@ -258,8 +258,8 @@ EOD;
     public function getOrmNamespace($model)
     {
         $base = $model->modelCategory == 1
-            ? 'App\\Data\\Domain\\DAO'
-            : 'Pozo\\EvilWife\\Data\\Domain\\DAO';
+            ? 'App\\Domain\\Data\\DAO'
+            : 'Pozo\\EvilWife\\Domain\\Data\\DAO';
 
         return $base . '\\' . $model->className;
     }

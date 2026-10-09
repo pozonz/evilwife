@@ -4,7 +4,7 @@ namespace Pozo\EvilWife\Portal\Cms\Service;
 
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Writer\PngWriter;
-use Pozo\EvilWife\Data\Domain\DAO\User\User;
+use Pozo\EvilWife\Domain\Data\DAO\User\User;
 use Scheb\TwoFactorBundle\Security\TwoFactor\Provider\Totp\TotpAuthenticatorInterface;
 
 class TwoFactorSetupService

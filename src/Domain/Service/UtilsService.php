@@ -1,6 +1,6 @@
 <?php
 
-namespace Pozo\EvilWife\Data\Core\Service;
+namespace Pozo\EvilWife\Domain\Service;
 
 class UtilsService
 {
@@ -11,8 +11,8 @@ class UtilsService
     static public function getFullClassFromName($className)
     {
         $fullClassNames = [
-            "\\App\\Data\\Domain\\DAO\\{$className}\\{$className}",
-            "\\Pozo\\EvilWife\\Data\\Domain\\DAO\\{$className}\\{$className}",
+            "\\App\\Domain\\Data\\DAO\\{$className}\\{$className}",
+            "\\Pozo\\EvilWife\\Domain\\Data\\DAO\\{$className}\\{$className}",
         ];
         foreach ($fullClassNames as $fullClassName) {
             if (class_exists($fullClassName)) {
@@ -42,8 +42,8 @@ class UtilsService
     static public function getModelFromName($className, $connection)
     {
         $fullClassNames = [
-            "\\App\\Data\\Domain\\DAO\\{$className}\\Generated\\{$className}CMS",
-            "\\Pozo\\EvilWife\\Data\\Domain\\DAO\\{$className}\\Generated\\{$className}CMS",
+            "\\App\\Domain\\Data\\DAO\\{$className}\\Generated\\{$className}CMS",
+            "\\Pozo\\EvilWife\\Domain\\Data\\DAO\\{$className}\\Generated\\{$className}CMS",
         ];
         foreach ($fullClassNames as $fullClassName) {
             if (class_exists($fullClassName)) {

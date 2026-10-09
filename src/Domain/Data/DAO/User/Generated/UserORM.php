@@ -1,8 +1,8 @@
 <?php
 
-namespace Pozo\EvilWife\Data\Domain\DAO\User\Generated;
+namespace Pozo\EvilWife\Domain\Data\DAO\User\Generated;
 
-use Pozo\EvilWife\Data\Core\Repository\DAO;
+use Pozo\EvilWife\Domain\Repository\DAO;
 
 class UserORM extends DAO
 {
