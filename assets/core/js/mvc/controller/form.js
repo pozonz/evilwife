@@ -17,28 +17,6 @@ function keysFromName(name, root) {
     return keys;
 }
 
-function set(model, keys, value, container, root) {
-    let cur = model;
-    for (let i = 0; i < keys.length - 1; i++) {
-        const key = keys[i];
-        if (cur[key] == null || typeof cur[key] !== 'object') {
-            cur[key] = /^\d+$/.test(keys[i + 1]) ? [] : {};
-        }
-        cur = cur[key];
-    }
-    cur[keys[keys.length - 1]] = value;
-
-    $.ajax({
-        url: '/manage/model/validate',
-        type: 'POST',
-        data: JSON.stringify(model),
-        contentType: 'application/json',
-        success: function (xhr) {
-            errors(container, xhr.errors, root);
-        },
-    });
-}
-
 function read(el) {
     if (el.type === 'checkbox') {
         return el.checked;
@@ -55,8 +33,37 @@ function read(el) {
 }
 
 export function mount(container, schema, data) {
-
     render(container, schema, data);
+
+    const modal = document.getElementById('field-settings-modal');
+    if (modal) {
+        container.appendChild(modal);
+    }
+
+    function validate() {
+        $.ajax({
+            url: '/manage/model/validate',
+            type: 'POST',
+            data: JSON.stringify(data),
+            contentType: 'application/json',
+            success: function (xhr) {
+                errors(container, xhr.errors, schema.name);
+            },
+        });
+    }
+
+    function set(keys, value) {
+        let cur = data;
+        for (let i = 0; i < keys.length - 1; i++) {
+            const key = keys[i];
+            if (cur[key] == null || typeof cur[key] !== 'object') {
+                cur[key] = /^\d+$/.test(keys[i + 1]) ? [] : {};
+            }
+            cur = cur[key];
+        }
+        cur[keys[keys.length - 1]] = value;
+        validate();
+    }
 
     function apply(event) {
         const el = event.target.closest('[name]');
@@ -67,12 +74,12 @@ export function mount(container, schema, data) {
 
         const keys = keysFromName(el.name, schema.name);
         if (keys.length) {
-            set(data, keys, read(el), container, schema.name);
+            set(keys, read(el));
         }
     }
 
     container.addEventListener('input', apply);
     container.addEventListener('change', apply);
 
-    return data;
+    return { data, validate };
 }

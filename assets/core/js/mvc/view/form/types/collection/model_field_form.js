@@ -5,7 +5,7 @@ import { render as textarea } from '../textarea';
 import { childPath } from '../util';
 
 const row = ['widget', 'label', 'field', 'constraints'];
-const extra = ['sqlQuery', 'showInListingTable', 'listingWidth', 'listingTitle', 'queryableInCmsSearch'];
+const extra = ['sqlQuery'];
 
 function field(schema, path, value) {
     return ({ choice, checkbox, textarea }[schema.type] || text)(Object.assign({}, schema, { label: row.indexOf(schema.name) >= 0 ? null : schema.label }), path, value);
@@ -25,8 +25,7 @@ export function render(schema, path, value) {
             if (!fields[name]) {
                 return '';
             }
-            const html = field(fields[name], childPath(prefix, name), data[name]);
-            return name === 'sqlQuery' ? html : `<div class="d-none">${html}</div>`;
+            return field(fields[name], childPath(prefix, name), data[name]);
         }).join('');
 
         return `
