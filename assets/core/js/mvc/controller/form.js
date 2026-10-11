@@ -1,4 +1,5 @@
 import { render } from '../view/form/render';
+import { render as errors } from '../view/form/types/error';
 
 function keysFromName(name, root) {
     const keys = [];
@@ -16,7 +17,7 @@ function keysFromName(name, root) {
     return keys;
 }
 
-function set(model, keys, value) {
+function set(model, keys, value, container, root) {
     let cur = model;
     for (let i = 0; i < keys.length - 1; i++) {
         const key = keys[i];
@@ -27,17 +28,14 @@ function set(model, keys, value) {
     }
     cur[keys[keys.length - 1]] = value;
 
-    console.log(model);
-
-
     $.ajax({
         url: '/manage/model/validate',
         type: 'POST',
         data: JSON.stringify(model),
         contentType: 'application/json',
-        success: function(response) {
-            console.log(response);
-        }
+        success: function (xhr) {
+            errors(container, xhr.errors, root);
+        },
     });
 }
 
@@ -69,7 +67,7 @@ export function mount(container, schema, data) {
 
         const keys = keysFromName(el.name, schema.name);
         if (keys.length) {
-            set(data, keys, read(el));
+            set(data, keys, read(el), container, schema.name);
         }
     }
 

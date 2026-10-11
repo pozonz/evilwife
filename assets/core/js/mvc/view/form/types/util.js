@@ -17,3 +17,11 @@ export function fieldName(path, multiple) {
 export function childPath(path, name) {
     return path ? path + '[' + name + ']' : name;
 }
+
+export function propertyPathToId(root, propertyPath) {
+    let path = root || '';
+    String(propertyPath || '').split(/[.\[\]]/).filter(Boolean).forEach(function (part) {
+        path = path ? path + '[' + part + ']' : part;
+    });
+    return fieldId(path);
+}

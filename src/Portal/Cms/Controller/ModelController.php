@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[AsController]
@@ -123,18 +124,19 @@ class ModelController extends AbstractController
 
         $violations = $this->validator->validate($model);
 
-        if (count($violations) > 0) {
-            $errors = [];
-            foreach ($violations as $violation) {
-                var_dump($violation->getPropertyPath());
-                var_dump($violation->getMessage());
-                var_dump($violation->getInvalidValue());
-                var_dump($violation->getPlural());
-                var_dump($violation->getPlural());exit;
-                $errors[$violation->getPropertyPath()] = $violation->getMessage();
+        $errors = [];
+        foreach ($violations as $violation) {
+            if ($violation->getConstraint() instanceof NotBlank) {
+                continue;
             }
+            $errors[] = [
+                'path' => $violation->getPropertyPath(),
+                'message' => $violation->getMessage(),
+            ];
+        }
 
-            return $this->json(['errors' => $errors], 400);
+        if ($errors) {
+            return $this->json(['errors' => $errors]);
         }
 
         return $this->json(['status' => 'Success!']);

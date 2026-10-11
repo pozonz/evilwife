@@ -56,18 +56,14 @@ import { mount } from './mvc/controller/form';
         });
     }
 
-    fetch(root.getAttribute('data-schema-url'))
-        .then(function (response) {
-            if (!response.ok) {
-                throw new Error('Could not load form schema.');
-            }
-            return response.json();
-        })
-        .then(function (payload) {
+    $.ajax({
+        url: root.getAttribute('data-schema-url'),
+        success: function (payload) {
             mount(root, payload.form, payload.data);
             enhance();
-        })
-        .catch(function (error) {
-            root.innerHTML = '<div class="alert alert-danger mb-0">' + error.message + '</div>';
-        });
+        },
+        error: function () {
+            root.innerHTML = '<div class="alert alert-danger mb-0">Could not load form schema.</div>';
+        },
+    });
 })($);
