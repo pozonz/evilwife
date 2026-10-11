@@ -9,6 +9,7 @@ use Pozo\EvilWife\Domain\Model\Form\ModelForm;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -26,25 +27,28 @@ class ModelController extends AbstractController
     {
         $modelField = new ModelField();
         $modelField->widget = 'Text';
-        $modelField->label = 'Title';
+        $modelField->label = '';
         $modelField->field = 'title';
         $modelField->constraints = ['Required', 'Unique'];
         $modelField->sqlQuery = null;
         $modelField->showInListingTable = true;
-        $modelField->listingWidth = -10;
+        $modelField->listingWidth = 10;
         $modelField->listingTitle = null;
         $modelField->queryableInCmsSearch = false;
 
         $model = new Model();
         $model->title = 'New models3';
-        $model->className = 'NewModel';
+        $model->className = '';
         $model->fields = [$modelField, $modelField];
 
-        $form = $this->createForm(ModelForm::class, $model, [
+        $form = $this->createForm(ModelForm::class, new Model(), [
             'csrf_protection' => false,
         ]);
 
-        return $this->json($this->formToSchema($form));
+        return $this->json([
+            'form' => $this->formToSchema($form),
+            'data' => $model,
+        ]);
     }
 
     #[Route('/manage/model/{id}', name: 'manage_model', requirements: ['id' => '\d+'])]
@@ -93,68 +97,40 @@ class ModelController extends AbstractController
             }
         }
 
-        $children = [];
-        foreach ($form->all() as $child) {
-            $children[$child->getName()] = $this->formToSchema($child);
-        }
-        if ($children && 'collection' !== $schema['type']) {
-            $schema['fields'] = $children;
-        } else {
-            $schema['value'] = $form->getViewData();
+        if ('collection' !== $schema['type']) {
+            $children = [];
+            foreach ($form->all() as $child) {
+                $children[$child->getName()] = $this->formToSchema($child);
+            }
+            if ($children) {
+                $schema['fields'] = $children;
+            }
         }
 
         return $schema;
     }
 
     #[Route('/manage/model/validate', name: 'manage_model_validate')]
-    public function modelValidate(): Response
+    public function modelValidate(Request $request): Response
     {
         $model = new Model();
         $form = $this->createForm(ModelForm::class, $model, [
             'csrf_protection' => false,
         ]);
 
-        $form->submit([
-            'title' => '',
-            'className' => 'news-article',
-            'modelCategory' => 'Customised',
-            'listingType' => 'Drag & Drop',
-            'accesses' => ['admin'],
-            'frontendUrl' => '/news',
-            'searchableInCms' => true,
-            'enableVersioning' => false,
-            'searchableInFrontend' => false,
-            'fields' => [
-                [
-                    'widget' => 'Text',
-                    'label' => '',
-                    'field' => 'Title',
-                    'constraints' => ['Required', 'Unique'],
-                    'sqlQuery' => null,
-                    'showInListingTable' => true,
-                    'listingWidth' => -10,
-                    'listingTitle' => null,
-                    'queryableInCmsSearch' => false,
-                ],
-                [
-                    'widget' => 'Choice',
-                    'label' => 'Author',
-                    'field' => 'author',
-                    'constraints' => [],
-                    'sqlQuery' => '',
-                    'showInListingTable' => false,
-                    'listingWidth' => null,
-                    'listingTitle' => null,
-                    'queryableInCmsSearch' => true,
-                ],
-            ],
-        ]);
+        $data = json_decode($request->getContent(), true);
+        $form->submit($data);
 
         $violations = $this->validator->validate($model);
 
         if (count($violations) > 0) {
             $errors = [];
             foreach ($violations as $violation) {
+                var_dump($violation->getPropertyPath());
+                var_dump($violation->getMessage());
+                var_dump($violation->getInvalidValue());
+                var_dump($violation->getPlural());
+                var_dump($violation->getPlural());exit;
                 $errors[$violation->getPropertyPath()] = $violation->getMessage();
             }
 

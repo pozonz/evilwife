@@ -5,7 +5,7 @@ import 'chosen-js';
 import 'chosen-js/chosen.css';
 import './main.js';
 import '../css/model.less';
-import { mount } from './render/form/render';
+import { mount } from './mvc/controller/form';
 
 (function ($) {
     var root = document.querySelector('[data-schema-url]');
@@ -56,7 +56,18 @@ import { mount } from './render/form/render';
         });
     }
 
-    mount(root, root.getAttribute('data-schema-url')).then(enhance).catch(function (error) {
-        root.innerHTML = '<div class="alert alert-danger mb-0">' + error.message + '</div>';
-    });
+    fetch(root.getAttribute('data-schema-url'))
+        .then(function (response) {
+            if (!response.ok) {
+                throw new Error('Could not load form schema.');
+            }
+            return response.json();
+        })
+        .then(function (payload) {
+            mount(root, payload.form, payload.data);
+            enhance();
+        })
+        .catch(function (error) {
+            root.innerHTML = '<div class="alert alert-danger mb-0">' + error.message + '</div>';
+        });
 })($);

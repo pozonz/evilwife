@@ -8,7 +8,7 @@ const row = ['widget', 'label', 'field', 'constraints'];
 const extra = ['sqlQuery', 'showInListingTable', 'listingWidth', 'listingTitle', 'queryableInCmsSearch'];
 
 function field(schema, path, value) {
-    return ({ choice, checkbox, textarea }[schema.type] || text)(Object.assign({}, schema, { label: row.indexOf(schema.name) >= 0 ? null : schema.label }), path, value ?? schema.value);
+    return ({ choice, checkbox, textarea }[schema.type] || text)(Object.assign({}, schema, { label: row.indexOf(schema.name) >= 0 ? null : schema.label }), path, value);
 }
 
 export function render(schema, path, value) {
