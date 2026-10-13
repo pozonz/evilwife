@@ -51,6 +51,37 @@ class ModelController extends AbstractController
             'data' => $model,
         ]);
     }
+    
+    #[Route('/manage/model/validate', name: 'manage_model_validate')]
+    public function modelValidate(Request $request): Response
+    {
+        $model = new Model();
+        $form = $this->createForm(ModelForm::class, $model, [
+            'csrf_protection' => false,
+        ]);
+
+        $data = json_decode($request->getContent(), true);
+        $form->submit($data);
+
+        $violations = $this->validator->validate($model);
+
+        $errors = [];
+        foreach ($violations as $violation) {
+            if ($violation->getConstraint() instanceof NotBlank) {
+                continue;
+            }
+            $errors[] = [
+                'path' => $violation->getPropertyPath(),
+                'message' => $violation->getMessage(),
+            ];
+        }
+
+        if ($errors) {
+            return $this->json(['errors' => $errors]);
+        }
+
+        return $this->json(['status' => 'Success!']);
+    }
 
     #[Route('/manage/model/{id}', name: 'manage_model', requirements: ['id' => '\d+'])]
     public function model(int $id): Response
@@ -111,34 +142,4 @@ class ModelController extends AbstractController
         return $schema;
     }
 
-    #[Route('/manage/model/validate', name: 'manage_model_validate')]
-    public function modelValidate(Request $request): Response
-    {
-        $model = new Model();
-        $form = $this->createForm(ModelForm::class, $model, [
-            'csrf_protection' => false,
-        ]);
-
-        $data = json_decode($request->getContent(), true);
-        $form->submit($data);
-
-        $violations = $this->validator->validate($model);
-
-        $errors = [];
-        foreach ($violations as $violation) {
-            if ($violation->getConstraint() instanceof NotBlank) {
-                continue;
-            }
-            $errors[] = [
-                'path' => $violation->getPropertyPath(),
-                'message' => $violation->getMessage(),
-            ];
-        }
-
-        if ($errors) {
-            return $this->json(['errors' => $errors]);
-        }
-
-        return $this->json(['status' => 'Success!']);
-    }
 }

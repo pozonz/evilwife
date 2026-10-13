@@ -1,4 +1,4 @@
-import { propertyPathToId } from './util';
+import { propertyPathToId } from '../../../../util';
 
 export function render(container, errors, root) {
     container.querySelectorAll('.is-invalid').forEach(function (el) {
