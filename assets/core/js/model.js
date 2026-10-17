@@ -6,7 +6,7 @@ import 'chosen-js/chosen.css';
 import './main.js';
 import '../css/model.less';
 import { mount } from './mvc/controller/form';
-import { fieldId } from './util.js';
+import { fieldId } from './mvc/util';
 
 (function () {
     var root = document.querySelector('[data-schema-url]');
