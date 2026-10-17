@@ -1,22 +1,16 @@
+import $ from 'jquery';
 import { propertyPathToId } from '../data';
 
-export function render(container, errors, root) {
-    container.querySelectorAll('.is-invalid').forEach(function (el) {
-        el.classList.remove('is-invalid');
-    });
-    container.querySelectorAll('.invalid-feedback').forEach(function (el) {
-        el.remove();
-    });
+export function render($container, errors, root) {
+    $container.find('.is-invalid').removeClass('is-invalid');
+    $container.find('.invalid-feedback').remove();
 
     (errors || []).forEach(function (error) {
-        const field = document.getElementById(propertyPathToId(root, error.path));
-        if (!field) {
+        const $field = $('#' + propertyPathToId(root, error.path));
+        if (!$field.length) {
             return;
         }
-        field.classList.add('is-invalid');
-        const message = document.createElement('div');
-        message.className = 'invalid-feedback d-block';
-        message.textContent = error.message;
-        field.after(message);
+        $field.addClass('is-invalid');
+        $('<div class="invalid-feedback d-block"></div>').text(error.message).insertAfter($field);
     });
 }

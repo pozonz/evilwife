@@ -25,3 +25,19 @@ export function propertyPathToId(root, propertyPath) {
     });
     return fieldId(path);
 }
+
+export function keysFromName(name, root) {
+    const keys = [];
+    const base = name.split('[', 1)[0];
+    if (base && base !== root) {
+        keys.push(base);
+    }
+    const re = /\[([^\]]*)\]/g;
+    let match;
+    while ((match = re.exec(name))) {
+        if (match[1] !== '') {
+            keys.push(match[1]);
+        }
+    }
+    return keys;
+}

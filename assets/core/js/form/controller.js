@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import 'jquery-ui/dist/jquery-ui';
 import 'jquery-ui/dist/themes/base/jquery-ui.css';
 import 'chosen-js';
@@ -6,37 +5,20 @@ import 'chosen-js/chosen.css';
 
 import { render } from './view';
 import { render as errors } from './render/error';
-import { fieldId } from './data';
+import { fieldId, keysFromName } from './data';
 
-function keysFromName(name, root) {
-    const keys = [];
-    const base = name.split('[', 1)[0];
-    if (base && base !== root) {
-        keys.push(base);
+function read($el) {
+    if ($el.is(':checkbox')) {
+        return $el.prop('checked');
     }
-    const re = /\[([^\]]*)\]/g;
-    let match;
-    while ((match = re.exec(name))) {
-        if (match[1] !== '') {
-            keys.push(match[1]);
-        }
+    if ($el.is('[type=number]')) {
+        const value = $el.val();
+        return value === '' ? null : Number(value);
     }
-    return keys;
-}
-
-function read(el) {
-    if (el.type === 'checkbox') {
-        return el.checked;
+    if ($el.prop('multiple')) {
+        return $el.val() || [];
     }
-    if (el.type === 'number') {
-        return el.value === '' ? null : Number(el.value);
-    }
-    if (el.multiple) {
-        return Array.from(el.selectedOptions).map(function (option) {
-            return option.value;
-        });
-    }
-    return el.value;
+    return $el.val();
 }
 
 function set(data, keys, value) {
@@ -49,131 +31,116 @@ function set(data, keys, value) {
         cur = cur[key];
     }
     cur[keys[keys.length - 1]] = value;
-
 }
 
-function apply(el, container, schema, data) {
-    if (!el || !container.contains(el)) {
-        return;
-    }
-
-    const keys = keysFromName(el.name, schema.name);
+function apply($el, $container, schema, data) {
+    const keys = keysFromName($el.attr('name') || '', schema.name);
     if (keys.length) {
-        set(data, keys, read(el));
-        validate(container, schema, data);
+        set(data, keys, read($el));
+        validate($container, schema, data);
     }
 }
 
-function validate(container, schema, data) {
+function validate($container, schema, data) {
     $.ajax({
         url: '/manage/model/validate',
         type: 'POST',
         data: JSON.stringify(data),
         contentType: 'application/json',
         success: function (xhr) {
-            errors(container, xhr.errors, schema.name);
+            errors($container, xhr.errors, schema.name);
         },
     });
 }
 
-function enhance() {
-    var $table = $('.field-table');
-    if ($table.length) {
-        $table.sortable({
-            items: '.field-item',
-            placeholder: 'field-item-placeholder',
-            forcePlaceholderSize: true,
-        });
-    }
+function enhance($container) {
+    $container.find('.field-table').sortable({
+        items: '.field-item',
+        placeholder: 'field-item-placeholder',
+        forcePlaceholderSize: true,
+    });
 
-    $('select[multiple]').each(function () {
-        $(this).chosen({
+    $container.find('select[multiple]').each(function () {
+        const $select = $(this);
+        $select.chosen({
             width: '100%',
-            placeholder_text_multiple: this.getAttribute('data-placeholder') || 'Select...',
+            placeholder_text_multiple: $select.attr('data-placeholder') || 'Select...',
         });
     });
 
-    document.querySelectorAll('select[name*="[widget]"]').forEach(function (select) {
-        var item = select.closest('.field-item');
-        if (!item) {
+    $container.find('select[name*="[widget]"]').on('change', function () {
+        const $select = $(this);
+        $select.closest('.field-item').toggleClass('is-choice', String($select.val()).indexOf('Choice') === 0);
+    });
+}
+
+function rowPrefix($item) {
+    const name = $item.find('[name*="[widget]"], [name*="[label]"], [name*="[field]"]').attr('name') || '';
+    return name.replace(/\[[^\]]+\]$/, '');
+}
+
+function setModal($container, schema, data) {
+    const settings = ['showInListingTable', 'listingWidth', 'listingTitle', 'queryableInCmsSearch'];
+    const $modal = $('#field-settings-modal');
+    if (!$modal.length) {
+        return;
+    }
+
+    $container.append($modal);
+
+    $modal.on('show.bs.modal', function (event) {
+        const $item = $(event.relatedTarget).closest('.field-item');
+        if (!$item.length) {
             return;
         }
-        item.classList.toggle('is-choice', select.value.indexOf('Choice') === 0);
-        select.addEventListener('change', function () {
-            item.classList.toggle('is-choice', select.value.indexOf('Choice') === 0);
+
+        const prefix = rowPrefix($item);
+        const index = Number((prefix.match(/\[(\d+)\]$/) || [])[1]);
+        const row = (data.fields && data.fields[index]) || {};
+
+        $modal.find('.modal-title').text($item.find('[name*="[label]"]').val() || 'Field');
+        $modal.find('.field-key').text($item.find('[name*="[field]"]').val() || '');
+
+        settings.forEach(function (name) {
+            const $el = $modal.find('[data-setting="' + name + '"]');
+            if (!$el.length) {
+                return;
+            }
+            const id = fieldId(prefix + '[' + name + ']');
+            $el.attr({ name: prefix + '[' + name + ']', id: id });
+            $el.closest('.form-check, .mb-3').find('label').attr('for', id);
+            if ($el.is(':checkbox')) {
+                $el.prop('checked', !!row[name]);
+            } else {
+                $el.val(row[name] ?? '');
+            }
         });
+
+        validate($container, schema, data);
     });
 }
 
-function mount(container, schema, data) {
-    render(container, schema, data);
-
-    setModal(container, schema, data);
-
-    container.addEventListener('input', (event) => apply(event.target.closest('[name]'), container, schema, data));
-    container.addEventListener('change', (event) => apply(event.target.closest('[name]'), container, schema, data));
-    enhance();
+function mount($container, schema, data) {
+    render($container, schema, data);
+    setModal($container, schema, data);
+    $container.on('input change', '[name]', function () {
+        apply($(this), $container, schema, data);
+    });
+    enhance($container);
 }
 
-function rowPrefix(item) {
-    var named = item.querySelector('[name*="[widget]"], [name*="[label]"], [name*="[field]"]');
-    return named ? named.name.replace(/\[[^\]]+\]$/, '') : '';
-}
-
-function setModal(container, schema, data) {
-    var settings = ['showInListingTable', 'listingWidth', 'listingTitle', 'queryableInCmsSearch'];
-    var modal = document.getElementById('field-settings-modal');
-    if (modal) {
-        container.appendChild(modal);
-
-        modal.addEventListener('show.bs.modal', function (event) {
-            var item = event.relatedTarget && event.relatedTarget.closest('.field-item');
-            if (!item) {
-                return;
-            }
-            var prefix = rowPrefix(item);
-            var index = Number((prefix.match(/\[(\d+)\]$/) || [])[1]);
-            var row = (data && data.fields && data.fields[index]) || {};
-
-            console.log(row);
-
-            var label = item.querySelector('[name*="[label]"]');
-            var field = item.querySelector('[name*="[field]"]');
-            this.querySelector('.modal-title').textContent = (label && label.value) || 'Field';
-            this.querySelector('.field-key').textContent = (field && field.value) || '';
-            settings.forEach(function (name) {
-                var el = modal.querySelector('[data-setting="' + name + '"]');
-                if (!el) {
-                    return;
-                }
-                var path = prefix + '[' + name + ']';
-                el.name = path;
-                el.id = fieldId(path);
-                var labelEl = el.closest('.form-check, .mb-3');
-                labelEl = labelEl && labelEl.querySelector('label');
-                if (labelEl) {
-                    labelEl.htmlFor = el.id;
-                }
-                if (el.type === 'checkbox') {
-                    el.checked = !!row[name];
-                } else {
-                    el.value = row[name] ?? '';
-                }
-            });
-
-            validate(container, schema, data);
-        });
+export function load($container) {
+    if (!$container.length) {
+        return;
     }
-}
 
-export function load(container) {
     $.ajax({
-        url: container.getAttribute('data-schema-url'),
-        success: function (payload) {
-            mount(container, payload.schema, payload.data);
+        url: $container.attr('data-schema-url'),
+        success: function (response) {
+            mount($container, response.schema, response.data);
         },
         error: function () {
-            container.innerHTML = '<div class="alert alert-danger mb-0">Could not load form schema.</div>';
+            $container.html('<div class="alert alert-danger mb-0">Could not load form schema.</div>');
         },
     });
 }
