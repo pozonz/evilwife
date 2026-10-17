@@ -1,4 +1,4 @@
-import { escapeHtml, fieldId, fieldName } from '../../util';
+import { escapeHtml, fieldId, fieldName } from '../data';
 
 export function render(schema, path, value) {
     const id = fieldId(path);

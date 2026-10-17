@@ -1,5 +1,5 @@
-import { render } from '../view/render';
-import { render as errors } from '../view/types/error';
+import { render } from './view';
+import { render as errors } from './render/error';
 
 function keysFromName(name, root) {
     const keys = [];

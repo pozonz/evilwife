@@ -2,7 +2,7 @@ import { render as text } from '../text';
 import { render as choice } from '../choice';
 import { render as checkbox } from '../checkbox';
 import { render as textarea } from '../textarea';
-import { childPath } from '../../../util';
+import { childPath } from '../../data';
 
 const row = ['widget', 'label', 'field', 'constraints'];
 const extra = ['sqlQuery'];
