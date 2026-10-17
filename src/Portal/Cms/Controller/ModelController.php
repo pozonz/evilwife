@@ -47,7 +47,7 @@ class ModelController extends AbstractController
         ]);
 
         return $this->json([
-            'form' => $this->formToSchema($form),
+            'schema' => $this->formToSchema($form),
             'data' => $model,
         ]);
     }

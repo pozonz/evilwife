@@ -91,7 +91,7 @@ import { fieldId } from './form/data';
     $.ajax({
         url: root.getAttribute('data-schema-url'),
         success: function (payload) {
-            form = mount(root, payload.form, payload.data);
+            form = mount(root, payload.schema, payload.data);
             enhance();
         },
         error: function () {
