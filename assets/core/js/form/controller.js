@@ -7,7 +7,7 @@ import { render } from './view';
 import { render as errors } from './render/error';
 import { fieldId, keysFromName } from './data';
 
-function read(el) {
+const read = (el) => {
     if (el.type === 'checkbox') {
         return el.checked;
     }
@@ -15,14 +15,12 @@ function read(el) {
         return el.value === '' ? null : Number(el.value);
     }
     if (el.multiple) {
-        return Array.from(el.selectedOptions).map(function (option) {
-            return option.value;
-        });
+        return Array.from(el.selectedOptions).map((option) => option.value);
     }
     return el.value;
-}
+};
 
-function set(data, keys, value) {
+const set = (data, keys, value) => {
     let cur = data;
     for (let i = 0; i < keys.length - 1; i++) {
         const key = keys[i];
@@ -32,9 +30,9 @@ function set(data, keys, value) {
         cur = cur[key];
     }
     cur[keys[keys.length - 1]] = value;
-}
+};
 
-function apply(el, container, schema, data) {
+const apply = (el, container, schema, data) => {
     if (!el || !container.contains(el)) {
         return;
     }
@@ -43,23 +41,21 @@ function apply(el, container, schema, data) {
         set(data, keys, read(el));
         validate(container, schema, data);
     }
-}
+};
 
-function validate(container, schema, data) {
+const validate = (container, schema, data) => {
     fetch('/manage/model/validate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
     })
-        .then(function (res) {
-            return res.json();
-        })
-        .then(function (response) {
+        .then((res) => res.json())
+        .then((response) => {
             errors(container, response.errors, schema.name);
         });
-}
+};
 
-function enhance(container, schema, data) {
+const enhance = (container, schema, data) => {
     const table = container.querySelector('.field-table');
     if (table) {
         $(table).sortable({
@@ -69,34 +65,34 @@ function enhance(container, schema, data) {
         });
     }
 
-    container.querySelectorAll('select[multiple]').forEach(function (select) {
+    container.querySelectorAll('select[multiple]').forEach((select) => {
         $(select)
             .chosen({
                 width: '100%',
                 placeholder_text_multiple: select.getAttribute('data-placeholder') || 'Select...',
             })
-            .on('change', function () {
+            .on('change', () => {
                 apply(select, container, schema, data);
             });
     });
 
-    container.querySelectorAll('select[name*="[widget]"]').forEach(function (select) {
+    container.querySelectorAll('select[name*="[widget]"]').forEach((select) => {
         const item = select.closest('.field-item');
         if (!item) {
             return;
         }
-        select.addEventListener('change', function () {
+        select.addEventListener('change', () => {
             item.classList.toggle('is-choice', String(select.value).indexOf('Choice') === 0);
         });
     });
-}
+};
 
-function rowPrefix(item) {
+const rowPrefix = (item) => {
     const named = item.querySelector('[name*="[widget]"], [name*="[label]"], [name*="[field]"]');
     return named ? named.name.replace(/\[[^\]]+\]$/, '') : '';
-}
+};
 
-function setModal(container, schema, data) {
+const setModal = (container, schema, data) => {
     const settings = ['showInListingTable', 'listingWidth', 'listingTitle', 'queryableInCmsSearch'];
     const modal = document.getElementById('field-settings-modal');
     if (!modal) {
@@ -105,8 +101,8 @@ function setModal(container, schema, data) {
 
     container.appendChild(modal);
 
-    modal.addEventListener('show.bs.modal', function (event) {
-        const item = event.relatedTarget && event.relatedTarget.closest('.field-item');
+    modal.addEventListener('show.bs.modal', (ev) => {
+        const item = ev.relatedTarget && ev.relatedTarget.closest('.field-item');
         if (!item) {
             return;
         }
@@ -120,7 +116,7 @@ function setModal(container, schema, data) {
         modal.querySelector('.modal-title').textContent = (label && label.value) || 'Field';
         modal.querySelector('.field-key').textContent = (field && field.value) || '';
 
-        settings.forEach(function (name) {
+        settings.forEach((name) => {
             const el = modal.querySelector('[data-setting="' + name + '"]');
             if (!el) {
                 return;
@@ -142,36 +138,32 @@ function setModal(container, schema, data) {
 
         validate(container, schema, data);
     });
-}
+};
 
-function mount(container, schema, data) {
+const mount = (container, schema, data) => {
     render(container, schema, data);
     setModal(container, schema, data);
-    container.addEventListener('input', function (event) {
-        apply(event.target.closest('[name]'), container, schema, data);
-    });
-    container.addEventListener('change', function (event) {
-        apply(event.target.closest('[name]'), container, schema, data);
-    });
+    container.addEventListener('input', ev => apply(ev.target.closest('[name]'), container, schema, data));
+    container.addEventListener('change', ev => apply(ev.target.closest('[name]'), container, schema, data));
     enhance(container, schema, data);
-}
+};
 
-export function load(container) {
+export const load = (container) => {
     if (!container) {
         return;
     }
 
     fetch(container.getAttribute('data-schema-url'))
-        .then(function (res) {
+        .then((res) => {
             if (!res.ok) {
                 throw new Error();
             }
             return res.json();
         })
-        .then(function (response) {
+        .then((response) => {
             mount(container, response.schema, response.data);
         })
-        .catch(function () {
+        .catch(() => {
             container.innerHTML = '<div class="alert alert-danger mb-0">Could not load form schema.</div>';
         });
-}
+};

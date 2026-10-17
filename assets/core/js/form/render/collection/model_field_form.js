@@ -7,21 +7,20 @@ import { childPath } from '../../data';
 const row = ['widget', 'label', 'field', 'constraints'];
 const extra = ['sqlQuery'];
 
-function field(schema, path, value) {
-    return ({ choice, checkbox, textarea }[schema.type] || text)(Object.assign({}, schema, { label: row.indexOf(schema.name) >= 0 ? null : schema.label }), path, value);
-}
+const field = (schema, path, value) =>
+    ({ choice, checkbox, textarea }[schema.type] || text)(Object.assign({}, schema, { label: row.indexOf(schema.name) >= 0 ? null : schema.label }), path, value);
 
-export function render(schema, path, value) {
+export const render = (schema, path, value) => {
     const items = Array.isArray(value) && value.length ? value : [{}];
     const fields = (schema.entry && schema.entry.fields) || {};
-    const rows = items.map(function (item, i) {
+    const rows = items.map((item, i) => {
         const prefix = path + '[' + i + ']';
         const data = item || {};
         const widget = data.widget || '';
-        const cells = row.map(function (name) {
-            return fields[name] ? field(Object.assign({ name: name }, fields[name]), childPath(prefix, name), data[name]) : '';
-        }).join('');
-        const rest = extra.map(function (name) {
+        const cells = row.map((name) =>
+            fields[name] ? field(Object.assign({ name: name }, fields[name]), childPath(prefix, name), data[name]) : ''
+        ).join('');
+        const rest = extra.map((name) => {
             if (!fields[name]) {
                 return '';
             }
@@ -54,4 +53,4 @@ export function render(schema, path, value) {
             ${rows}
         </div>
     `;
-}
+};

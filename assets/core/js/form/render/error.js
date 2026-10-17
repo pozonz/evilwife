@@ -1,14 +1,14 @@
 import { propertyPathToId } from '../data';
 
-export function render(container, errors, root) {
-    container.querySelectorAll('.is-invalid').forEach(function (el) {
+export const render = (container, errors, root) => {
+    container.querySelectorAll('.is-invalid').forEach((el) => {
         el.classList.remove('is-invalid');
     });
-    container.querySelectorAll('.invalid-feedback').forEach(function (el) {
+    container.querySelectorAll('.invalid-feedback').forEach((el) => {
         el.remove();
     });
 
-    (errors || []).forEach(function (error) {
+    (errors || []).forEach((error) => {
         const field = document.getElementById(propertyPathToId(root, error.path));
         if (!field) {
             return;
@@ -19,4 +19,4 @@ export function render(container, errors, root) {
         message.textContent = error.message;
         field.after(message);
     });
-}
+};

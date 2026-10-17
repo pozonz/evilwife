@@ -1,13 +1,13 @@
 import { escapeHtml, fieldId, fieldName } from '../data';
 
-export function render(schema, path, value) {
+export const render = (schema, path, value) => {
     const id = fieldId(path);
     const multiple = !!schema.multiple;
     const label = schema.label ? `<label class="form-label" for="${id}">${escapeHtml(schema.label)}</label>` : '';
     const cls = (schema.attr && schema.attr.class) || 'form-select';
     const placeholder = (schema.attr && schema.attr['data-placeholder']) || '';
     const values = Array.isArray(value) ? value : (value ? [value] : []);
-    const options = (schema.choices || []).map(function (choice) {
+    const options = (schema.choices || []).map((choice) => {
         const selected = values.indexOf(choice.value) !== -1 ? ' selected' : '';
         return `<option value="${escapeHtml(choice.value)}"${selected}>${escapeHtml(choice.label)}</option>`;
     }).join('');
@@ -20,4 +20,4 @@ export function render(schema, path, value) {
             </select>
         </div>
     `;
-}
+};

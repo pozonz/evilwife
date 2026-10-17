@@ -1,6 +1,6 @@
 import { escapeHtml, fieldId, fieldName } from '../data';
 
-export function render(schema, path, value) {
+export const render = (schema, path, value) => {
     const id = fieldId(path);
     return `
         <div class="form-check">
@@ -8,4 +8,4 @@ export function render(schema, path, value) {
             <label class="form-check-label" for="${id}">${escapeHtml(schema.label || '')}</label>
         </div>
     `;
-}
+};
