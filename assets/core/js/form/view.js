@@ -9,7 +9,7 @@ function field(schema, path, value) {
     return ({ choice, checkbox, textarea, collection }[schema.type] || text)(schema, path, value);
 }
 
-export function render($element, schema, data) {
+export function render(element, schema, data) {
     const fields = schema.fields || {};
     const values = data || {};
     const path = schema.name || '';
@@ -19,5 +19,5 @@ export function render($element, schema, data) {
         const col = item.type === 'collection' ? 'col-12' : 'col-md-6';
         html += `<div class="${col}">${field(item, childPath(path, name), values[name])}</div>`;
     });
-    $element.html(html + '</div>');
+    element.innerHTML = html + '</div>';
 }
