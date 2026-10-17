@@ -1,3 +1,9 @@
+import $ from 'jquery';
+import 'jquery-ui/dist/jquery-ui';
+import 'jquery-ui/dist/themes/base/jquery-ui.css';
+import 'chosen-js';
+import 'chosen-js/chosen.css';
+
 import { render } from './view';
 import { render as errors } from './render/error';
 import { fieldId } from './data';
@@ -99,17 +105,24 @@ function enhance() {
     });
 }
 
+function mount(container, schema, data) {
+    render(container, schema, data);
+
+    setModal(container, schema, data);
+
+    container.addEventListener('input', (event) => apply(event.target.closest('[name]'), container, schema, data));
+    container.addEventListener('change', (event) => apply(event.target.closest('[name]'), container, schema, data));
+    enhance();
+}
+
 function rowPrefix(item) {
     var named = item.querySelector('[name*="[widget]"], [name*="[label]"], [name*="[field]"]');
     return named ? named.name.replace(/\[[^\]]+\]$/, '') : '';
 }
 
-export function mount(container, schema, data) {
-    render(container, schema, data);
-
-    var modal = document.getElementById('field-settings-modal');
+function setModal(container, schema, data) {
     var settings = ['showInListingTable', 'listingWidth', 'listingTitle', 'queryableInCmsSearch'];
-
+    var modal = document.getElementById('field-settings-modal');
     if (modal) {
         container.appendChild(modal);
 
@@ -151,9 +164,16 @@ export function mount(container, schema, data) {
             validate(container, schema, data);
         });
     }
+}
 
-    container.addEventListener('input', (event) => apply(event.target.closest('[name]'), container, schema, data));
-    container.addEventListener('change', (event) => apply(event.target.closest('[name]'), container, schema, data));
-
-    enhance();
+export function load(container) {
+    $.ajax({
+        url: container.getAttribute('data-schema-url'),
+        success: function (payload) {
+            mount(container, payload.schema, payload.data);
+        },
+        error: function () {
+            container.innerHTML = '<div class="alert alert-danger mb-0">Could not load form schema.</div>';
+        },
+    });
 }
