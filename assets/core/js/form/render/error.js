@@ -1,4 +1,4 @@
-import { fieldId } from '../data';
+import { getIdFromAttr } from '../data';
 
 export const render = (container, errors, root) => {
     container.querySelectorAll('.is-invalid').forEach((el) => {
@@ -9,7 +9,7 @@ export const render = (container, errors, root) => {
     });
 
     (errors || []).forEach((error) => {
-        const field = document.getElementById(fieldId(root, error.path).id);
+        const field = document.getElementById(getIdFromAttr(root, error.path));
         if (!field) {
             return;
         }

@@ -5,7 +5,11 @@ import 'chosen-js/chosen.css';
 
 import { render } from './view';
 import { render as errors } from './render/error';
-import { fieldId, keysFromName } from './data';
+import { getIdFromAttr, getNameFromAttr, getAttrsFromName } from './data';
+
+let container;
+let schema;
+let data;
 
 const read = (el) => {
     if (el.type === 'checkbox') {
@@ -20,30 +24,30 @@ const read = (el) => {
     return el.value;
 };
 
-const set = (data, keys, value) => {
+const set = (attrs, value) => {
     let cur = data;
-    for (let i = 0; i < keys.length - 1; i++) {
-        const key = keys[i];
+    for (let i = 0; i < attrs.length - 1; i++) {
+        const key = attrs[i];
         if (cur[key] == null || typeof cur[key] !== 'object') {
-            cur[key] = /^\d+$/.test(keys[i + 1]) ? [] : {};
+            cur[key] = /^\d+$/.test(attrs[i + 1]) ? [] : {};
         }
         cur = cur[key];
     }
-    cur[keys[keys.length - 1]] = value;
+    cur[attrs[attrs.length - 1]] = value;
 };
 
-const apply = (el, container, schema, data) => {
+const apply = (el) => {
     if (!el || !container.contains(el)) {
         return;
     }
-    const keys = keysFromName(el.name || '', schema.name);
-    if (keys.length) {
-        set(data, keys, read(el));
-        validate(container, data);
+    const attrs = getAttrsFromName(el.name || '', schema.name);
+    if (attrs.length) {
+        set(attrs, read(el));
+        validate();
     }
 };
 
-const validate = (container, data) => {
+const validate = () => {
     fetch('/manage/model/validate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -51,11 +55,11 @@ const validate = (container, data) => {
     })
         .then((res) => res.json())
         .then((response) => {
-            errors(container, response.errors, response.schema.name);
+            errors(container, response.errors, schema.name);
         });
 };
 
-const enhance = (container, schema, data) => {
+const enhance = () => {
     const table = container.querySelector('.field-table');
     if (table) {
         $(table).sortable({
@@ -72,7 +76,7 @@ const enhance = (container, schema, data) => {
                 placeholder_text_multiple: select.getAttribute('data-placeholder') || 'Select...',
             })
             .on('change', () => {
-                apply(select, container, schema, data);
+                apply(select);
             });
     });
 
@@ -92,7 +96,7 @@ const rowPrefix = (item) => {
     return named ? named.name.replace(/\[[^\]]+\]$/, '') : '';
 };
 
-const setModal = (container, schema, data) => {
+const setModal = () => {
     const settings = ['showInListingTable', 'listingWidth', 'listingTitle', 'queryableInCmsSearch'];
     const modal = document.getElementById('field-settings-modal');
     if (!modal) {
@@ -121,13 +125,12 @@ const setModal = (container, schema, data) => {
             if (!el) {
                 return;
             }
-            const path = fieldId(prefix, name);
-            el.name = path.name;
-            el.id = path.id;
+            el.name = getNameFromAttr(prefix, name);
+            el.id = getIdFromAttr(prefix, name);
             const wrap = el.closest('.form-check, .mb-3');
             const labelEl = wrap && wrap.querySelector('label');
             if (labelEl) {
-                labelEl.htmlFor = path.id;
+                labelEl.htmlFor = el.id;
             }
             if (el.type === 'checkbox') {
                 el.checked = !!row[name];
@@ -136,22 +139,24 @@ const setModal = (container, schema, data) => {
             }
         });
 
-        validate(container, schema, data);
+        validate();
     });
 };
 
-const mount = (container, schema, data) => {
+const mount = () => {
     render(container, schema, data);
-    setModal(container, schema, data);
-    container.addEventListener('input', ev => apply(ev.target.closest('[name]'), container, schema, data));
-    container.addEventListener('change', ev => apply(ev.target.closest('[name]'), container, schema, data));
-    enhance(container, schema, data);
+    setModal();
+    container.addEventListener('input', (ev) => apply(ev.target.closest('[name]')));
+    container.addEventListener('change', (ev) => apply(ev.target.closest('[name]')));
+    enhance();
 };
 
-export const load = (container) => {
-    if (!container) {
+export const load = (el) => {
+    if (!el) {
         return;
     }
+
+    container = el;
 
     fetch(container.getAttribute('data-schema-url'))
         .then((res) => {
@@ -161,7 +166,9 @@ export const load = (container) => {
             return res.json();
         })
         .then((response) => {
-            mount(container, response.schema, response.data);
+            schema = response.schema;
+            data = response.data;
+            mount();
         })
         .catch(() => {
             container.innerHTML = '<div class="alert alert-danger mb-0">Could not load form schema.</div>';

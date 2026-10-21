@@ -2,28 +2,28 @@ import { render as text } from '../text';
 import { render as choice } from '../choice';
 import { render as checkbox } from '../checkbox';
 import { render as textarea } from '../textarea';
-import { fieldId } from '../../data';
+import { getIdFromAttr, getNameFromAttr } from '../../data';
 
 const row = ['widget', 'label', 'field', 'constraints'];
 const extra = ['sqlQuery'];
 
-const field = (schema, path, value) =>
-    ({ choice, checkbox, textarea }[schema.type] || text)(Object.assign({}, schema, { label: row.indexOf(schema.name) >= 0 ? null : schema.label }), path, value);
+const field = (schema, fieldId, fieldName, value) =>
+    ({ choice, checkbox, textarea }[schema.type] || text)(Object.assign({}, schema, { label: row.indexOf(schema.name) >= 0 ? null : schema.label }), fieldId, fieldName, value);
 
-export const render = (schema, path, value) => {
+export const render = (schema, fieldId, fieldName, value) => {
     const items = Array.isArray(value) && value.length ? value : [{}];
     const fields = (schema.entry && schema.entry.fields) || {};
     const rows = items.map((item, i) => {
         const data = item || {};
         const widget = data.widget || '';
         const cells = row.map((name) =>
-            fields[name] ? field(Object.assign({ name: name }, fields[name]), fieldId(path, i, name).name, data[name]) : ''
+            fields[name] ? field(Object.assign({ name: name }, fields[name]), getIdFromAttr(fieldName, i, name), getNameFromAttr(fieldName, i, name), data[name]) : ''
         ).join('');
         const rest = extra.map((name) => {
             if (!fields[name]) {
                 return '';
             }
-            return field(fields[name], fieldId(path, i, name).name, data[name]);
+            return field(fields[name], getIdFromAttr(fieldName, i, name), getNameFromAttr(fieldName, i, name), data[name]);
         }).join('');
 
         return `

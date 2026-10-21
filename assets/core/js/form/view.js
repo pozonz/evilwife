@@ -3,20 +3,19 @@ import { render as choice } from './render/choice';
 import { render as checkbox } from './render/checkbox';
 import { render as textarea } from './render/textarea';
 import { render as collection } from './render/collection/model_field_form';
-import { fieldId } from './data';
+import { getIdFromAttr, getNameFromAttr } from './data';
 
-const field = (schema, path, value) =>
-    ({ choice, checkbox, textarea, collection }[schema.type] || text)(schema, path, value);
+const field = (schema, fieldId, fieldName, value) =>
+    ({ choice, checkbox, textarea, collection }[schema.type] || text)(schema, fieldId, fieldName, value);
 
 export const render = (container, schema, data) => {
     const fields = schema.fields || {};
     const values = data || {};
-    const path = schema.name || '';
     let html = '<div class="row g-3">';
-    Object.keys(fields).forEach((name) => {
-        const item = fields[name];
+    Object.keys(fields).forEach((key) => {
+        const item = fields[key];
         const col = item.type === 'collection' ? 'col-12' : 'col-md-6';
-        html += `<div class="${col}">${field(item, fieldId(path, name).name, values[name])}</div>`;
+        html += `<div class="${col}">${field(item, getIdFromAttr(schema.name, key), getNameFromAttr(schema.name, key), values[key])}</div>`;
     });
     container.innerHTML = html + '</div>';
 };

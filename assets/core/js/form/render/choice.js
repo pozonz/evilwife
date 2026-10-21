@@ -1,9 +1,8 @@
-import { escapeHtml, fieldId, fieldName } from '../data';
+import { escapeHtml } from '../data';
 
-export const render = (schema, path, value) => {
-    const { id } = fieldId(path);
+export const render = (schema, fieldId, fieldName, value) => {
     const multiple = !!schema.multiple;
-    const label = schema.label ? `<label class="form-label" for="${id}">${escapeHtml(schema.label)}</label>` : '';
+    const label = schema.label ? `<label class="form-label" for="${fieldId}">${escapeHtml(schema.label)}</label>` : '';
     const cls = (schema.attr && schema.attr.class) || 'form-select';
     const placeholder = (schema.attr && schema.attr['data-placeholder']) || '';
     const values = Array.isArray(value) ? value : (value ? [value] : []);
@@ -15,7 +14,7 @@ export const render = (schema, path, value) => {
     return `
         <div class="mb-0">
             ${label}
-            <select class="${escapeHtml(cls)}" id="${id}" name="${escapeHtml(fieldName(path, multiple))}"${multiple ? ' multiple' : ''}${placeholder ? ` data-placeholder="${escapeHtml(placeholder)}"` : ''}>
+            <select class="${escapeHtml(cls)}" id="${fieldId}" name="${escapeHtml(multiple ? fieldName + '[]' : fieldName)}"${multiple ? ' multiple' : ''}${placeholder ? ` data-placeholder="${escapeHtml(placeholder)}"` : ''}>
                 ${options}
             </select>
         </div>

@@ -1,11 +1,8 @@
-import { escapeHtml, fieldId, fieldName } from '../data';
+import { escapeHtml } from '../data';
 
-export const render = (schema, path, value) => {
-    const { id } = fieldId(path);
-    return `
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="${id}" name="${escapeHtml(fieldName(path))}" value="1"${value ? ' checked' : ''}>
-            <label class="form-check-label" for="${id}">${escapeHtml(schema.label || '')}</label>
-        </div>
-    `;
-};
+export const render = (schema, fieldId, fieldName, value) => `
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="${fieldId}" name="${escapeHtml(fieldName)}" value="1"${value ? ' checked' : ''}>
+        <label class="form-check-label" for="${fieldId}">${escapeHtml(schema.label || '')}</label>
+    </div>
+`;
