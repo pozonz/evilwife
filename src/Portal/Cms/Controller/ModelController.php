@@ -77,10 +77,16 @@ class ModelController extends AbstractController
         }
 
         if ($errors) {
-            return $this->json(['errors' => $errors]);
+            return $this->json([
+                'schema' => $this->formToSchema($form),
+                'errors' => $errors,
+            ]);
         }
 
-        return $this->json(['status' => 'Success!']);
+        return $this->json([
+            'schema' => $this->formToSchema($form),
+            'status' => 'Success!',
+        ]);
     }
 
     #[Route('/manage/model/{id}', name: 'manage_model', requirements: ['id' => '\d+'])]

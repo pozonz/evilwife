@@ -1,4 +1,4 @@
-import { propertyPathToId } from '../data';
+import { fieldId } from '../data';
 
 export const render = (container, errors, root) => {
     container.querySelectorAll('.is-invalid').forEach((el) => {
@@ -9,7 +9,7 @@ export const render = (container, errors, root) => {
     });
 
     (errors || []).forEach((error) => {
-        const field = document.getElementById(propertyPathToId(root, error.path));
+        const field = document.getElementById(fieldId(root, error.path).id);
         if (!field) {
             return;
         }

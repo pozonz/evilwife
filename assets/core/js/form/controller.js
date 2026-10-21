@@ -39,11 +39,11 @@ const apply = (el, container, schema, data) => {
     const keys = keysFromName(el.name || '', schema.name);
     if (keys.length) {
         set(data, keys, read(el));
-        validate(container, schema, data);
+        validate(container, data);
     }
 };
 
-const validate = (container, schema, data) => {
+const validate = (container, data) => {
     fetch('/manage/model/validate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -51,7 +51,7 @@ const validate = (container, schema, data) => {
     })
         .then((res) => res.json())
         .then((response) => {
-            errors(container, response.errors, schema.name);
+            errors(container, response.errors, response.schema.name);
         });
 };
 
@@ -121,13 +121,13 @@ const setModal = (container, schema, data) => {
             if (!el) {
                 return;
             }
-            const id = fieldId(prefix + '[' + name + ']');
-            el.name = prefix + '[' + name + ']';
-            el.id = id;
+            const path = fieldId(prefix, name);
+            el.name = path.name;
+            el.id = path.id;
             const wrap = el.closest('.form-check, .mb-3');
             const labelEl = wrap && wrap.querySelector('label');
             if (labelEl) {
-                labelEl.htmlFor = id;
+                labelEl.htmlFor = path.id;
             }
             if (el.type === 'checkbox') {
                 el.checked = !!row[name];

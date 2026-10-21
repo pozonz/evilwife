@@ -5,19 +5,17 @@ export const escapeHtml = (value) =>
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;');
 
-export const fieldId = (path) => path.replace(/[^A-Za-z0-9]+/g, '_').replace(/^_|_$/g, '');
+export const fieldId = (...parts) => {
+    const segments = parts
+        .flatMap((part) => String(part ?? '').split(/[.\[\]]/))
+        .filter(Boolean);
+    return {
+        id: segments.join('_'),
+        name: segments.reduce((acc, part) => (acc ? acc + '[' + part + ']' : part), ''),
+    };
+};
 
 export const fieldName = (path, multiple) => (multiple ? path + '[]' : path);
-
-export const childPath = (path, name) => (path ? path + '[' + name + ']' : name);
-
-export const propertyPathToId = (root, propertyPath) => {
-    let path = root || '';
-    String(propertyPath || '').split(/[.\[\]]/).filter(Boolean).forEach((part) => {
-        path = path ? path + '[' + part + ']' : part;
-    });
-    return fieldId(path);
-};
 
 export const keysFromName = (name, root) => {
     const keys = [];

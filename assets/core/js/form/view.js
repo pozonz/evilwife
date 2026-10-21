@@ -3,7 +3,7 @@ import { render as choice } from './render/choice';
 import { render as checkbox } from './render/checkbox';
 import { render as textarea } from './render/textarea';
 import { render as collection } from './render/collection/model_field_form';
-import { childPath } from './data';
+import { fieldId } from './data';
 
 const field = (schema, path, value) =>
     ({ choice, checkbox, textarea, collection }[schema.type] || text)(schema, path, value);
@@ -16,7 +16,7 @@ export const render = (container, schema, data) => {
     Object.keys(fields).forEach((name) => {
         const item = fields[name];
         const col = item.type === 'collection' ? 'col-12' : 'col-md-6';
-        html += `<div class="${col}">${field(item, childPath(path, name), values[name])}</div>`;
+        html += `<div class="${col}">${field(item, fieldId(path, name).name, values[name])}</div>`;
     });
     container.innerHTML = html + '</div>';
 };
