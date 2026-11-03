@@ -111,6 +111,11 @@
         &.is-choice .field-choice-source {
             display: block;
         }
+
+        > .modal {
+            grid-column: 1 / -1;
+            padding: 0;
+        }
     }
 
     .field-item-placeholder,
@@ -171,13 +176,17 @@
     }
 }
 
-#field-settings-modal {
+.field-settings-modal {
     .modal-dialog {
         max-width: 22rem;
     }
 
     .modal-content {
         border: 0;
+    }
+
+    .modal-body > * + * {
+        margin-top: 1rem;
     }
 
     .modal-header {

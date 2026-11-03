@@ -24,7 +24,6 @@ export const render = () => {
     store.container.innerHTML = html + '</div>';
 
     enhance();
-    setModal();
 };
 
 const enhance = () => {
@@ -56,57 +55,5 @@ const enhance = () => {
         select.addEventListener('change', () => {
             item.classList.toggle('is-choice', String(select.value).indexOf('Choice') === 0);
         });
-    });
-};
-
-const rowPrefix = (item) => {
-    const named = item.querySelector('[name*="[widget]"], [name*="[label]"], [name*="[field]"]');
-    return named ? named.name.replace(/\[[^\]]+\]$/, '') : '';
-};
-
-const setModal = () => {
-    const settings = ['showInListingTable', 'listingWidth', 'listingTitle', 'queryableInCmsSearch'];
-    const modal = document.getElementById('field-settings-modal');
-    if (!modal) {
-        return;
-    }
-
-    store.container.appendChild(modal);
-
-    modal.addEventListener('show.bs.modal', (ev) => {
-        const item = ev.relatedTarget && ev.relatedTarget.closest('.field-item');
-        if (!item) {
-            return;
-        }
-
-        const prefix = rowPrefix(item);
-        const index = Number((prefix.match(/\[(\d+)\]$/) || [])[1]);
-        const label = item.querySelector('[name*="[label]"]');
-        const field = item.querySelector('[name*="[field]"]');
-
-        modal.querySelector('.modal-title').textContent = (label && label.value) || 'Field';
-        modal.querySelector('.field-key').textContent = (field && field.value) || '';
-
-        settings.forEach((setting) => {
-            const el = modal.querySelector('[data-setting="' + setting + '"]');
-            if (!el) {
-                return;
-            }
-            const { id, name, value } = getByKeys(['fields', index, setting]);
-            el.name = name;
-            el.id = id;
-            const wrap = el.closest('.form-check, .mb-3');
-            const labelEl = wrap && wrap.querySelector('label');
-            if (labelEl) {
-                labelEl.htmlFor = el.id;
-            }
-            if (el.type === 'checkbox') {
-                el.checked = !!value;
-            } else {
-                el.value = value ?? '';
-            }
-        });
-
-        store.validate && store.validate();
     });
 };
