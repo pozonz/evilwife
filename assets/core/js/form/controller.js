@@ -1,15 +1,28 @@
-import { render, enhance, setModal } from './render';
-import { data, apply, setValidate } from './store';
+import { store } from './store';
+import { render } from './render';
+import { getKeysByFieldName, setValueByKeys, getValueByEl } from './utils';
 
-export const load = (el, validate) => {
-    if (!el) {
+
+export const load = (container, options) => {
+    if (!container) {
         return;
     }
+    store.container = container;
 
-    data.container = el;
-    setValidate(validate);
+    const { validate, save, apply } = options;
+    const applyChange = (el) => {
+        if (!el || !store.container.contains(el)) {
+            return;
+        }
+    
+        const keys = getKeysByFieldName(el.name);
+        if (keys.length) {
+            setValueByKeys(store.data, keys, getValueByEl(el));
+            validate();
+        }
+    };
 
-    fetch(data.container.getAttribute('data-schema-url'))
+    fetch(store.container.getAttribute('data-schema-url'))
         .then((res) => {
             if (!res.ok) {
                 throw new Error();
@@ -17,17 +30,17 @@ export const load = (el, validate) => {
             return res.json();
         })
         .then((response) => {
-            data.schema = response.schema;
-            data.data = response.data;
+            store.schema = response.schema;
+            store.data = response.data;
 
             render();
-            enhance();
-            setModal();
 
-            data.container.addEventListener('input', (ev) => apply(ev.target.closest('[name]')));
-            data.container.addEventListener('change', (ev) => apply(ev.target.closest('[name]')));
+            // store.container.addEventListener('input', (ev) => applyChange(ev.target.closest('[name]')));
+            // store.container.addEventListener('change', (ev) => applyChange(ev.target.closest('[name]')));
         })
-        .catch(() => {
-            data.container.innerHTML = '<div class="alert alert-danger mb-0">Could not load form schema.</div>';
+        .catch((ev) => {
+            store.container.innerHTML = `<div class="alert alert-danger mb-0">${ev.message}</div>`;
         });
 };
+
+

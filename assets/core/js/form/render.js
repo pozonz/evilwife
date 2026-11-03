@@ -21,9 +21,12 @@ export const render = () => {
         html += `<div class="${col}">${field([key])}</div>`;
     });
     data.container.innerHTML = html + '</div>';
+
+    enhance();
+    setModal();
 };
 
-export const enhance = () => {
+const enhance = () => {
     const table = data.container.querySelector('.field-table');
     if (table) {
         $(table).sortable({

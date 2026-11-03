@@ -1,4 +1,4 @@
-import { data, getIdFromAttr } from '../store';
+import { data, getIdFromAttr } from './store';
 
 export const render = (errors) => {
     data.container.querySelectorAll('.is-invalid').forEach((el) => {
