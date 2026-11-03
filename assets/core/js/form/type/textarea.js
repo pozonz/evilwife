@@ -1,5 +1,4 @@
-import { applyChange, getByKeys } from '../dom';
-import { escapeHtml } from '../utils';
+import { applyChange, getByKeys, escapeHtml } from '../dom';
 import { render as error } from './error/error';
 
 export const render = (dom, keys) => {

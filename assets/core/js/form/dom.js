@@ -1,5 +1,12 @@
 import { store } from './store';
 
+export const escapeHtml = (value) =>
+    String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+        
 export const getByKeys = (keys) => {   
     const getSchemaByKeys = (keys) => {
         let schema = store.schema;

@@ -1,4 +1,4 @@
-import { escapeHtml } from '../../utils';
+import { escapeHtml } from '../../dom';
 
 export const render = (errors) =>
     (errors || []).map((message) =>
