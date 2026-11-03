@@ -1,11 +1,8 @@
-import { store } from '../store';
-import { escapeHtml, getSchemaByKeys, getValueByKeys, getFieldIdByKeys, getFieldNamebyKeys } from '../utils';
+import { escapeHtml, getByKeys } from '../utils';
+import { render as error } from './error/error';
 
 export const render = (keys) => {
-    const schema = getSchemaByKeys(keys);
-    const value = getValueByKeys(store.data, keys);
-    const id = getFieldIdByKeys(keys);
-    const fieldName = getFieldNamebyKeys(keys);
+    const { schema, id, name, value, errors } = getByKeys(keys);
     const label = schema.label ? `<label class="form-label" for="${id}">${escapeHtml(schema.label)}</label>` : '';
     const cls = (schema.attr && schema.attr.class) || 'form-control';
     const rows = (schema.attr && schema.attr.rows) || 3;
@@ -13,7 +10,8 @@ export const render = (keys) => {
     return `
         <div class="mb-0">
             ${label}
-            <textarea class="${escapeHtml(cls)}" id="${id}" name="${escapeHtml(fieldName)}" rows="${rows}">${escapeHtml(value ?? '')}</textarea>
+            <textarea class="${escapeHtml(cls)}${errors.length ? ' is-invalid' : ''}" id="${id}" name="${escapeHtml(name)}" rows="${rows}">${escapeHtml(value ?? '')}</textarea>
+            ${error(errors)}
         </div>
     `;
 };

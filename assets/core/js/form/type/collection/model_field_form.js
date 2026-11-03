@@ -2,18 +2,16 @@ import { render as text } from '../text';
 import { render as choice } from '../choice';
 import { render as checkbox } from '../checkbox';
 import { render as textarea } from '../textarea';
-import { store } from '../../store';
-import { getSchemaByKeys, getValueByKeys } from '../../utils';
+import { getByKeys } from '../../utils';
 
 const row = ['widget', 'label', 'field', 'constraints'];
 const extra = ['sqlQuery'];
 
 const field = (keys) =>
-    ({ choice, checkbox, textarea }[getSchemaByKeys(keys).type] || text)(keys);
+    ({ choice, checkbox, textarea }[getByKeys(keys).schema.type] || text)(keys);
 
 export const render = (keys) => {
-    const schema = getSchemaByKeys(keys);
-    const value = getValueByKeys(store.data, keys);
+    const { schema, value } = getByKeys(keys);
     const items = Array.isArray(value) && value.length ? value : [{}];
     const fields = (schema.entry && schema.entry.fields) || {};
     const rows = items.map((item, i) => {

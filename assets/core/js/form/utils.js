@@ -42,6 +42,14 @@ export const getByKeys = (keys) => {
     };
     
     const getErrorsByKeys = (keys) => {
+        const wanted = keys.map(String);
+        return (store.errors || []).filter((error) => {
+            const parts = String(error.path ?? '').split(/[.\[\]]/).filter((part) => part !== '' && part != null);
+            if (store.schema && parts[0] === store.schema.name) {
+                parts.shift();
+            }
+            return parts.length === wanted.length && parts.every((part, i) => part === wanted[i]);
+        }).map((error) => error.message);
     };
 
     return {

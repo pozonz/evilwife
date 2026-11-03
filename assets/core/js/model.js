@@ -2,9 +2,8 @@ import './main.js';
 import '../css/model.less';
 import { load } from './form/controller';
 import { store } from './form/store';
-import { render as errors } from './form/type/error/error.js';
 
-const validate = () => {
+const validate = (callback = () => {}) => {
     fetch('/manage/model/validate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -12,15 +11,16 @@ const validate = () => {
     })
         .then((res) => res.json())
         .then((response) => {
-            errors(response.errors);
+            store.errors = response.errors;
+            callback();
         });
 };
 
-const save = () => {
-    apply();
+const save = (callback = () => {}) => {
+    apply(callback);
 };
 
-const apply = () => {
+const apply = (callback = () => {}) => {
     fetch('/manage/model/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -28,7 +28,8 @@ const apply = () => {
     })
         .then((res) => res.json())
         .then((response) => {
-            errors(response.errors);
+            store.errors = response.errors;
+            callback();
         });
 };
 

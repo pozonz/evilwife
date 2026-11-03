@@ -4,7 +4,7 @@ import 'chosen-js';
 import 'chosen-js/chosen.css';
 
 import { store } from './store';
-import { getSchemaByKeys, getFieldIdByKeys, getFieldNamebyKeys } from './utils';
+import { getByKeys } from './utils';
 import { render as text } from './type/text';
 import { render as choice } from './type/choice';
 import { render as checkbox } from './type/checkbox';
@@ -12,7 +12,7 @@ import { render as textarea } from './type/textarea';
 import { render as collection } from './type/collection/model_field_form';
 
 const field = (keys) =>
-    ({ choice, checkbox, textarea, collection }[getSchemaByKeys(keys).type] || text)(keys);
+    ({ choice, checkbox, textarea, collection }[getByKeys(keys).schema.type] || text)(keys);
 
 export const render = () => {
     const fields = store.schema.fields || {};
@@ -81,29 +81,29 @@ const setModal = () => {
 
         const prefix = rowPrefix(item);
         const index = Number((prefix.match(/\[(\d+)\]$/) || [])[1]);
-        const row = (store.data.fields && store.data.fields[index]) || {};
         const label = item.querySelector('[name*="[label]"]');
         const field = item.querySelector('[name*="[field]"]');
 
         modal.querySelector('.modal-title').textContent = (label && label.value) || 'Field';
         modal.querySelector('.field-key').textContent = (field && field.value) || '';
 
-        settings.forEach((name) => {
-            const el = modal.querySelector('[data-setting="' + name + '"]');
+        settings.forEach((setting) => {
+            const el = modal.querySelector('[data-setting="' + setting + '"]');
             if (!el) {
                 return;
             }
-            el.name = getFieldNamebyKeys(['fields', index, name]);
-            el.id = getFieldIdByKeys(['fields', index, name]);
+            const { id, name, value } = getByKeys(['fields', index, setting]);
+            el.name = name;
+            el.id = id;
             const wrap = el.closest('.form-check, .mb-3');
             const labelEl = wrap && wrap.querySelector('label');
             if (labelEl) {
                 labelEl.htmlFor = el.id;
             }
             if (el.type === 'checkbox') {
-                el.checked = !!row[name];
+                el.checked = !!value;
             } else {
-                el.value = row[name] ?? '';
+                el.value = value ?? '';
             }
         });
 

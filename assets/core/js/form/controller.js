@@ -19,11 +19,9 @@ export const load = (container, options) => {
         const keys = getKeysByFieldName(el.name);
         if (keys.length) {
             setValueByKeys(store.data, keys, getValueByEl(el));
-            validate();
+            validate(render);
         }
     };
-
-    store.applyChange = applyChange;
 
     fetch(store.container.getAttribute('data-schema-url'))
         .then((res) => {
