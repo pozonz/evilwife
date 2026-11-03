@@ -19,11 +19,11 @@ export const render = () => {
     store.container.appendChild(wrapper);
 
     Object.keys(fields).forEach((key) => {
-        const block = document.createElement('div');
-        block.className = fields[key].type === 'collection' ? 'col-12' : 'col-md-6';
-        wrapper.appendChild(block);
+        const dom = document.createElement('div');
+        dom.className = fields[key].type === 'collection' ? 'col-12' : 'col-md-6';
+        wrapper.appendChild(dom);
 
-        ({ choice, checkbox, textarea, collection }[fields[key].type] || text)(block, [key]);
+        ({ choice, checkbox, textarea, collection }[fields[key].type] || text)(dom, [key]);
     });
 
     enhance();

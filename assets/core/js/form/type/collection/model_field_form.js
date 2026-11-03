@@ -9,16 +9,16 @@ const row = ['widget', 'label', 'field', 'constraints'];
 const extra = ['sqlQuery'];
 const settings = ['showInListingTable', 'listingWidth', 'listingTitle', 'queryableInCmsSearch'];
 
-const field = (block, keys) =>
-    ({ choice, checkbox, textarea }[getByKeys(keys).schema.type] || text)(block, keys);
+const field = (dom, keys) =>
+    ({ choice, checkbox, textarea }[getByKeys(keys).schema.type] || text)(dom, keys);
 
-const modal = (block, keys) => {
+const modal = (dom, keys) => {
     const { id } = getByKeys(keys);
     const title = getByKeys(keys.concat('label')).value;
     const key = getByKeys(keys.concat('field')).value;
     const modalId = id + '_settings';
 
-    block.innerHTML = `
+    dom.innerHTML = `
         <div class="modal fade field-settings-modal" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}-title" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content shadow">
@@ -32,7 +32,7 @@ const modal = (block, keys) => {
         </div>
     `;
 
-    const body = block.querySelector('.modal-body');
+    const body = dom.querySelector('.modal-body');
     settings.forEach((name) => {
         const cell = document.createElement('div');
         body.appendChild(cell);
@@ -40,12 +40,12 @@ const modal = (block, keys) => {
     });
 };
 
-export const render = (block, keys) => {
+export const render = (dom, keys) => {
     const { schema, value } = getByKeys(keys);
     const items = Array.isArray(value) && value.length ? value : [{}];
     const fields = (schema.entry && schema.entry.fields) || {};
 
-    block.innerHTML = `
+    dom.innerHTML = `
         <div class="field-table">
             <div class="field-grid-head">
                 <div>Widget</div>
@@ -57,7 +57,7 @@ export const render = (block, keys) => {
         </div>
     `;
 
-    const table = block.querySelector('.field-table');
+    const table = dom.querySelector('.field-table');
 
     items.forEach((item, i) => {
         const itemKeys = keys.concat(i);

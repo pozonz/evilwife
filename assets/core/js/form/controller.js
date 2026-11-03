@@ -5,6 +5,7 @@ export const load = (container, options) => {
     const { validate, save, apply } = options;
 
     store.container = container;
+    
     store.validate = validate;
     store.save = save;
     store.apply = apply;
