@@ -1,10 +1,11 @@
-import { escapeHtml, getSchemaByKeys, getValueByKeys, getIdByKeys, getNameByKeys } from '../store';
+import { store } from '../store';
+import { escapeHtml, getSchemaByKeys, getValueByKeys, getFieldIdByKeys, getFieldNamebyKeys } from '../utils';
 
 export const render = (keys) => {
     const schema = getSchemaByKeys(keys);
-    const value = getValueByKeys(keys);
-    const id = getIdByKeys(keys);
-    const fieldName = getNameByKeys(keys);
+    const value = getValueByKeys(store.data, keys);
+    const id = getFieldIdByKeys(keys);
+    const fieldName = getFieldNamebyKeys(keys);
     const multiple = !!schema.multiple;
     const label = schema.label ? `<label class="form-label" for="${id}">${escapeHtml(schema.label)}</label>` : '';
     const cls = (schema.attr && schema.attr.class) || 'form-select';

@@ -1,15 +1,16 @@
-import { data, getIdFromAttr } from './store';
+import { store } from '../../store';
+import { getFieldIdByKeys, getKeysByFieldName } from '../../utils';
 
 export const render = (errors) => {
-    data.container.querySelectorAll('.is-invalid').forEach((el) => {
+    store.container.querySelectorAll('.is-invalid').forEach((el) => {
         el.classList.remove('is-invalid');
     });
-    data.container.querySelectorAll('.invalid-feedback').forEach((el) => {
+    store.container.querySelectorAll('.invalid-feedback').forEach((el) => {
         el.remove();
     });
 
     (errors || []).forEach((error) => {
-        const field = document.getElementById(getIdFromAttr(data.schema.name, error.path));
+        const field = document.getElementById(getFieldIdByKeys(getKeysByFieldName(error.path)));
         if (!field) {
             return;
         }

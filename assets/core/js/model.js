@@ -1,14 +1,14 @@
 import './main.js';
 import '../css/model.less';
 import { load } from './form/controller';
-import { data } from './form/store';
-import { render as errors } from './form/error.js';
+import { store } from './form/store';
+import { render as errors } from './form/type/error/error.js';
 
 const validate = () => {
     fetch('/manage/model/validate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data.data),
+        body: JSON.stringify(store.data),
     })
         .then((res) => res.json())
         .then((response) => {
@@ -24,7 +24,7 @@ const apply = () => {
     fetch('/manage/model/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data.data),
+        body: JSON.stringify(store.data),
     })
         .then((res) => res.json())
         .then((response) => {
@@ -33,7 +33,7 @@ const apply = () => {
 };
 
 load(document.querySelector('[data-schema-url]'), {
-    validate: validate, 
+    validate: validate,
     save: save,
     apply: apply,
 });
