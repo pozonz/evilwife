@@ -1,20 +1,30 @@
-import { render as text } from '../text';
-import { render as choice } from '../choice';
-import { render as checkbox } from '../checkbox';
-import { render as textarea } from '../textarea';
-import { getByKeys, escapeHtml } from '../../dom';
+import 'jquery-ui/dist/jquery-ui';
+import 'jquery-ui/dist/themes/base/jquery-ui.css';
 
+import { render as text } from '../type/text';
+import { render as choice } from '../type/choice';
+import { render as checkbox } from '../type/checkbox';
+import { render as textarea } from '../type/textarea';
+import { getTypeByKeys, escapeHtml } from '../dom';
+
+const types = { choice, checkbox, textarea };
 const row = ['widget', 'label', 'field', 'constraints'];
 const extra = ['sqlQuery'];
 const settings = ['showInListingTable', 'listingWidth', 'listingTitle', 'queryableInCmsSearch'];
 
 const field = (dom, keys) =>
-    ({ choice, checkbox, textarea }[getByKeys(keys).schema.type] || text)(dom, keys);
+    (types[getTypeByKeys(keys).schema.type] || text)(dom, keys);
+
+const append = (parent, keys) => {
+    const cell = document.createElement('div');
+    parent.appendChild(cell);
+    field(cell, keys);
+};
 
 const modal = (dom, keys) => {
-    const { id } = getByKeys(keys);
-    const title = getByKeys(keys.concat('label')).value;
-    const key = getByKeys(keys.concat('field')).value;
+    const { id } = getTypeByKeys(keys);
+    const title = getTypeByKeys(keys.concat('label')).value;
+    const key = getTypeByKeys(keys.concat('field')).value;
     const modalId = id + '_settings';
 
     dom.innerHTML = `
@@ -32,15 +42,11 @@ const modal = (dom, keys) => {
     `;
 
     const body = dom.querySelector('.modal-body');
-    settings.forEach((name) => {
-        const cell = document.createElement('div');
-        body.appendChild(cell);
-        field(cell, keys.concat(name));
-    });
+    settings.forEach((name) => append(body, keys.concat(name)));
 };
 
 export const render = (dom, keys) => {
-    const { schema, value } = getByKeys(keys);
+    const { schema, value } = getTypeByKeys(keys);
     const items = Array.isArray(value) && value.length ? value : [{}];
     const fields = (schema.entry && schema.entry.fields) || {};
 
@@ -60,19 +66,12 @@ export const render = (dom, keys) => {
 
     items.forEach((item, i) => {
         const itemKeys = keys.concat(i);
-        const modalId = getByKeys(itemKeys).id + '_settings';
+        const modalId = getTypeByKeys(itemKeys).id + '_settings';
         const rowEl = document.createElement('div');
         rowEl.className = 'field-item' + (String(item && item.widget).indexOf('Choice') === 0 ? ' is-choice' : '');
         table.appendChild(rowEl);
 
-        row.forEach((name) => {
-            if (!fields[name]) {
-                return;
-            }
-            const cell = document.createElement('div');
-            rowEl.appendChild(cell);
-            field(cell, itemKeys.concat(name));
-        });
+        row.forEach((name) => fields[name] && append(rowEl, itemKeys.concat(name)));
 
         const actions = document.createElement('div');
         actions.className = 'field-actions';
@@ -84,17 +83,16 @@ export const render = (dom, keys) => {
         `;
         rowEl.appendChild(actions);
 
-        extra.forEach((name) => {
-            if (!fields[name]) {
-                return;
-            }
-            const cell = document.createElement('div');
-            rowEl.appendChild(cell);
-            field(cell, itemKeys.concat(name));
-        });
+        extra.forEach((name) => fields[name] && append(rowEl, itemKeys.concat(name)));
 
         const modalEl = document.createElement('div');
         rowEl.appendChild(modalEl);
         modal(modalEl, itemKeys);
+    });
+
+    $(table).sortable({
+        items: '.field-item',
+        placeholder: 'field-item-placeholder',
+        forcePlaceholderSize: true,
     });
 };

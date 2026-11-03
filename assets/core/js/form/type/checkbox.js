@@ -1,8 +1,7 @@
-import { applyChange, getByKeys, escapeHtml } from '../dom';
-import { render as error } from './error/error';
+import { bind, getTypeByKeys, escapeHtml, error } from '../dom';
 
 export const render = (dom, keys) => {
-    const { schema, id, name, value, errors } = getByKeys(keys);
+    const { schema, id, name, value, errors } = getTypeByKeys(keys);
 
     dom.innerHTML = `
         <div class="form-check">
@@ -12,7 +11,5 @@ export const render = (dom, keys) => {
         </div>
     `;
 
-    $(document).off('change input', `#${id}`).on('change input', `#${id}`, (ev) => {
-        applyChange(ev.target, () => render(dom, keys));
-    });
+    bind(id, () => render(dom, keys));
 };
