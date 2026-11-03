@@ -1,4 +1,5 @@
-import { escapeHtml, getByKeys } from '../utils';
+import { getByKeys } from '../dom';
+import { escapeHtml } from '../utils';
 import { render as error } from './error/error';
 
 export const render = (keys) => {

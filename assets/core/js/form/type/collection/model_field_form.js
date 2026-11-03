@@ -2,14 +2,15 @@ import { render as text } from '../text';
 import { render as choice } from '../choice';
 import { render as checkbox } from '../checkbox';
 import { render as textarea } from '../textarea';
-import { escapeHtml, getByKeys } from '../../utils';
+import { getByKeys, getSchemaByKeys } from '../../dom';
+import { escapeHtml } from '../../utils';
 
 const row = ['widget', 'label', 'field', 'constraints'];
 const extra = ['sqlQuery'];
 const settings = ['showInListingTable', 'listingWidth', 'listingTitle', 'queryableInCmsSearch'];
 
 const field = (keys) =>
-    ({ choice, checkbox, textarea }[getByKeys(keys).schema.type] || text)(keys);
+    ({ choice, checkbox, textarea }[getSchemaByKeys(keys).type] || text)(keys);
 
 const modal = (keys) => {
     const { id } = getByKeys(keys);

@@ -4,7 +4,7 @@ import 'chosen-js';
 import 'chosen-js/chosen.css';
 
 import { store } from './store';
-import { getByKeys } from './utils';
+import { getSchemaByKeys } from './dom';
 import { render as text } from './type/text';
 import { render as choice } from './type/choice';
 import { render as checkbox } from './type/checkbox';
@@ -12,7 +12,7 @@ import { render as textarea } from './type/textarea';
 import { render as collection } from './type/collection/model_field_form';
 
 const field = (keys) =>
-    ({ choice, checkbox, textarea, collection }[getByKeys(keys).schema.type] || text)(keys);
+    ({ choice, checkbox, textarea, collection }[getSchemaByKeys(keys).type] || text)(keys);
 
 export const render = () => {
     const fields = store.schema.fields || {};
