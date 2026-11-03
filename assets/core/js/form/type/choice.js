@@ -1,8 +1,8 @@
-import { getByKeys } from '../dom';
+import { applyChange, getByKeys } from '../dom';
 import { escapeHtml } from '../utils';
 import { render as error } from './error/error';
 
-export const render = (keys) => {
+export const render = (block, keys) => {
     const { schema, id, name, value, errors } = getByKeys(keys);
     const multiple = !!schema.multiple;
     const label = schema.label ? `<label class="form-label" for="${id}">${escapeHtml(schema.label)}</label>` : '';
@@ -14,7 +14,7 @@ export const render = (keys) => {
         return `<option value="${escapeHtml(choice.value)}"${selected}>${escapeHtml(choice.label)}</option>`;
     }).join('');
 
-    return `
+    block.innerHTML = `
         <div class="mb-0">
             ${label}
             <select class="${escapeHtml(cls)}${errors.length ? ' is-invalid' : ''}" id="${id}" name="${escapeHtml(multiple ? name + '[]' : name)}"${multiple ? ' multiple' : ''}${placeholder ? ` data-placeholder="${escapeHtml(placeholder)}"` : ''}>
@@ -23,4 +23,20 @@ export const render = (keys) => {
             ${error(errors)}
         </div>
     `;
+
+    const item = block.closest('.field-item');
+    if (item && /\[widget\]$/.test(name)) {
+        item.classList.toggle('is-choice', String(value).indexOf('Choice') === 0);
+    }
+
+    if (multiple) {
+        $(block).find('select').chosen({
+            width: '100%',
+            placeholder_text_multiple: placeholder || 'Select...',
+        });
+    }
+
+    $(document).off('change input', `#${id}`).on('change input', `#${id}`, (ev) => {
+        applyChange(ev.target, () => render(block, keys));
+    });
 };

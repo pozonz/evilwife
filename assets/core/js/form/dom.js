@@ -1,6 +1,22 @@
 import { store } from './store';
 
 export const getByKeys = (keys) => {   
+    const getSchemaByKeys = (keys) => {
+        let schema = store.schema;
+        keys.forEach((key) => {
+            if (schema && schema.type === 'collection' && /^\d+$/.test(String(key))) {
+                schema = schema.entry;
+                return;
+            }
+            schema = ((schema && schema.fields) || {})[key];
+        });
+        const last = keys[keys.length - 1];
+        if (keys.some((key) => /^\d+$/.test(String(key))) && ['widget', 'label', 'field', 'constraints'].includes(last)) {
+            return Object.assign({}, schema, { label: null });
+        }
+        return schema || {};
+    };
+
     const getIdByKeys = (keys) =>
         [store.schema.name, ...keys].filter((part) => part !== '' && part != null).join('_');
     
@@ -37,26 +53,43 @@ export const getByKeys = (keys) => {
     };
 };
 
-export const getSchemaByKeys = (keys) => {
-    let schema = store.schema;
-    keys.forEach((key) => {
-        if (schema && schema.type === 'collection' && /^\d+$/.test(String(key))) {
-            schema = schema.entry;
-            return;
-        }
-        schema = ((schema && schema.fields) || {})[key];
-    });
-    const last = keys[keys.length - 1];
-    if (keys.some((key) => /^\d+$/.test(String(key))) && ['widget', 'label', 'field', 'constraints'].includes(last)) {
-        return Object.assign({}, schema, { label: null });
-    }
-    return schema || {};
-};
-
 export const applyChange = (el, callback = () => {}) => {
     if (!el || !store.container.contains(el)) {
         return;
     }
+
+    const getKeysByFieldName = (fieldName) => {
+        const keys = String(fieldName ?? '').split(/[.\[\]]/).filter((part) => part !== '' && part != null);
+        if (store.schema && keys[0] === store.schema.name) {
+            keys.shift();
+        }
+        return keys;
+    };
+    
+    const setValueByKeys = (keys, value) => {
+        let object = store.data;
+        for (let i = 0; i < keys.length - 1; i++) {
+            const key = keys[i];
+            if (object[key] == null || typeof object[key] !== 'object') {
+                object[key] = /^\d+$/.test(keys[i + 1]) ? [] : {};
+            }
+            object = object[key];
+        }
+        object[keys[keys.length - 1]] = value;
+    };
+    
+    const getValueByEl = (el) => {
+        if (el.type === 'checkbox') {
+            return el.checked;
+        }
+        if (el.type === 'number') {
+            return el.value === '' ? null : Number(el.value);
+        }
+        if (el.multiple) {
+            return Array.from(el.selectedOptions).map((option) => option.value);
+        }
+        return el.value;
+    };
 
     const keys = getKeysByFieldName(el.name);
     if (keys.length) {
@@ -65,47 +98,4 @@ export const applyChange = (el, callback = () => {}) => {
     }
 };
 
-const getKeysByFieldName = (fieldName) => {
-    const keys = String(fieldName ?? '').split(/[.\[\]]/).filter((part) => part !== '' && part != null);
-    if (store.schema && keys[0] === store.schema.name) {
-        keys.shift();
-    }
-    return keys;
-};
 
-/**
- * Set the value of an object by keys
- * @param {*} object 
- * @param {*} keys 
- * @param {*} value 
- * @returns {void}
- */
-const setValueByKeys = (keys, value) => {
-    let object = store.data;
-    for (let i = 0; i < keys.length - 1; i++) {
-        const key = keys[i];
-        if (object[key] == null || typeof object[key] !== 'object') {
-            object[key] = /^\d+$/.test(keys[i + 1]) ? [] : {};
-        }
-        object = object[key];
-    }
-    object[keys[keys.length - 1]] = value;
-};
-
-/**
- * Get the value of an element
- * @param {*} el 
- * @returns {any}
- */
-const getValueByEl = (el) => {
-    if (el.type === 'checkbox') {
-        return el.checked;
-    }
-    if (el.type === 'number') {
-        return el.value === '' ? null : Number(el.value);
-    }
-    if (el.multiple) {
-        return Array.from(el.selectedOptions).map((option) => option.value);
-    }
-    return el.value;
-};
