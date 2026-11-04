@@ -18,7 +18,9 @@ export const Text = ({ keys = [] }: { keys: Array<string> }) => {
                 onChange={(ev) => applyChange(ev.currentTarget)}
             />
             <div id={id ? `${id}-error` : undefined} className={errors.length ? 'invalid-feedback d-block' : 'invalid-feedback d-none'}>
-
+                {errors.map((message) => (
+                    <div key={message} className="invalid-feedback d-block">{message}</div>
+                ))}
             </div>
         </div>
     );

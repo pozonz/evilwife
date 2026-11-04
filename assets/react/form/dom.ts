@@ -48,24 +48,8 @@ export const getTypeByKeys = (keys: Array<string>) => {
     };
 };
 
-// const error = (keys: Array<string>) => {
-//     const { id, errors } = getTypeByKeys(keys);
-//     const field = document.getElementById(id);
-//     const box = document.getElementById(id + '-error');
-//     if (!field || !box) {
-//         return;
-//     }
-
-//     box.innerHTML = errors.map((message) =>
-//         `<div class="invalid-feedback d-block">${escapeHtml(message)}</div>`
-//     ).join('');
-//     box.classList.toggle('d-none', errors.length === 0);
-//     box.classList.toggle('d-block', errors.length > 0);
-//     field.classList.toggle('is-invalid', errors.length > 0);
-// };
-
 export const applyChange = (el: HTMLInputElement | HTMLSelectElement, callback = () => {}) => {
-    const { data, update } = useFormStore.getState();
+    const { data, update, validate } = useFormStore.getState();
 
     const keys = keysFromName(el.name);
     if (!keys.length) {
@@ -95,13 +79,5 @@ export const applyChange = (el: HTMLInputElement | HTMLSelectElement, callback =
     }
 
     update({ data: next });
-    callback();
+    validate(callback);
 };
-
-// export const bind = (keys) => {
-//     const { id } = getTypeByKeys(keys);
-
-//     error(keys);
-
-//     $(document).off('change input', `#${id}`).on('change input', `#${id}`, (ev) => applyChange(ev.target, () => error(keys)));
-// };
