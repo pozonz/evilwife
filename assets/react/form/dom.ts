@@ -1,12 +1,5 @@
 import useFormStore from './store';
 
-export const escapeHtml = (value: string) =>
-    String(value ?? '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-
 const keysFromName = (fieldName: string) => {
     const { schema } = useFormStore.getState();
     
@@ -19,6 +12,7 @@ const keysFromName = (fieldName: string) => {
 
 export const getTypeByKeys = (keys: Array<string>) => {
     let { schema, data, errors } = useFormStore();
+    const rootName = schema.name || '';
 
     keys.forEach((key) => {
         if (schema && schema.type === 'collection' && /^\d+$/.test(String(key))) {
@@ -43,7 +37,7 @@ export const getTypeByKeys = (keys: Array<string>) => {
         return parts.length === wanted.length && parts.every((part, i) => part === wanted[i]);
     }).map((item: any) => item.message);
 
-    const parts = [schema.name, ...keys].filter((part) => part !== '' && part != null);
+    const parts = [rootName, ...keys].filter((part) => part !== '' && part != null);
 
     return {
         schema: schema || {},
@@ -70,7 +64,7 @@ export const getTypeByKeys = (keys: Array<string>) => {
 //     field.classList.toggle('is-invalid', errors.length > 0);
 // };
 
-export const applyChange = (el: HTMLInputElement, callback = () => {}) => {
+export const applyChange = (el: HTMLInputElement | HTMLSelectElement, callback = () => {}) => {
     const { data, update } = useFormStore.getState();
 
     const keys = keysFromName(el.name);
@@ -90,18 +84,17 @@ export const applyChange = (el: HTMLInputElement, callback = () => {}) => {
         object = copy;
     }
 
-    if (el.type === 'checkbox') {
+    if (el instanceof HTMLInputElement && el.type === 'checkbox') {
         object[keys[keys.length - 1]] = el.checked;
-    } else if (el.type === 'number') {
+    } else if (el instanceof HTMLInputElement && el.type === 'number') {
         object[keys[keys.length - 1]] = el.value === '' ? null : Number(el.value);
-    } else if (el.multiple) {
-        // object[keys[keys.length - 1]] = Array.from(el.selectedOptions).map((option) => option.value);
+    } else if (el instanceof HTMLSelectElement && el.multiple) {
+        object[keys[keys.length - 1]] = Array.from(el.selectedOptions).map((option) => option.value);
     } else {
         object[keys[keys.length - 1]] = el.value;
     }
 
-    console.log(object, el.value, keys, keys[keys.length - 1]);
-    update({ data: object });
+    update({ data: next });
     callback();
 };
 
