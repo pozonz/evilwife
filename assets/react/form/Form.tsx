@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ComponentType } from 'react';
 import useFormStore from './store';
 import { Text } from './type/text';
 import { Choice } from './type/choice';
@@ -45,14 +45,14 @@ export const Form = ({ url }: { url: string }) => {
     const fields = schema.fields || [];
 
     return (
-        <div id={schema?.name} className="row g-3">
+        <div id={schema.name} className="row g-3">
             {Object.keys(fields).map((key) => {
                 const fieldType = fields[key].type as keyof typeof types;
-                const Component = types[fieldType] || Text;
+                const Component = (types[fieldType] || Text) as ComponentType<{ field: any; keys?: any }>;
 
                 return (
                     <div key={key} className={fields[key].type === 'collection' ? 'col-12' : 'col-md-6'}>
-                        <Component field={fields[key]} />
+                        <Component field={fields[key]} keys={[key]} />
                     </div>
                 );
             })}

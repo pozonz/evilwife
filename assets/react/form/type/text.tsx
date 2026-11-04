@@ -1,10 +1,25 @@
-export const Text = ({ field }: { field: any }) => {
-    const label = field.label ? <label className="form-label">{field.label}</label> : null;
+import { getTypeByKeys, applyChange } from '../dom';
+
+export const Text = ({ keys = [] }: { keys: Array<string> }) => {
+    const { schema, id, name, value, errors } = getTypeByKeys(keys);
+
+    const cls = (schema.attr && schema.attr.class) || 'form-control';
+    const type = schema.type === 'integer' ? 'number' : 'text';
 
     return (
         <div className="mb-0">
-            {label}
-            <input className="form-control" type={field.type === 'integer' ? 'number' : 'text'} />
+            <label className="form-label" htmlFor={id}>{schema.label}</label>
+            <input
+                className={`${cls}${errors.length ? ' is-invalid' : ''}`}
+                id={id}
+                name={name}
+                type={type}
+                value={value ?? ''}
+                onChange={(ev) => applyChange(ev.target)}
+            />
+            <div id={id ? `${id}-error` : undefined} className={errors.length ? 'invalid-feedback d-block' : 'invalid-feedback d-none'}>
+
+            </div>
         </div>
     );
 };
