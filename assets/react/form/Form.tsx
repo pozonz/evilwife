@@ -47,7 +47,8 @@ export const Form = ({ url }: { url: string }) => {
     return (
         <div id={schema?.name} className="row g-3">
             {Object.keys(fields).map((key) => {
-                const Component = types[fields[key].type] || Text;
+                const fieldType = fields[key].type as keyof typeof types;
+                const Component = types[fieldType] || Text;
 
                 return (
                     <div key={key} className={fields[key].type === 'collection' ? 'col-12' : 'col-md-6'}>
