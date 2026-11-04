@@ -48,7 +48,7 @@ export const getTypeByKeys = (keys: Array<string>) => {
     };
 };
 
-export const applyChange = (el: HTMLInputElement | HTMLSelectElement, callback = () => {}) => {
+export const applyChange = (el: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement, callback = () => {}) => {
     const { data, update, validate } = useFormStore.getState();
 
     const keys = keysFromName(el.name);
