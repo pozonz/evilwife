@@ -1,47 +1,12 @@
 import { useEffect, useState } from 'react';
 import useFormStore from './store';
+import { Text } from './type/text';
+import { Choice } from './type/choice';
+import { Checkbox } from './type/checkbox';
+import { Textarea } from './type/textarea';
+import { Collection } from './collection/model_field_form';
 
-const Field = ({ field }: { field: any }) => {
-    const label = field.label ? <label className="form-label">{field.label}</label> : null;
-
-    if (field.type === 'choice') {
-        return (
-            <div className="mb-0">
-                {label}
-                <select className="form-select" />
-            </div>
-        );
-    }
-
-    if (field.type === 'checkbox') {
-        return (
-            <div className="form-check">
-                <input className="form-check-input" type="checkbox" />
-                <label className="form-check-label">{field.label || ''}</label>
-            </div>
-        );
-    }
-
-    if (field.type === 'textarea') {
-        return (
-            <div className="mb-0">
-                {label}
-                <textarea className="form-control" rows={3} />
-            </div>
-        );
-    }
-
-    if (field.type === 'collection') {
-        return <div className="border rounded p-3 text-muted">Collection</div>;
-    }
-
-    return (
-        <div className="mb-0">
-            {label}
-            <input className="form-control" type={field.type === 'integer' ? 'number' : 'text'} />
-        </div>
-    );
-};
+const types = { choice: Choice, checkbox: Checkbox, textarea: Textarea, collection: Collection };
 
 export const Form = ({ url }: { url: string }) => {
     const { update, schema } = useFormStore();
@@ -77,15 +42,19 @@ export const Form = ({ url }: { url: string }) => {
         return null;
     }
 
-    const fields = schema.fields || {};
+    const fields = schema.fields || [];
 
     return (
         <div id={schema?.name} className="row g-3">
-            {Object.keys(fields).map((key) => (
-                <div key={key} className={fields[key].type === 'collection' ? 'col-12' : 'col-md-6'}>
-                    <Field field={fields[key]} />
-                </div>
-            ))}
+            {Object.keys(fields).map((key) => {
+                const Component = types[fields[key].type] || Text;
+
+                return (
+                    <div key={key} className={fields[key].type === 'collection' ? 'col-12' : 'col-md-6'}>
+                        <Component field={fields[key]} />
+                    </div>
+                );
+            })}
         </div>
     );
 };
