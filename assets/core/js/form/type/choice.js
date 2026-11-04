@@ -1,10 +1,10 @@
 import 'chosen-js';
 import 'chosen-js/chosen.css';
 
-import { bind, getTypeByKeys, escapeHtml, error } from '../dom';
+import { bind, getTypeByKeys, escapeHtml } from '../dom';
 
 export const render = (dom, keys) => {
-    const { schema, id, name, value, errors } = getTypeByKeys(keys);
+    const { schema, id, name, value } = getTypeByKeys(keys);
     const multiple = !!schema.multiple;
     const label = schema.label ? `<label class="form-label" for="${id}">${escapeHtml(schema.label)}</label>` : '';
     const cls = (schema.attr && schema.attr.class) || 'form-select';
@@ -18,16 +18,19 @@ export const render = (dom, keys) => {
     dom.innerHTML = `
         <div class="mb-0">
             ${label}
-            <select class="${escapeHtml(cls)}${errors.length ? ' is-invalid' : ''}" id="${id}" name="${escapeHtml(multiple ? name + '[]' : name)}"${multiple ? ' multiple' : ''}${placeholder ? ` data-placeholder="${escapeHtml(placeholder)}"` : ''}>
+            <select class="${escapeHtml(cls)}" id="${id}" name="${escapeHtml(multiple ? name + '[]' : name)}"${multiple ? ' multiple' : ''}${placeholder ? ` data-placeholder="${escapeHtml(placeholder)}"` : ''}>
                 ${options}
             </select>
-            ${error(errors)}
+            <div id="${id}-error" class="invalid-feedback d-none"></div>
         </div>
     `;
 
     const item = dom.closest('.field-item');
     if (item && /\[widget\]$/.test(name)) {
         item.classList.toggle('is-choice', String(value).indexOf('Choice') === 0);
+        $(document).on('change', `#${id}`, () => {
+            item.classList.toggle('is-choice', String(document.getElementById(id).value).indexOf('Choice') === 0);
+        });
     }
 
     if (multiple) {
@@ -37,5 +40,5 @@ export const render = (dom, keys) => {
         });
     }
 
-    bind(id, () => render(dom, keys));
+    bind(keys);
 };

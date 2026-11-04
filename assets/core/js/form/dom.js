@@ -7,11 +7,6 @@ export const escapeHtml = (value) =>
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;');
 
-export const error = (errors) =>
-    (errors || []).map((message) =>
-        `<div class="invalid-feedback d-block">${escapeHtml(message)}</div>`
-    ).join('');
-
 const keysFromName = (fieldName) => {
     const keys = String(fieldName ?? '').split(/[.\[\]]/).filter((part) => part !== '' && part != null);
     if (store.schema && keys[0] === store.schema.name) {
@@ -51,12 +46,28 @@ export const getTypeByKeys = (keys) => {
         schema: schema || {},
         id: parts.join('_'),
         name: parts.reduce((acc, part) => (acc ? acc + '[' + part + ']' : part), ''),
-        value: value,
-        errors: errors,
+        value,
+        errors,
     };
 };
 
-export const applyChange = (el, callback = () => {}) => {
+const error = (keys) => {
+    const { id, errors } = getTypeByKeys(keys);
+    const field = document.getElementById(id);
+    const box = document.getElementById(id + '-error');
+    if (!field || !box) {
+        return;
+    }
+
+    box.innerHTML = errors.map((message) =>
+        `<div class="invalid-feedback d-block">${escapeHtml(message)}</div>`
+    ).join('');
+    box.classList.toggle('d-none', errors.length === 0);
+    box.classList.toggle('d-block', errors.length > 0);
+    field.classList.toggle('is-invalid', errors.length > 0);
+};
+
+const applyChange = (el, callback = () => {}) => {
     if (!el || !store.container.contains(el)) {
         return;
     }
@@ -86,27 +97,12 @@ export const applyChange = (el, callback = () => {}) => {
     }
 
     store.validate(callback);
-
-    $(el).focus();
 };
 
-export const bind = (id, redraw) => {
-    if (typeof window._delays === 'undefined') {
-        window._delays = [];
-    }
+export const bind = (keys) => {
+    const { id } = getTypeByKeys(keys);
 
-    $(document).off('change', `#${id}`).on('change', `#${id}`, (ev) => {
-        applyChange(ev.target, redraw);
-    });
+    error(keys);
 
-    $(document).off('input', `#${id}`).on('input', `#${id}`, (ev) => {
-        if (window._delays[id] !== 'undefined') {
-            clearTimeout(window._delays[id]);
-            delete window._delays[id];
-        }
-
-        window._delays[id] = setTimeout(() => {
-            applyChange(ev.target, redraw);
-        }, 1000);
-    });
+    $(document).off('change input', `#${id}`).on('change input', `#${id}`, (ev) => applyChange(ev.target, () => error(keys)));
 };

@@ -3,8 +3,8 @@ import '../css/model.less';
 import { load } from './form/controller';
 import { store } from './form/store';
 
-const validate = (callback = () => {}) => {
-    fetch('/manage/model/validate', {
+const post = (url, callback) => {
+    fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(store.data),
@@ -16,25 +16,12 @@ const validate = (callback = () => {}) => {
         });
 };
 
-const save = (callback = () => {}) => {
-    apply(callback);
-};
-
-const apply = (callback = () => {}) => {
-    fetch('/manage/model/save', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(store.data),
-    })
-        .then((res) => res.json())
-        .then((response) => {
-            store.errors = response.errors;
-            callback();
-        });
-};
+const validate = (callback = () => {}) => post('/manage/model/validate', callback);
+const apply = (callback = () => {}) => post('/manage/model/save', callback);
+const save = (callback = () => {}) => apply(callback);
 
 load(document.querySelector('[data-schema-url]'), {
-    validate: validate,
-    save: save,
-    apply: apply,
+    validate,
+    save,
+    apply,
 });

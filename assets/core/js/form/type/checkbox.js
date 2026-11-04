@@ -1,15 +1,15 @@
-import { bind, getTypeByKeys, escapeHtml, error } from '../dom';
+import { bind, getTypeByKeys, escapeHtml } from '../dom';
 
 export const render = (dom, keys) => {
-    const { schema, id, name, value, errors } = getTypeByKeys(keys);
+    const { schema, id, name, value } = getTypeByKeys(keys);
 
     dom.innerHTML = `
         <div class="form-check">
-            <input class="form-check-input${errors.length ? ' is-invalid' : ''}" type="checkbox" id="${id}" name="${escapeHtml(name)}" value="1"${value ? ' checked' : ''}>
+            <input class="form-check-input" type="checkbox" id="${id}" name="${escapeHtml(name)}" value="1"${value ? ' checked' : ''}>
             <label class="form-check-label" for="${id}">${escapeHtml(schema.label || '')}</label>
-            ${error(errors)}
+            <div id="${id}-error" class="invalid-feedback d-none"></div>
         </div>
     `;
 
-    bind(id, () => render(dom, keys));
+    bind(keys);
 };

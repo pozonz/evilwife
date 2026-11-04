@@ -1,19 +1,18 @@
 import 'jquery-ui/dist/jquery-ui';
 import 'jquery-ui/dist/themes/base/jquery-ui.css';
 
+import { getTypeByKeys, escapeHtml } from '../dom';
 import { render as text } from '../type/text';
 import { render as choice } from '../type/choice';
 import { render as checkbox } from '../type/checkbox';
 import { render as textarea } from '../type/textarea';
-import { getTypeByKeys, escapeHtml } from '../dom';
 
 const types = { choice, checkbox, textarea };
 const row = ['widget', 'label', 'field', 'constraints'];
 const extra = ['sqlQuery'];
 const settings = ['showInListingTable', 'listingWidth', 'listingTitle', 'queryableInCmsSearch'];
 
-const field = (dom, keys) =>
-    (types[getTypeByKeys(keys).schema.type] || text)(dom, keys);
+const field = (dom, keys) => (types[getTypeByKeys(keys).schema.type] || text)(dom, keys);
 
 const append = (parent, keys) => {
     const cell = document.createElement('div');
@@ -25,7 +24,7 @@ const modal = (dom, keys) => {
     const { id } = getTypeByKeys(keys);
     const title = getTypeByKeys(keys.concat('label')).value;
     const key = getTypeByKeys(keys.concat('field')).value;
-    const modalId = id + '_settings';
+    const modalId = id + '-settings';
 
     dom.innerHTML = `
         <div class="modal fade field-settings-modal" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}-title" aria-hidden="true">
@@ -66,7 +65,7 @@ export const render = (dom, keys) => {
 
     items.forEach((item, i) => {
         const itemKeys = keys.concat(i);
-        const modalId = getTypeByKeys(itemKeys).id + '_settings';
+        const modalId = getTypeByKeys(itemKeys).id + '-settings';
         const rowEl = document.createElement('div');
         rowEl.className = 'field-item' + (String(item && item.widget).indexOf('Choice') === 0 ? ' is-choice' : '');
         table.appendChild(rowEl);
