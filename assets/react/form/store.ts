@@ -3,10 +3,10 @@ import { mountStoreDevtool } from 'simple-zustand-devtools';
 
 interface FormStore { 
     container: HTMLElement | null;
-    schema: Object | null;
-    data: Object | null;
-    errors: Array<Object> | null;
-    update: (data: Object) => void;
+    schema: any | null;
+    data: any | null;
+    errors: Array<any> | null;
+    update: (data: any) => void;
 }
 
 const useFormStore = create<FormStore>(set => ({
@@ -14,7 +14,7 @@ const useFormStore = create<FormStore>(set => ({
     schema: null,
     data: null,
     errors: null,
-    update: (data: Object) => set((state) => ({...state, ...data}))
+    update: (data: any) => set((state) => ({...state, ...data}))
 }));
 
 // if (process.env.NODE_ENV === 'development')
