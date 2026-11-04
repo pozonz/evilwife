@@ -15,7 +15,7 @@ export const Text = ({ keys = [] }: { keys: Array<string> }) => {
                 name={name}
                 type={type}
                 value={value ?? ''}
-                onChange={(ev) => applyChange(ev.target)}
+                onChange={(ev) => applyChange(ev.currentTarget)}
             />
             <div id={id ? `${id}-error` : undefined} className={errors.length ? 'invalid-feedback d-block' : 'invalid-feedback d-none'}>
 

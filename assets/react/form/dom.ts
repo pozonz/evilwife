@@ -8,7 +8,7 @@ export const escapeHtml = (value: string) =>
         .replace(/"/g, '&quot;');
 
 const keysFromName = (fieldName: string) => {
-    const { schema } = useFormStore();
+    const { schema } = useFormStore.getState();
     
     const keys = String(fieldName ?? '').split(/[.\[\]]/).filter((part) => part !== '' && part != null);
     if (schema && keys[0] === schema.name) {
@@ -71,20 +71,23 @@ export const getTypeByKeys = (keys: Array<string>) => {
 // };
 
 export const applyChange = (el: HTMLInputElement, callback = () => {}) => {
-    let { data } = useFormStore();
+    const { data, update } = useFormStore.getState();
 
     const keys = keysFromName(el.name);
     if (!keys.length) {
         return;
     }
 
-    let object = data;
+    const next = Array.isArray(data) ? [...data] : { ...(data ?? {}) };
+    let object: any = next;
     for (let i = 0; i < keys.length - 1; i++) {
         const key = keys[i];
-        if (object[key] == null || typeof object[key] !== 'object') {
-            object[key] = /^\d+$/.test(keys[i + 1]) ? [] : {};
-        }
-        object = object[key];
+        const child = object[key];
+        const copy = child == null || typeof child !== 'object'
+            ? (/^\d+$/.test(String(keys[i + 1])) ? [] : {})
+            : (Array.isArray(child) ? [...child] : { ...child });
+        object[key] = copy;
+        object = copy;
     }
 
     if (el.type === 'checkbox') {
@@ -97,9 +100,9 @@ export const applyChange = (el: HTMLInputElement, callback = () => {}) => {
         object[keys[keys.length - 1]] = el.value;
     }
 
-    console.log(data);
-
-    // validate(callback);
+    console.log(object, el.value, keys, keys[keys.length - 1]);
+    update({ data: object });
+    callback();
 };
 
 // export const bind = (keys) => {
