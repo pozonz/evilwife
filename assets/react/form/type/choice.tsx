@@ -30,12 +30,20 @@ export const Choice = ({ keys = [] }: { keys: Array<string> }) => {
         return () => tom.destroy();
     }, [id]);
 
+    const invalid = errors.length > 0;
+    useEffect(() => {
+        const wrapper = selectRef.current?.nextElementSibling;
+        if (wrapper?.classList.contains('ts-wrapper')) {
+            wrapper.classList.toggle('is-invalid', invalid);
+        }
+    }, [id, invalid]);
+
     return (
         <div className="mb-0">
             <label className="form-label" htmlFor={id}>{schema.label}</label>
             <select
                 ref={selectRef}
-                className={`${cls}${errors.length ? ' is-invalid' : ''}`}
+                className={cls}
                 id={id}
                 name={multiple ? `${name}[]` : name}
                 multiple={multiple}
