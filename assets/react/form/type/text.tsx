@@ -1,7 +1,7 @@
-import { getTypeByKeys, applyChange } from '../dom';
+import { getInfo, applyChange } from '../dom';
 
 export const Text = ({ keys = [] }: { keys: Array<string> }) => {
-    const { schema, id, name, value, errors } = getTypeByKeys(keys);
+    const { schema, id, name, value, errors } = getInfo(keys);
 
     const cls = (schema.attr && schema.attr.class) || 'form-control';
     const type = schema.type === 'integer' ? 'number' : 'text';

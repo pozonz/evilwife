@@ -2,10 +2,10 @@ import { useEffect, useRef } from 'react';
 import $ from 'jquery';
 import 'chosen-js';
 import 'chosen-js/chosen.css';
-import { getTypeByKeys, applyChange } from '../dom';
+import { getInfo, applyChange } from '../dom';
 
 export const Choice = ({ keys = [] }: { keys: Array<string> }) => {
-    const { schema, id, name, value, errors } = getTypeByKeys(keys);
+    const { schema, id, name, value, errors } = getInfo(keys);
     const selectRef = useRef<HTMLSelectElement>(null);
     const multiple = !!schema.multiple;
     const cls = (schema.attr && schema.attr.class) || 'form-select';

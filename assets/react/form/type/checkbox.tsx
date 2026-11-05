@@ -1,7 +1,7 @@
-import { getTypeByKeys, applyChange } from '../dom';
+import { getInfo, applyChange } from '../dom';
 
 export const Checkbox = ({ keys = [] }: { keys: Array<string> }) => {
-    const { schema, id, name, value, errors } = getTypeByKeys(keys);
+    const { schema, id, name, value, errors } = getInfo(keys);
 
     return (
         <div className="form-check">

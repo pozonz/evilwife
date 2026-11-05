@@ -7,34 +7,28 @@ import { Textarea } from './type/textarea';
 import { ModelFieldCollection } from './collection/modelFieldForm';
 import { ComponentType } from 'react';
 
-export const getType = (type: string) => {
+export const getType = (field: any) => {
+    const type = field?.type === 'collection' ? field.entry?.type : field?.type;
     const types = { choice: Choice, checkbox: Checkbox, textarea: Textarea, model_field_form: ModelFieldCollection };
     return (types[type as keyof typeof types] || Text) as ComponentType<{ keys: Array<string> }>;
 };
 
-const keysFromName = (fieldName: string) => {
-    const { schema } = useFormStore.getState();
-    
-    const keys = String(fieldName ?? '').split(/[.\[\]]/).filter((part) => part !== '' && part != null);
-    if (schema && keys[0] === schema.name) {
-        keys.shift();
-    }
-    return keys;
-};
-
-export const getTypeByKeys = (keys: Array<string>) => {
+export const getInfo = (keys: Array<string>) => {
     let { schema, data, errors } = useFormStore();
     const rootName = schema.name || '';
 
     keys.forEach((key) => {
-        if (schema && schema.type === 'collection' && /^\d+$/.test(String(key))) {
+        if (schema.type === 'collection' && /^\d+$/.test(String(key))) {
             schema = schema.entry;
             return;
         }
         schema = ((schema && schema.fields) || {})[key];
     });
     const last = keys[keys.length - 1];
-    if (keys.some((key) => /^\d+$/.test(String(key))) && ['widget', 'label', 'field', 'constraints'].includes(last)) {
+    if (schema.type === 'collection' && schema.entry?.type) {
+        schema = { ...schema, type: schema.entry.type };
+    }
+    if (schema && keys.some((key) => /^\d+$/.test(String(key))) && ['widget', 'label', 'field', 'constraints'].includes(last)) {
         schema = Object.assign({}, schema, { label: null });
     }
 
@@ -92,4 +86,14 @@ export const applyChange = (el: HTMLInputElement | HTMLTextAreaElement | HTMLSel
 
     update({ data: next });
     validate();
+};
+
+const keysFromName = (fieldName: string) => {
+    const { schema } = useFormStore.getState();
+    
+    const keys = String(fieldName ?? '').split(/[.\[\]]/).filter((part) => part !== '' && part != null);
+    if (schema && keys[0] === schema.name) {
+        keys.shift();
+    }
+    return keys;
 };

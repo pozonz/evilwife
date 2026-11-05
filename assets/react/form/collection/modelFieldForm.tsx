@@ -3,7 +3,7 @@ import $ from 'jquery';
 import 'jquery-ui/dist/jquery-ui';
 import 'jquery-ui/dist/themes/base/jquery-ui.css';
 import useFormStore from '../store';
-import { getTypeByKeys, getType } from '../dom';
+import { getInfo, getType } from '../dom';
 
 const row = ['widget', 'label', 'field', 'constraints'];
 const extra = ['sqlQuery'];
@@ -36,7 +36,7 @@ const Field = ({ itemKeys, name, fields }: { itemKeys: string[]; name: string; f
         return null;
     }
 
-    const Component = getType(fields[name].type);
+    const Component = getType(fields[name]);
 
     return (
         <div>
@@ -46,9 +46,9 @@ const Field = ({ itemKeys, name, fields }: { itemKeys: string[]; name: string; f
 };
 
 const Settings = ({ itemKeys, fields }: { itemKeys: string[]; fields: any }) => {
-    const { id } = getTypeByKeys(itemKeys);
-    const title = getTypeByKeys([...itemKeys, 'label']).value;
-    const fieldKey = getTypeByKeys([...itemKeys, 'field']).value;
+    const { id } = getInfo(itemKeys);
+    const title = getInfo([...itemKeys, 'label']).value;
+    const fieldKey = getInfo([...itemKeys, 'field']).value;
     const modalId = `${id}-settings`;
 
     return (
@@ -71,7 +71,7 @@ const Settings = ({ itemKeys, fields }: { itemKeys: string[]; fields: any }) => 
 };
 
 const Item = ({ itemKeys, fields }: { itemKeys: string[]; fields: any }) => {
-    const { id, value } = getTypeByKeys(itemKeys);
+    const { id, value } = getInfo(itemKeys);
     const modalId = `${id}-settings`;
     const className = 'field-item' + (String(value && value.widget).indexOf('Choice') === 0 ? ' is-choice' : '');
 
@@ -97,7 +97,7 @@ const Item = ({ itemKeys, fields }: { itemKeys: string[]; fields: any }) => {
 };
 
 export const ModelFieldCollection = ({ keys = [] }: { keys: Array<string> }) => {
-    const { schema, value } = getTypeByKeys(keys);
+    const { schema, value } = getInfo(keys);
     const items = Array.isArray(value) && value.length ? value : [{}];
     const fields = (schema.entry && schema.entry.fields) || {};
     const tableRef = useRef<HTMLDivElement>(null);
