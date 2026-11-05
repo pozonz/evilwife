@@ -3,13 +3,8 @@ import $ from 'jquery';
 import 'jquery-ui/dist/jquery-ui';
 import 'jquery-ui/dist/themes/base/jquery-ui.css';
 import useFormStore from '../store';
-import { getTypeByKeys } from '../dom';
-import { Text } from '../type/text';
-import { Choice } from '../type/choice';
-import { Checkbox } from '../type/checkbox';
-import { Textarea } from '../type/textarea';
+import { getTypeByKeys, getType } from '../dom';
 
-const types = { choice: Choice, checkbox: Checkbox, textarea: Textarea };
 const row = ['widget', 'label', 'field', 'constraints'];
 const extra = ['sqlQuery'];
 const settings = ['showInListingTable', 'listingWidth', 'listingTitle', 'queryableInCmsSearch'];
@@ -33,7 +28,7 @@ const reorder = (path: string[], order: number[]) => {
     const list = Array.isArray(object[key]) ? object[key] : [];
     object[key] = order.map((index) => list[index]).filter((item) => item !== undefined);
     update({ data: next, errors: null });
-    validate(() => {});
+    validate();
 };
 
 const Field = ({ itemKeys, name, fields }: { itemKeys: string[]; name: string; fields: any }) => {
@@ -41,8 +36,7 @@ const Field = ({ itemKeys, name, fields }: { itemKeys: string[]; name: string; f
         return null;
     }
 
-    const fieldType = fields[name].type as keyof typeof types;
-    const Component = (types[fieldType] || Text) as ComponentType<{ keys: Array<string> }>;
+    const Component = getType(fields[name].type);
 
     return (
         <div>
@@ -102,7 +96,7 @@ const Item = ({ itemKeys, fields }: { itemKeys: string[]; fields: any }) => {
     );
 };
 
-export const Collection = ({ keys = [] }: { keys: Array<string> }) => {
+export const ModelFieldCollection = ({ keys = [] }: { keys: Array<string> }) => {
     const { schema, value } = getTypeByKeys(keys);
     const items = Array.isArray(value) && value.length ? value : [{}];
     const fields = (schema.entry && schema.entry.fields) || {};

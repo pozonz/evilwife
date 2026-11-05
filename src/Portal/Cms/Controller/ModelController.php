@@ -89,6 +89,14 @@ class ModelController extends AbstractController
         ]);
     }
 
+    #[Route('/manage/model/save', name: 'manage_model_save')]
+    public function modelSave(Request $request): Response
+    {
+        return $this->json([
+            'errors' => [],
+        ]);
+    }
+
     #[Route('/manage/model/{id}', name: 'manage_model', requirements: ['id' => '\d+'])]
     public function model(int $id): Response
     {

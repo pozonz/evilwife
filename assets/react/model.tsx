@@ -6,6 +6,8 @@ import { Form } from './form/Form';
 
 const container = document.querySelector<HTMLElement>('[data-schema-url]');
 if (container) {
-    const url = container.getAttribute('data-schema-url') || '';
-    createRoot(container).render(<Form url={url} />);
+    const schemaUrl = container.getAttribute('data-schema-url') || '';
+    const saveUrl = container.getAttribute('data-save-url') || '';
+    const validateUrl = container.getAttribute('data-validate-url') || '';
+    createRoot(container).render(<Form schemaUrl={schemaUrl} saveUrl={saveUrl} validateUrl={validateUrl} />);
 }

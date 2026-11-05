@@ -1,5 +1,17 @@
 import useFormStore from './store';
 
+import { Text } from './type/text';
+import { Choice } from './type/choice';
+import { Checkbox } from './type/checkbox';
+import { Textarea } from './type/textarea';
+import { ModelFieldCollection } from './collection/modelFieldForm';
+import { ComponentType } from 'react';
+
+export const getType = (type: string) => {
+    const types = { choice: Choice, checkbox: Checkbox, textarea: Textarea, model_field_form: ModelFieldCollection };
+    return (types[type as keyof typeof types] || Text) as ComponentType<{ keys: Array<string> }>;
+};
+
 const keysFromName = (fieldName: string) => {
     const { schema } = useFormStore.getState();
     
@@ -48,7 +60,7 @@ export const getTypeByKeys = (keys: Array<string>) => {
     };
 };
 
-export const applyChange = (el: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement, callback = () => {}) => {
+export const applyChange = (el: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement) => {
     const { data, update, validate } = useFormStore.getState();
 
     const keys = keysFromName(el.name);
@@ -79,5 +91,5 @@ export const applyChange = (el: HTMLInputElement | HTMLTextAreaElement | HTMLSel
     }
 
     update({ data: next });
-    validate(callback);
+    validate();
 };
