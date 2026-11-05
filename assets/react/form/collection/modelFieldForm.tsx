@@ -30,6 +30,32 @@ const reorder = (path: string[], order: number[]) => {
     setTimeout(() => validate(), 500);
 };
 
+const append = (path: string[]) => {
+    const { data, update, validate } = useFormStore.getState();
+    const next = Array.isArray(data) ? [...data] : { ...(data ?? {}) };
+    let object: any = next;
+
+    for (let i = 0; i < path.length - 1; i++) {
+        const key = path[i];
+        const child = object[key];
+        const copy = child == null || typeof child !== 'object'
+            ? (/^\d+$/.test(String(path[i + 1])) ? [] : {})
+            : (Array.isArray(child) ? [...child] : { ...child });
+        object[key] = copy;
+        object = copy;
+    }
+
+    const key = path[path.length - 1];
+    const list = Array.isArray(object[key]) ? [...object[key]] : [];
+    if (!list.length) {
+        list.push({});
+    }
+    list.push({});
+    object[key] = list;
+    update({ data: next, errors: null });
+    setTimeout(() => validate(), 500);
+};
+
 const Field = ({ itemKeys, name, fields }: { itemKeys: string[]; name: string; fields: any }) => {
     if (!fields[name]) {
         return null;
@@ -111,7 +137,7 @@ export const ModelFieldCollection = ({ keys = [] }: { keys: Array<string> }) => 
     const ids = items.map((_item: any, index: number) => String(index));
     const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
 
-    const onDragStart = (event: DragStartEvent) => {
+    const onDragStart = () => {
         update({ errors: null });
     };
 
@@ -140,6 +166,9 @@ export const ModelFieldCollection = ({ keys = [] }: { keys: Array<string> }) => 
                     ))}
                 </SortableContext>
             </div>
+            <button type="button" className="btn btn-light border mt-2" onClick={() => append(keys)}>
+                Add
+            </button>
         </DndContext>
     );
 };
