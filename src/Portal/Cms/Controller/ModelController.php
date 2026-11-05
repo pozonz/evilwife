@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -24,35 +25,20 @@ class ModelController extends AbstractController
     public function __construct(
         private readonly ValidatorInterface $validator,
         private readonly Connection $connection,
+        private readonly SerializerInterface $serializer,
     ) {
     }
 
-    #[Route('/manage/model/schema', name: 'manage_model_schema')]
-    public function modelSchemas(): Response
+    #[Route('/manage/model/{className}/schema', name: 'manage_model_schema', requirements: ['className' => '[A-Z][A-Za-z0-9]*'])]
+    public function modelSchemas(string $className): Response
     {
-        $modelField = new ModelField();
-        $modelField->widget = 'Text';
-        $modelField->label = '';
-        $modelField->field = 'title';
-        $modelField->constraints = ['Required', 'Unique'];
-        $modelField->sqlQuery = null;
-        $modelField->showInListingTable = true;
-        $modelField->listingWidth = 10;
-        $modelField->listingTitle = null;
-        $modelField->queryableInCmsSearch = false;
-
-        $model = new Model();
-        $model->title = 'New models3';
-        $model->className = '';
-        $model->fields = [$modelField, $modelField];
-
         $form = $this->createForm(ModelForm::class, new Model(), [
             'csrf_protection' => false,
         ]);
 
         return $this->json([
             'schema' => $this->formToSchema($form),
-            'data' => $model,
+            'data' => $this->modelFromClass($className),
         ]);
     }
     
@@ -203,10 +189,12 @@ class {$className}ORM extends DAO
 PHP;
     }
 
-    #[Route('/manage/model/{id}', name: 'manage_model', requirements: ['id' => '\d+'])]
-    public function model(int $id): Response
+    #[Route('/manage/model/{className}', name: 'manage_model', requirements: ['className' => '[A-Z][A-Za-z0-9]*'])]
+    public function model(string $className): Response
     {
-        return $this->render('@EvilWife/model.twig');
+        return $this->render('@EvilWife/model.twig', [
+            'className' => $className,
+        ]);
     }
 
     private function validate($data, $ignores = []): array
@@ -294,4 +282,16 @@ PHP;
         return $schema;
     }
 
+    private function modelFromClass(string $className): Model
+    {
+        $path = dirname(__DIR__, 3).'/Domain/Data/DAO/'.$className.'/Generated/'.$className.'.json';
+        if (!is_file($path)) {
+            $model = new Model();
+            $model->className = $className;
+
+            return $model;
+        }
+
+        return $this->serializer->deserialize((string) file_get_contents($path), Model::class, 'json');
+    }
 }

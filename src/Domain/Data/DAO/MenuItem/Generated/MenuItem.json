@@ -22,6 +22,11 @@
             "listingWidth": 10,
             "listingTitle": null,
             "queryableInCmsSearch": false
+        },
+        {
+            "widget": "Checkbox",
+            "label": "Test",
+            "field": "test"
         }
     ]
 }

@@ -12,7 +12,7 @@
 <div class="model-builder d-flex align-items-start gap-3">
     <div class="fields-panel card shadow-sm">
         <div class="card-body" 
-            data-schema-url="{{ path('manage_model_schema') }}"
+            data-schema-url="{{ path('manage_model_schema', {className: className}) }}"
             data-save-url="{{ path('manage_model_save') }}"
             data-validate-url="{{ path('manage_model_validate') }}"
         ></div>

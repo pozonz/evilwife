@@ -11,4 +11,9 @@ class MenuItemORM extends DAO
      */
     public $title;
 
+    /**
+     * #pz text COLLATE utf8mb4_unicode_ci DEFAULT NULL
+     */
+    public $test;
+
 }
