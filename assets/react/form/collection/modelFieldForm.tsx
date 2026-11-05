@@ -1,7 +1,6 @@
-import { useEffect, useRef, type ComponentType } from 'react';
-import $ from 'jquery';
-import 'jquery-ui/dist/jquery-ui';
-import 'jquery-ui/dist/themes/base/jquery-ui.css';
+import { DndContext, PointerSensor, closestCenter, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core';
+import { SortableContext, arrayMove, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import useFormStore from '../store';
 import { getInfo, getType } from '../dom';
 
@@ -72,11 +71,18 @@ const Settings = ({ itemKeys, fields }: { itemKeys: string[]; fields: any }) => 
 
 const Item = ({ itemKeys, fields }: { itemKeys: string[]; fields: any }) => {
     const { id, value } = getInfo(itemKeys);
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: itemKeys[itemKeys.length - 1] });
     const modalId = `${id}-settings`;
-    const className = 'field-item' + (String(value && value.widget).indexOf('Choice') === 0 ? ' is-choice' : '');
+    const className = 'field-item' + (String(value && value.widget).indexOf('Choice') === 0 ? ' is-choice' : '') + (isDragging ? ' is-dragging' : '');
 
     return (
-        <div className={className} data-index={itemKeys[itemKeys.length - 1]}>
+        <div
+            ref={setNodeRef}
+            className={className}
+            style={{ transform: CSS.Transform.toString(transform), transition }}
+            {...attributes}
+            {...listeners}
+        >
             {row.map((name) => (
                 <Field key={name} itemKeys={itemKeys} name={name} fields={fields} />
             ))}
@@ -100,56 +106,33 @@ export const ModelFieldCollection = ({ keys = [] }: { keys: Array<string> }) => 
     const { schema, value } = getInfo(keys);
     const items = Array.isArray(value) && value.length ? value : [{}];
     const fields = (schema.entry && schema.entry.fields) || {};
-    const tableRef = useRef<HTMLDivElement>(null);
-    const keysRef = useRef(keys);
-    keysRef.current = keys;
-    const path = keys.join('\0');
-    const orderKey = items.map((item: any) => String(item?.field ?? '')).join('\0');
+    const ids = items.map((_item: any, index: number) => String(index));
+    const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
 
-    useEffect(() => {
-        const table = tableRef.current;
-        if (!table) {
+    const onDragEnd = (event: DragEndEvent) => {
+        const { active, over } = event;
+        if (!over || active.id === over.id) {
             return;
         }
-
-        const $table = $(table);
-        let sorting = false;
-        ($table as any).sortable({
-            items: '.field-item',
-            placeholder: 'field-item-placeholder',
-            forcePlaceholderSize: true,
-            update: () => {
-                if (sorting) {
-                    return;
-                }
-                sorting = true;
-                const order = Array.from(table.querySelectorAll<HTMLElement>(':scope > .field-item'))
-                    .map((item) => Number(item.dataset.index));
-                ($table as any).sortable('cancel');
-                sorting = false;
-                if (order.some((index, position) => index !== position)) {
-                    reorder(keysRef.current, order);
-                }
-            },
-        });
-
-        return () => {
-            ($table as any).sortable('destroy');
-        };
-    }, [path, orderKey]);
+        reorder(keys, arrayMove(ids.map((_, index) => index), Number(active.id), Number(over.id)));
+    };
 
     return (
-        <div className="field-table" ref={tableRef}>
-            <div className="field-grid-head">
-                <div>Widget</div>
-                <div>Label</div>
-                <div>Field</div>
-                <div>Constraints</div>
-                <div></div>
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+            <div className="field-table">
+                <div className="field-grid-head">
+                    <div>Widget</div>
+                    <div>Label</div>
+                    <div>Field</div>
+                    <div>Constraints</div>
+                    <div></div>
+                </div>
+                <SortableContext items={ids} strategy={verticalListSortingStrategy}>
+                    {items.map((_item: any, index: number) => (
+                        <Item key={index} itemKeys={[...keys, String(index)]} fields={fields} />
+                    ))}
+                </SortableContext>
             </div>
-            {items.map((_item: any, index: number) => (
-                <Item key={index} itemKeys={[...keys, String(index)]} fields={fields} />
-            ))}
-        </div>
+        </DndContext>
     );
 };

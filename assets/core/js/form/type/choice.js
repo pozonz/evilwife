@@ -1,6 +1,3 @@
-import 'chosen-js';
-import 'chosen-js/chosen.css';
-
 import { bind, getTypeByKeys, escapeHtml } from '../dom';
 
 export const render = (dom, keys) => {
@@ -25,19 +22,12 @@ export const render = (dom, keys) => {
         </div>
     `;
 
+    const select = dom.querySelector('select');
     const item = dom.closest('.field-item');
-    if (item && /\[widget\]$/.test(name)) {
-        item.classList.toggle('is-choice', String(value).indexOf('Choice') === 0);
-        $(document).on('change', `#${id}`, () => {
-            item.classList.toggle('is-choice', String(document.getElementById(id).value).indexOf('Choice') === 0);
-        });
-    }
-
-    if (multiple) {
-        $(dom).find('select').chosen({
-            width: '100%',
-            placeholder_text_multiple: placeholder || 'Select...',
-        });
+    if (select && item && /\[widget\]$/.test(name)) {
+        const mark = () => item.classList.toggle('is-choice', String(select.value).indexOf('Choice') === 0);
+        mark();
+        select.addEventListener('change', mark);
     }
 
     bind(keys);

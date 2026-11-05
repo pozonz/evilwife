@@ -1,6 +1,3 @@
-import 'jquery-ui/dist/jquery-ui';
-import 'jquery-ui/dist/themes/base/jquery-ui.css';
-
 import { getTypeByKeys, escapeHtml } from '../dom';
 import { render as text } from '../type/text';
 import { render as choice } from '../type/choice';
@@ -87,11 +84,5 @@ export const render = (dom, keys) => {
         const modalEl = document.createElement('div');
         rowEl.appendChild(modalEl);
         modal(modalEl, itemKeys);
-    });
-
-    $(table).sortable({
-        items: '.field-item',
-        placeholder: 'field-item-placeholder',
-        forcePlaceholderSize: true,
     });
 };

@@ -99,10 +99,26 @@ const applyChange = (el, callback = () => {}) => {
     store.validate(callback);
 };
 
+const listeners = new Map();
+
 export const bind = (keys) => {
     const { id } = getTypeByKeys(keys);
 
     error(keys);
 
-    $(document).off('change input', `#${id}`).on('change input', `#${id}`, (ev) => applyChange(ev.target, () => error(keys)));
+    const field = document.getElementById(id);
+    if (!field) {
+        return;
+    }
+
+    const previous = listeners.get(field);
+    if (previous) {
+        field.removeEventListener('change', previous);
+        field.removeEventListener('input', previous);
+    }
+
+    const listener = (ev) => applyChange(ev.target, () => error(keys));
+    field.addEventListener('change', listener);
+    field.addEventListener('input', listener);
+    listeners.set(field, listener);
 };
