@@ -1,4 +1,4 @@
-import { DndContext, PointerSensor, closestCenter, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core';
+import { DndContext, PointerSensor, closestCenter, useSensor, useSensors, type DragEndEvent, type DragStartEvent } from '@dnd-kit/core';
 import { SortableContext, arrayMove, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import useFormStore from '../store';
@@ -27,7 +27,10 @@ const reorder = (path: string[], order: number[]) => {
     const list = Array.isArray(object[key]) ? object[key] : [];
     object[key] = order.map((index) => list[index]).filter((item) => item !== undefined);
     update({ data: next, errors: null });
-    validate();
+
+    setTimeout(() => {
+        validate();
+    }, 500);
 };
 
 const Field = ({ itemKeys, name, fields }: { itemKeys: string[]; name: string; fields: any }) => {
@@ -104,10 +107,16 @@ const Item = ({ itemKeys, fields }: { itemKeys: string[]; fields: any }) => {
 
 export const ModelFieldCollection = ({ keys = [] }: { keys: Array<string> }) => {
     const { schema, value } = getInfo(keys);
+    const { update } = useFormStore.getState();
+
     const items = Array.isArray(value) && value.length ? value : [{}];
     const fields = (schema.entry && schema.entry.fields) || {};
     const ids = items.map((_item: any, index: number) => String(index));
     const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
+
+    const onDragStart = (event: DragStartEvent) => {
+        update({ errors: null });
+    };
 
     const onDragEnd = (event: DragEndEvent) => {
         const { active, over } = event;
@@ -118,7 +127,7 @@ export const ModelFieldCollection = ({ keys = [] }: { keys: Array<string> }) => 
     };
 
     return (
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd} onDragStart={onDragStart}>
             <div className="field-table">
                 <div className="field-grid-head">
                     <div>Widget</div>
