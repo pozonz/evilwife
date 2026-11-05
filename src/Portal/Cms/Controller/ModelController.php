@@ -55,45 +55,22 @@ class ModelController extends AbstractController
     #[Route('/manage/model/validate', name: 'manage_model_validate')]
     public function modelValidate(Request $request): Response
     {
-        $model = new Model();
-        $form = $this->createForm(ModelForm::class, $model, [
-            'csrf_protection' => false,
-        ]);
-
         $data = json_decode($request->getContent(), true);
-        $form->submit($data);
-
-        $violations = $this->validator->validate($model);
-
-        $errors = [];
-        foreach ($violations as $violation) {
-            if ($violation->getConstraint() instanceof NotBlank) {
-                continue;
-            }
-            $errors[] = [
-                'path' => $violation->getPropertyPath(),
-                'message' => $violation->getMessage(),
-            ];
-        }
-
-        if ($errors) {
-            return $this->json([
-                'schema' => $this->formToSchema($form),
-                'errors' => $errors,
-            ]);
-        }
+        $errors = $this->validate($data, [NotBlank::class]);
 
         return $this->json([
-            'schema' => $this->formToSchema($form),
-            'status' => 'Success!',
+            'errors' => $errors,
         ]);
     }
 
     #[Route('/manage/model/save', name: 'manage_model_save')]
     public function modelSave(Request $request): Response
     {
+        $data = json_decode($request->getContent(), true);
+        $errors = $this->validate($data);
+
         return $this->json([
-            'errors' => [],
+            'errors' => $errors,
         ]);
     }
 
@@ -101,6 +78,38 @@ class ModelController extends AbstractController
     public function model(int $id): Response
     {
         return $this->render('@EvilWife/model.twig');
+    }
+
+    private function validate($data, $ignores = []): array
+    {
+        $model = new Model();
+        $form = $this->createForm(ModelForm::class, $model, [
+            'csrf_protection' => false,
+        ]);
+        $form->submit($data);
+
+        $violations = $this->validator->validate($model);
+
+        $errors = [];
+        foreach ($violations as $violation) {
+            $ignored = false;
+            foreach ($ignores as $ignore) {
+                if ($violation->getConstraint() instanceof NotBlank) {
+                    $ignored = true;
+                }
+            }
+            
+            if ($ignored) {
+                continue;
+            }
+
+            $errors[] = [
+                'path' => $violation->getPropertyPath(),
+                'message' => $violation->getMessage(),
+            ];
+        }
+
+        return $errors;
     }
 
     /**
