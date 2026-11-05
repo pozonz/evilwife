@@ -27,10 +27,7 @@ const reorder = (path: string[], order: number[]) => {
     const list = Array.isArray(object[key]) ? object[key] : [];
     object[key] = order.map((index) => list[index]).filter((item) => item !== undefined);
     update({ data: next, errors: null });
-
-    setTimeout(() => {
-        validate();
-    }, 500);
+    setTimeout(() => validate(), 500);
 };
 
 const Field = ({ itemKeys, name, fields }: { itemKeys: string[]; name: string; fields: any }) => {
@@ -107,7 +104,7 @@ const Item = ({ itemKeys, fields }: { itemKeys: string[]; fields: any }) => {
 
 export const ModelFieldCollection = ({ keys = [] }: { keys: Array<string> }) => {
     const { schema, value } = getInfo(keys);
-    const { update } = useFormStore.getState();
+    const { update, validate } = useFormStore.getState();
 
     const items = Array.isArray(value) && value.length ? value : [{}];
     const fields = (schema.entry && schema.entry.fields) || {};
@@ -121,6 +118,7 @@ export const ModelFieldCollection = ({ keys = [] }: { keys: Array<string> }) => 
     const onDragEnd = (event: DragEndEvent) => {
         const { active, over } = event;
         if (!over || active.id === over.id) {
+            setTimeout(() => validate(), 500);
             return;
         }
         reorder(keys, arrayMove(ids.map((_, index) => index), Number(active.id), Number(over.id)));

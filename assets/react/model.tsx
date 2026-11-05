@@ -1,4 +1,7 @@
-import '../core/js/main.js';
+import 'admin-lte/dist/css/adminlte.min.css';
+import '@fortawesome/fontawesome-free/css/all.min.css';
+import 'bootstrap';
+import '../core/css/main.less';
 import '../core/css/model.less';
 
 import { createRoot } from 'react-dom/client';
