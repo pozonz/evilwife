@@ -3,12 +3,24 @@ import useFormStore from './store';
 import { getType } from './dom';
 
 export const Form = ({ schemaUrl, saveUrl, validateUrl }: { schemaUrl: string; saveUrl: string; validateUrl: string }) => {
-    const { update, schema, init } = useFormStore();
+    const { update, schema, init, apply, save } = useFormStore();
 
     useEffect(() => {
         update({ schemaUrl, saveUrl, validateUrl });
         init();
     }, [schemaUrl, saveUrl, validateUrl]);
+
+    useEffect(() => {
+        const applyButton = document.querySelector<HTMLButtonElement>('[data-model-apply]');
+        const saveButton = document.querySelector<HTMLButtonElement>('[data-model-save]');
+        applyButton?.addEventListener('click', apply);
+        saveButton?.addEventListener('click', save);
+
+        return () => {
+            applyButton?.removeEventListener('click', apply);
+            saveButton?.removeEventListener('click', save);
+        };
+    }, [apply, save]);
 
     if (!schema) {
         return null;
