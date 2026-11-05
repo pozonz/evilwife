@@ -34,7 +34,7 @@ class ModelField
 
     #[Assert\NotBlank]
     #[Assert\Choice(choices: self::WIDGETS)]
-    public string $widget = 'Text';
+    public ?string $widget = 'Text';
 
     #[Assert\NotBlank(message: 'Label is required.')]
     public string $label = '';

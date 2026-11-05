@@ -68,7 +68,7 @@ class ModelController extends AbstractController
         $errors = [];
         foreach ($violations as $violation) {
             if ($violation->getConstraint() instanceof NotBlank) {
-                continue;
+                // continue;
             }
             $errors[] = [
                 'path' => $violation->getPropertyPath(),

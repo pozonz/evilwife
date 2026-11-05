@@ -28,6 +28,8 @@ class ModelForm extends AbstractType
             ])
             ->add('modelCategory', ChoiceType::class, [
                 'label' => 'Model category',
+                'required' => false,
+                'placeholder' => '',
                 'choices' => [
                     'Customised' => 'Customised',
                     'Core' => 'Core',
@@ -37,6 +39,8 @@ class ModelForm extends AbstractType
             ])
             ->add('listingType', ChoiceType::class, [
                 'label' => 'Listing type',
+                'required' => false,
+                'placeholder' => '',
                 'choices' => [
                     'Drag & Drop' => 'Drag & Drop',
                     'Table' => 'Table',

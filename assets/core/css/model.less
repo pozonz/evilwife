@@ -23,6 +23,24 @@
         &.is-invalid .ts-control {
             border-color: var(--bs-form-invalid-border-color);
         }
+
+        &.single .ts-control {
+            flex-wrap: nowrap;
+
+            .item {
+                white-space: nowrap;
+            }
+        }
+    }
+
+    .ts-dropdown {
+        width: max-content !important;
+        min-width: 100%;
+        z-index: 20;
+
+        .option {
+            white-space: nowrap;
+        }
     }
 
     .field-table {
@@ -36,7 +54,7 @@
     .field-grid-head,
     .field-item {
         display: grid;
-        grid-template-columns: 1.4fr 1.2fr 1.2fr 1.4fr 3.5rem;
+        grid-template-columns: minmax(13.5rem, 2fr) minmax(0, 1.2fr) minmax(0, 1.2fr) minmax(0, 1.4fr) 3.5rem;
         gap: 0.5rem 0.75rem;
         align-items: center;
         padding: 0.7rem 0.9rem;
@@ -76,7 +94,7 @@
         }
 
         .ts-dropdown {
-            z-index: 5;
+            z-index: 20;
         }
 
         &.is-choice .field-choice-source {

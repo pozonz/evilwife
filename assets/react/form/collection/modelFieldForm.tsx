@@ -8,6 +8,9 @@ const row = ['widget', 'label', 'field', 'constraints'];
 const extra = ['sqlQuery'];
 const settings = ['showInListingTable', 'listingWidth', 'listingTitle', 'queryableInCmsSearch'];
 
+const rowKeys = { current: [] as string[] };
+const nextRowKey = { current: 0 };
+
 const reorder = (path: string[], order: number[]) => {
     const { data, update, validate } = useFormStore.getState();
     const next = Array.isArray(data) ? [...data] : { ...(data ?? {}) };
@@ -25,6 +28,7 @@ const reorder = (path: string[], order: number[]) => {
 
     const key = path[path.length - 1];
     const list = Array.isArray(object[key]) ? object[key] : [];
+    rowKeys.current = order.map((index) => rowKeys.current[index]);
     object[key] = order.map((index) => list[index]).filter((item) => item !== undefined);
     update({ data: next, errors: null });
     setTimeout(() => validate(), 500);
@@ -47,10 +51,32 @@ const append = (path: string[]) => {
 
     const key = path[path.length - 1];
     const list = Array.isArray(object[key]) ? [...object[key]] : [];
-    if (!list.length) {
-        list.push({});
-    }
     list.push({});
+    rowKeys.current.push(`row-${nextRowKey.current++}`);
+    object[key] = list;
+    update({ data: next, errors: null });
+    setTimeout(() => validate(), 500);
+};
+
+const remove = (path: string[], index: number) => {
+    const { data, update, validate } = useFormStore.getState();
+    const next = Array.isArray(data) ? [...data] : { ...(data ?? {}) };
+    let object: any = next;
+
+    for (let i = 0; i < path.length - 1; i++) {
+        const key = path[i];
+        const child = object[key];
+        const copy = child == null || typeof child !== 'object'
+            ? (/^\d+$/.test(String(path[i + 1])) ? [] : {})
+            : (Array.isArray(child) ? [...child] : { ...child });
+        object[key] = copy;
+        object = copy;
+    }
+
+    const key = path[path.length - 1];
+    const list = Array.isArray(object[key]) ? [...object[key]] : [];
+    list.splice(index, 1);
+    rowKeys.current.splice(index, 1);
     object[key] = list;
     update({ data: next, errors: null });
     setTimeout(() => validate(), 500);
@@ -112,11 +138,16 @@ const Item = ({ itemKeys, fields }: { itemKeys: string[]; fields: any }) => {
             {row.map((name) => (
                 <Field key={name} itemKeys={itemKeys} name={name} fields={fields} />
             ))}
-            <div className="field-actions">
+            <div className="field-actions" onPointerDown={(event) => event.stopPropagation()}>
                 <button type="button" className="field-settings-btn" data-bs-toggle="modal" data-bs-target={`#${modalId}`} aria-label="Field settings">
                     <i className="fa-solid fa-ellipsis" />
                 </button>
-                <button type="button" className="field-remove-btn" aria-label="Remove">
+                <button
+                    type="button"
+                    className="field-remove-btn"
+                    aria-label="Remove"
+                    onClick={() => remove(itemKeys.slice(0, -1), Number(itemKeys[itemKeys.length - 1]))}
+                >
                     <i className="fa-solid fa-xmark" />
                 </button>
             </div>
@@ -132,7 +163,10 @@ export const ModelFieldCollection = ({ keys = [] }: { keys: Array<string> }) => 
     const { schema, value } = getInfo(keys);
     const { update, validate } = useFormStore.getState();
 
-    const items = Array.isArray(value) && value.length ? value : [{}];
+    const items = Array.isArray(value) ? value : [];
+    while (rowKeys.current.length < items.length) {
+        rowKeys.current.push(`row-${nextRowKey.current++}`);
+    }
     const fields = (schema.entry && schema.entry.fields) || {};
     const ids = items.map((_item: any, index: number) => String(index));
     const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
@@ -152,6 +186,11 @@ export const ModelFieldCollection = ({ keys = [] }: { keys: Array<string> }) => 
 
     return (
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd} onDragStart={onDragStart}>
+            <div className="d-flex justify-content-end mb-2">
+                <button type="button" className="btn btn-light border" onClick={() => append(keys)}>
+                    Add a field
+                </button>
+            </div>
             <div className="field-table">
                 <div className="field-grid-head">
                     <div>Widget</div>
@@ -162,13 +201,10 @@ export const ModelFieldCollection = ({ keys = [] }: { keys: Array<string> }) => 
                 </div>
                 <SortableContext items={ids} strategy={verticalListSortingStrategy}>
                     {items.map((_item: any, index: number) => (
-                        <Item key={index} itemKeys={[...keys, String(index)]} fields={fields} />
+                        <Item key={rowKeys.current[index]} itemKeys={[...keys, String(index)]} fields={fields} />
                     ))}
                 </SortableContext>
             </div>
-            <button type="button" className="btn btn-light border mt-2" onClick={() => append(keys)}>
-                Add
-            </button>
         </DndContext>
     );
 };

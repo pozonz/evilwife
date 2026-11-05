@@ -18,11 +18,11 @@ class Model
 
     #[Assert\NotBlank]
     #[Assert\Choice(choices: ['Customised', 'Core', 'System'])]
-    public string $modelCategory = 'Customised';
+    public ?string $modelCategory = 'Customised';
 
     #[Assert\NotBlank]
     #[Assert\Choice(choices: ['Drag & Drop', 'Table', 'Tree'])]
-    public string $listingType = 'Drag & Drop';
+    public ?string $listingType = 'Drag & Drop';
 
     /** @var list<string> */
     public array $accesses = [];

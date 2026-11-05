@@ -22,6 +22,8 @@ class ModelFieldForm extends AbstractType
         $builder
             ->add('widget', ChoiceType::class, [
                 'label' => 'Widget',
+                'required' => false,
+                'placeholder' => '',
                 'choices' => $widgets,
                 'attr' => ['class' => 'form-select widget-select'],
             ])

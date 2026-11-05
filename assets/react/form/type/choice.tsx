@@ -19,10 +19,9 @@ export const Choice = ({ keys = [] }: { keys: Array<string> }) => {
         }
 
         const tom = new TomSelect(element, {
-            plugins: multiple ? ['remove_button'] : ['no_backspace_delete'],
+            plugins: multiple ? ['remove_button'] : undefined,
             placeholder: placeholder || undefined,
             hidePlaceholder: multiple,
-            onDelete: () => multiple,
             onChange: () => {
                 applyChange(element);
             },
