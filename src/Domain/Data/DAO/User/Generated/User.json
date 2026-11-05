@@ -1,0 +1,115 @@
+{
+    "title": "Users",
+    "className": "User",
+    "modelCategory": "Core",
+    "listingType": "Table",
+    "accesses": [],
+    "frontendUrl": null,
+    "searchableInCms": true,
+    "searchableInFrontend": false,
+    "enableVersioning": false,
+    "fields": [
+        {
+            "widget": "Text",
+            "label": "Username:",
+            "field": "title",
+            "constraints": [
+                "Required",
+                "Unique"
+            ],
+            "sqlQuery": null,
+            "showInListingTable": true,
+            "listingWidth": 250,
+            "listingTitle": null,
+            "queryableInCmsSearch": true
+        },
+        {
+            "widget": "Password",
+            "label": "Password:",
+            "field": "passwordInput",
+            "constraints": [],
+            "sqlQuery": null,
+            "showInListingTable": false,
+            "listingWidth": null,
+            "listingTitle": null,
+            "queryableInCmsSearch": false
+        },
+        {
+            "widget": "Hidden",
+            "label": "Password:",
+            "field": "password",
+            "constraints": [],
+            "sqlQuery": null,
+            "showInListingTable": false,
+            "listingWidth": null,
+            "listingTitle": null,
+            "queryableInCmsSearch": false
+        },
+        {
+            "widget": "Text",
+            "label": "Name:",
+            "field": "name",
+            "constraints": [],
+            "sqlQuery": null,
+            "showInListingTable": true,
+            "listingWidth": 250,
+            "listingTitle": null,
+            "queryableInCmsSearch": true
+        },
+        {
+            "widget": "Text",
+            "label": "Email:",
+            "field": "email",
+            "constraints": [],
+            "sqlQuery": null,
+            "showInListingTable": true,
+            "listingWidth": null,
+            "listingTitle": null,
+            "queryableInCmsSearch": true
+        },
+        {
+            "widget": "Choice multi",
+            "label": "Accessible menu items:",
+            "field": "accessibleSections",
+            "constraints": [],
+            "sqlQuery": "SELECT id AS `key`, title AS value FROM CmsMenuItem WHERE `_versionOrmId` IS NULL ORDER BY `_rank`",
+            "showInListingTable": false,
+            "listingWidth": null,
+            "listingTitle": null,
+            "queryableInCmsSearch": false
+        },
+        {
+            "widget": "Hidden",
+            "label": "TOTP Secret:",
+            "field": "totpSecret",
+            "constraints": [],
+            "sqlQuery": null,
+            "showInListingTable": false,
+            "listingWidth": null,
+            "listingTitle": null,
+            "queryableInCmsSearch": false
+        },
+        {
+            "widget": "Hidden",
+            "label": "TOTP Enabled:",
+            "field": "totpEnabled",
+            "constraints": [],
+            "sqlQuery": null,
+            "showInListingTable": false,
+            "listingWidth": null,
+            "listingTitle": null,
+            "queryableInCmsSearch": false
+        },
+        {
+            "widget": "Hidden",
+            "label": "Backup Codes:",
+            "field": "backupCodes",
+            "constraints": [],
+            "sqlQuery": null,
+            "showInListingTable": false,
+            "listingWidth": null,
+            "listingTitle": null,
+            "queryableInCmsSearch": false
+        }
+    ]
+}
