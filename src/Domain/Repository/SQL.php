@@ -25,7 +25,7 @@ class SQL
      */
     public function __construct(Connection $connection, $table)
     {
-        $this->pdo = $connection;
+        $this->connection = $connection;
         $this->table = $table;
     }
 
@@ -69,9 +69,7 @@ class SQL
     {
         $fields = array();
         $sql = "DESCRIBE `{$this->table}`";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute();
-        $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $result = $this->connection->executeQuery($sql)->fetchAllAssociative();
         foreach ($result as $itm) {
             $fields[$itm['Field']] = $itm['Type'] . ($itm['Null'] == 'NO' ? ' NOT NULL' : ' NULL');
         }
@@ -125,8 +123,8 @@ class SQL
         try {
             $sql = "ALTER TABLE `{$this->table}` 
                       ADD COLUMN `$column` $attrs" . ($lastColumn ? " AFTER `$lastColumn`" : '');
-            $stmt = $this->pdo->prepare($sql);
-            return $stmt->execute();
+            $this->connection->executeStatement($sql);
+            return true;
         } catch (\Exception $ex) {
             var_dump($ex->getMessage());
             exit;
@@ -145,8 +143,8 @@ class SQL
         try {
             $sql = "ALTER TABLE `{$this->table}` 
                       CHANGE `$oldColumn` `$newColumn` $dataType" . ($lastColumn ? " AFTER `$lastColumn`" : '');
-            $stmt = $this->pdo->prepare($sql);
-            return $stmt->execute();
+            $this->connection->executeStatement($sql);
+            return true;
         } catch (\Exception $ex) {
             var_dump($ex->getMessage());
             exit;
@@ -162,8 +160,7 @@ class SQL
             $sql = "CREATE TABLE IF NOT EXISTS `{$this->table}` (
                     `id` int(11) NOT NULL AUTO_INCREMENT, 
                     PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute();
+            $this->connection->executeStatement($sql);
         } catch (\Exception $ex) {
             var_dump($ex->getMessage());
             exit;
@@ -177,8 +174,7 @@ class SQL
     {
         try {
             $sql = "ALTER TABLE `$this->table` RENAME TO `$newTableName`;";
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute();
+            $this->connection->executeStatement($sql);
             $this->table = $newTableName;
         } catch (\Exception $ex) {
             var_dump($ex->getMessage());
@@ -193,8 +189,7 @@ class SQL
     {
         try {
             $sql = "SELECT 1 FROM `{$this->table}`";
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute();
+            $this->connection->executeQuery($sql);
             return 1;
         } catch (\Exception $ex) {
 //            var_dump($ex->getMessage());
@@ -213,8 +208,8 @@ class SQL
         try {
             $sql = "ALTER TABLE `{$this->table}`
                       ADD INDEX `$index` (`$column` ASC);";
-            $stmt = $this->pdo->prepare($sql);
-            return $stmt->execute();
+            $this->connection->executeStatement($sql);
+            return true;
         } catch (\Exception $ex) {
             var_dump($ex->getMessage());
             exit;
@@ -228,7 +223,7 @@ class SQL
     public function drop()
     {
         $sql = "DROP TABLE IF EXISTS `$this->table`";
-        $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute();
+        $this->connection->executeStatement($sql);
+        return true;
     }
 }

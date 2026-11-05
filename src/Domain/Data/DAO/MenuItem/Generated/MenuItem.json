@@ -1,0 +1,27 @@
+{
+    "title": "Menu items",
+    "className": "MenuItem",
+    "modelCategory": "Customised",
+    "listingType": "Drag & Drop",
+    "accesses": [],
+    "frontendUrl": null,
+    "searchableInCms": false,
+    "searchableInFrontend": false,
+    "enableVersioning": false,
+    "fields": [
+        {
+            "widget": "Text",
+            "label": "Title",
+            "field": "title",
+            "constraints": [
+                "Required",
+                "Unique"
+            ],
+            "sqlQuery": null,
+            "showInListingTable": true,
+            "listingWidth": 10,
+            "listingTitle": null,
+            "queryableInCmsSearch": false
+        }
+    ]
+}
