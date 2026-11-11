@@ -1,16 +1,30 @@
-import 'admin-lte/dist/css/adminlte.min.css';
-import '@fortawesome/fontawesome-free/css/all.min.css';
-import 'bootstrap';
-import '../core/css/main.less';
 import '../core/css/model.less';
 
-import { createRoot } from 'react-dom/client';
 import { Form } from './form/Form';
 
-const container = document.querySelector<HTMLElement>('[data-schema-url]');
-if (container) {
-    const schemaUrl = container.getAttribute('data-schema-url') || '';
-    const saveUrl = container.getAttribute('data-save-url') || '';
-    const validateUrl = container.getAttribute('data-validate-url') || '';
-    createRoot(container).render(<Form schemaUrl={schemaUrl} saveUrl={saveUrl} validateUrl={validateUrl} />);
-}
+export const Model = ({ className }: { className: string }) => {
+    const schemaUrl = `/manage/model/${className}/schema`;
+    const saveUrl = '/manage/model/save';
+    const validateUrl = '/manage/model/validate';
+
+    return (
+        <div className="model-builder d-flex align-items-start gap-3">
+            <div className="fields-panel card shadow-sm">
+                <div className="card-body">
+                    <Form schemaUrl={schemaUrl} saveUrl={saveUrl} validateUrl={validateUrl} />
+                </div>
+            </div>
+
+            <div className="toolbar-panel card shadow-sm">
+                <div className="card-body py-2 px-3 d-flex align-items-center gap-3">
+                    <div className="form-check form-switch mb-0">
+                        <input className="form-check-input" type="checkbox" id="model-status" defaultChecked />
+                        <label className="form-check-label visually-hidden" htmlFor="model-status">Enabled</label>
+                    </div>
+                    <button type="button" className="btn btn-light border" data-model-apply>Apply</button>
+                    <button type="button" className="btn btn-info text-white" data-model-save>Save &amp; exit</button>
+                </div>
+            </div>
+        </div>
+    );
+};

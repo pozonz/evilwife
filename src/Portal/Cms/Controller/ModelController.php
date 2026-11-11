@@ -189,14 +189,6 @@ class {$className}ORM extends DAO
 PHP;
     }
 
-    #[Route('/manage/model/{className}', name: 'manage_model', requirements: ['className' => '[A-Z][A-Za-z0-9]*'])]
-    public function model(string $className): Response
-    {
-        return $this->render('@EvilWife/model.twig', [
-            'className' => $className,
-        ]);
-    }
-
     private function validate($data, $ignores = []): array
     {
         $model = new Model();
