@@ -2,7 +2,9 @@
 
 namespace Pozo\EvilWife\Portal\Cms\Controller;
 
+use Doctrine\DBAL\Connection;
 use Pozo\EvilWife\Domain\Model\Form\DAOForm;
+use Pozo\EvilWife\Domain\Service\UtilsService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,8 +15,13 @@ use Symfony\Component\Routing\Attribute\Route;
 #[AsController]
 class DAOController extends AbstractController
 {
-    #[Route('/manage/dao/{className}/schema', name: 'manage_dao_schema', requirements: ['className' => '[A-Z][A-Za-z0-9]*'])]
-    public function schema(string $className): Response
+    public function __construct(
+        private readonly Connection $connection,
+    ) {
+    }
+
+    #[Route('/manage/dao/{className}/{id}/schema', name: 'manage_dao_schema', requirements: ['className' => '[A-Z][A-Za-z0-9]*', 'id' => '\d+'])]
+    public function schema(string $className, int $id): Response
     {
         $path = dirname(__DIR__, 3).'/Domain/Data/DAO/'.$className.'/Generated/'.$className.'.json';
         $model = is_file($path) ? json_decode((string) file_get_contents($path), true) : [];
@@ -25,9 +32,11 @@ class DAOController extends AbstractController
             'csrf_protection' => false,
         ]);
 
+        $class = UtilsService::getFullClassFromName($className);
+
         return $this->json([
             'schema' => $this->formToSchema($form),
-            'data' => $this->emptyData($fields),
+            'data' => $class ? $class::getById($this->connection, $id) : null,
         ]);
     }
 
@@ -49,24 +58,6 @@ class DAOController extends AbstractController
     public function save(string $className, Request $request): Response
     {
         return $this->validate($className, $request);
-    }
-
-    /**
-     * @param list<mixed> $fields
-     * @return array<string, mixed>
-     */
-    private function emptyData(array $fields): array
-    {
-        $data = [];
-        foreach ($fields as $field) {
-            if (!is_array($field) || !isset($field['field'])) {
-                continue;
-            }
-            $widget = (string) ($field['widget'] ?? '');
-            $data[(string) $field['field']] = str_contains($widget, 'multi') ? [] : null;
-        }
-
-        return $data;
     }
 
     /**
