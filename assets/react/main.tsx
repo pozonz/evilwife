@@ -18,7 +18,7 @@ const ModelRoute = () => {
 const root = document.getElementById('cms-app');
 if (root) {
     createRoot(root).render(
-        <BrowserRouter>
+        <BrowserRouter future={{ v7_relativeSplatPath: true }}>
             <Routes>
                 <Route path="/manage/model/:className" element={<ModelRoute />} />
             </Routes>
