@@ -165,9 +165,11 @@ class Model extends DAO
         $types = ModelService::getModelColumnTypes();
         $columnsJson = $this->objColumnsJson();
         foreach ($columnsJson as $itm) {
-            if ($types[$itm->id]) {
-                $columns[$itm->field] = $types[$itm->id];
+            if (empty($itm->field)) {
+                continue;
             }
+            $type = isset($itm->id) ? ($types[$itm->id] ?? null) : null;
+            $columns[$itm->field] = $type ?: 'text COLLATE utf8mb4_unicode_ci NULL';
         }
 
         return $columns;

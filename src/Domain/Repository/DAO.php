@@ -292,7 +292,29 @@ abstract class DAO implements \JsonSerializable
     static public function getModel($connection)
     {
         $className = UtilsService::basename(get_called_class());
-        return UtilsService::getModelFromName($className, $connection);
+        $path = dirname(__DIR__).'/Data/DAO/'.$className.'/Generated/'.$className.'.json';
+        if (!is_file($path)) {
+            return null;
+        }
+
+        $data = json_decode((string) file_get_contents($path));
+        if (!$data instanceof \stdClass) {
+            return null;
+        }
+
+        $model = new Model($connection);
+        $model->title = $data->title ?? '';
+        $model->className = $data->className ?? $className;
+        $model->modelCategory = $data->modelCategory ?? null;
+        $model->listingType = $data->listingType ?? null;
+        $model->frontendUrl = $data->frontendUrl ?? null;
+        $model->searchableInCms = $data->searchableInCms ?? false;
+        $model->searchableInFrontend = $data->searchableInFrontend ?? false;
+        $model->enableVersioning = $data->enableVersioning ?? false;
+        $model->accesses = json_encode($data->accesses ?? []);
+        $model->columnsJson = json_encode($data->fields ?? []);
+
+        return $model;
     }
 
     /**
