@@ -4,6 +4,8 @@ namespace Pozo\EvilWife\Domain\Repository;
 
 use Cocur\Slugify\Slugify;
 use Doctrine\DBAL\Connection;
+use Pozo\EvilWife\Domain\Model\DTO\Model;
+use Pozo\EvilWife\Domain\Model\DTO\ModelField;
 use Pozo\EvilWife\Domain\Service\UtilsService;
 use Ramsey\Uuid\Uuid;
 
@@ -234,8 +236,7 @@ abstract class DAO implements \JsonSerializable
         }
 
         $model = static::getModel($this->_connection);
-        $objColumnJson = $model->objColumnsJson();
-        foreach ($objColumnJson as $columnJson) {
+        foreach ($model ? $model->fields : [] as $columnJson) {
             if ($columnJson->field == $field) {
 
                 if (in_array($columnJson->widget, ModelService::getRelationalWidgets())) {
@@ -297,24 +298,77 @@ abstract class DAO implements \JsonSerializable
             return null;
         }
 
-        $data = json_decode((string) file_get_contents($path));
-        if (!$data instanceof \stdClass) {
+        $data = json_decode((string) file_get_contents($path), true);
+        if (!is_array($data)) {
             return null;
         }
 
-        $model = new Model($connection);
-        $model->title = $data->title ?? '';
-        $model->className = $data->className ?? $className;
-        $model->modelCategory = $data->modelCategory ?? null;
-        $model->listingType = $data->listingType ?? null;
-        $model->frontendUrl = $data->frontendUrl ?? null;
-        $model->searchableInCms = $data->searchableInCms ?? false;
-        $model->searchableInFrontend = $data->searchableInFrontend ?? false;
-        $model->enableVersioning = $data->enableVersioning ?? false;
-        $model->accesses = json_encode($data->accesses ?? []);
-        $model->columnsJson = json_encode($data->fields ?? []);
+        $model = new Model();
+        $model->title = (string) ($data['title'] ?? '');
+        $model->className = (string) ($data['className'] ?? $className);
+        $model->modelCategory = $data['modelCategory'] ?? null;
+        $model->listingType = $data['listingType'] ?? null;
+        $model->accesses = is_array($data['accesses'] ?? null) ? $data['accesses'] : [];
+        $model->frontendUrl = $data['frontendUrl'] ?? null;
+        $model->searchableInCms = (bool) ($data['searchableInCms'] ?? false);
+        $model->searchableInFrontend = (bool) ($data['searchableInFrontend'] ?? false);
+        $model->enableVersioning = (bool) ($data['enableVersioning'] ?? false);
+        $model->fields = [];
+        foreach ($data['fields'] ?? [] as $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+            $field = new ModelField();
+            $field->widget = $item['widget'] ?? 'Text';
+            $field->label = (string) ($item['label'] ?? '');
+            $field->field = (string) ($item['field'] ?? '');
+            $field->constraints = is_array($item['constraints'] ?? null) ? $item['constraints'] : [];
+            $field->sqlQuery = $item['sqlQuery'] ?? null;
+            $field->showInListingTable = (bool) ($item['showInListingTable'] ?? false);
+            $field->listingWidth = isset($item['listingWidth']) && $item['listingWidth'] !== '' ? (int) $item['listingWidth'] : null;
+            $field->listingTitle = $item['listingTitle'] ?? null;
+            $field->queryableInCmsSearch = (bool) ($item['queryableInCmsSearch'] ?? false);
+            $model->fields[] = $field;
+        }
 
         return $model;
+    }
+
+    private static function tableName(Model $model): string
+    {
+        return (new Slugify(['trim' => false]))->slugify($model->className, '_');
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private static function tableColumns(Model $model): array
+    {
+        $columns = [];
+        $reflection = new \ReflectionClass(get_called_class());
+        do {
+            foreach ($reflection->getProperties() as $property) {
+                $name = $property->getName();
+                if ($name !== 'id' && !str_starts_with($name, '_')) {
+                    continue;
+                }
+                $comment = $property->getDocComment();
+                if (!is_string($comment) || !preg_match('/#pz(\ )+(.*)/', $comment, $matches)) {
+                    continue;
+                }
+                $columns[$name] = $matches[2];
+            }
+            $reflection = $reflection->getParentClass();
+        } while ($reflection);
+
+        foreach ($model->fields as $field) {
+            if (!$field instanceof ModelField || $field->field === '') {
+                continue;
+            }
+            $columns[$field->field] = 'text COLLATE utf8mb4_unicode_ci NULL';
+        }
+
+        return $columns;
     }
 
     /**
@@ -429,8 +483,8 @@ abstract class DAO implements \JsonSerializable
     {
         /** @var Model $model */
         $model = static::getModel($connection);
-        $tableName = $model->getTableName();
-        $fields = array_keys($model->getTableColumns());
+        $tableName = static::tableName($model);
+        $fields = array_keys(static::tableColumns($model));
 
         $myClass = get_called_class();
         $implementedInterfaces = class_implements($myClass);
@@ -564,8 +618,8 @@ abstract class DAO implements \JsonSerializable
 
         /** @var Model $model */
         $model = static::getModel($this->_connection);
-        $tableName = $model->getTableName();
-        $fields = array_keys($model->getTableColumns());
+        $tableName = static::tableName($model);
+        $fields = array_keys(static::tableColumns($model));
 
         $sql = '';
         $params = [];
@@ -640,7 +694,7 @@ abstract class DAO implements \JsonSerializable
 
         /** @var Model $model */
         $model = static::getModel($this->_connection);
-        $tableName = $model->getTableName();
+        $tableName = static::tableName($model);
 
         $sql = "DELETE FROM `{$tableName}` WHERE id = ?";
         return $this->_connection->executeStatement($sql, [$this->id]);
@@ -653,7 +707,7 @@ abstract class DAO implements \JsonSerializable
     public function getSiteMapUrlByCustomUrl($customUrl)
     {
         $model = static::getModel($this->_connection);
-        $fields = array_keys($model->getTableColumns());
+        $fields = array_keys(static::tableColumns($model));
         foreach ($fields as $field) {
             $customUrl = str_replace("{{{$field}}}", $this->$field, $customUrl);
         }
