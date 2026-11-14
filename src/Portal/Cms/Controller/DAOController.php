@@ -23,9 +23,7 @@ class DAOController extends AbstractController
     #[Route('/manage/dao/{className}/{id}/schema', name: 'manage_dao_schema', requirements: ['className' => '[A-Z][A-Za-z0-9]*', 'id' => '\d+'])]
     public function schema(string $className, int $id): Response
     {
-        $path = dirname(__DIR__, 3).'/Domain/Data/DAO/'.$className.'/Generated/'.$className.'.json';
-        $model = is_file($path) ? json_decode((string) file_get_contents($path), true) : [];
-        $fields = is_array($model['fields'] ?? null) ? $model['fields'] : [];
+        $fields = $this->fields($className);
 
         $form = $this->createForm(DAOForm::class, null, [
             'fields' => $fields,
@@ -46,18 +44,113 @@ class DAOController extends AbstractController
         $data = json_decode($request->getContent(), true);
 
         return $this->json([
-            'className' => $className,
-            'errors' => is_array($data) ? [] : [[
-                'path' => '',
-                'message' => 'Invalid JSON.',
-            ]],
+            'errors' => $this->errors($className, $data),
         ]);
     }
 
     #[Route('/manage/dao/{className}/save', name: 'manage_dao_save', requirements: ['className' => '[A-Z][A-Za-z0-9]*'])]
     public function save(string $className, Request $request): Response
     {
-        return $this->validate($className, $request);
+        $data = json_decode($request->getContent(), true);
+        $errors = $this->errors($className, $data);
+        if (!$errors && is_array($data)) {
+            $this->write($className, $data);
+        }
+
+        return $this->json([
+            'errors' => $errors,
+        ]);
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    private function fields(string $className): array
+    {
+        $path = dirname(__DIR__, 3).'/Domain/Data/DAO/'.$className.'/Generated/'.$className.'.json';
+        $model = is_file($path) ? json_decode((string) file_get_contents($path), true) : [];
+
+        return is_array($model['fields'] ?? null) ? $model['fields'] : [];
+    }
+
+    /**
+     * @return list<array{path: string, message: string}>
+     */
+    private function errors(string $className, mixed $data): array
+    {
+        if (!is_array($data)) {
+            return [[
+                'path' => '',
+                'message' => 'Invalid JSON.',
+            ]];
+        }
+
+        $class = UtilsService::getFullClassFromName($className);
+        $errors = [];
+        foreach ($this->fields($className) as $field) {
+            if (!is_array($field) || !isset($field['field'])) {
+                continue;
+            }
+            $name = (string) $field['field'];
+            if (!preg_match('/^[a-z][A-Za-z0-9]*$/', $name)) {
+                continue;
+            }
+
+            $value = $data[$name] ?? null;
+            $blank = $value === null || $value === '' || $value === [];
+            $constraints = is_array($field['constraints'] ?? null) ? $field['constraints'] : [];
+            $label = (string) ($field['label'] ?? $name);
+
+            if (in_array('Required', $constraints, true) && $blank) {
+                $errors[] = [
+                    'path' => $name,
+                    'message' => $label.' is required.',
+                ];
+            }
+
+            if ($class && in_array('Unique', $constraints, true) && !$blank && !is_array($value)) {
+                $existing = $class::getByField($this->connection, $name, $value);
+                if ($existing && (string) $existing->id !== (string) ($data['id'] ?? '')) {
+                    $errors[] = [
+                        'path' => $name,
+                        'message' => $label.' must be unique.',
+                    ];
+                }
+            }
+        }
+
+        return $errors;
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function write(string $className, array $data): void
+    {
+        $class = UtilsService::getFullClassFromName($className);
+        if (!$class) {
+            return;
+        }
+
+        $id = $data['id'] ?? null;
+        $record = $id ? $class::getById($this->connection, $id) : null;
+        if (!$record) {
+            $record = new $class($this->connection);
+        }
+
+        foreach ($this->fields($className) as $field) {
+            if (!is_array($field) || !isset($field['field'])) {
+                continue;
+            }
+            $name = (string) $field['field'];
+            if (!preg_match('/^[a-z][A-Za-z0-9]*$/', $name) || !array_key_exists($name, $data)) {
+                continue;
+            }
+            $value = $data[$name];
+            $record->{$name} = is_array($value) ? json_encode(array_values($value)) : $value;
+        }
+
+        $record->save();
     }
 
     /**
