@@ -5,17 +5,15 @@ namespace Pozo\EvilWife\Portal\Cms\Controller;
 use Cocur\Slugify\Slugify;
 use Doctrine\DBAL\Connection;
 use Pozo\EvilWife\Domain\Model\DTO\Model;
-use Pozo\EvilWife\Domain\Model\DTO\ModelField;
-
 use Pozo\EvilWife\Domain\Model\Form\ModelForm;
 use Pozo\EvilWife\Domain\Repository\SQL;
+use Pozo\EvilWife\Domain\Service\ModelService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -25,7 +23,7 @@ class ModelController extends AbstractController
     public function __construct(
         private readonly ValidatorInterface $validator,
         private readonly Connection $connection,
-        private readonly SerializerInterface $serializer,
+        private readonly ModelService $models,
     ) {
     }
 
@@ -38,7 +36,7 @@ class ModelController extends AbstractController
 
         return $this->json([
             'schema' => $this->formToSchema($form),
-            'data' => $this->modelFromClass($className),
+            'data' => $this->models->modelFromClass($className),
         ]);
     }
     
@@ -65,39 +63,13 @@ class ModelController extends AbstractController
                 'csrf_protection' => false,
             ]);
             $form->submit($data);
-            $this->writeDao($model, $data);
+            $this->models->writeDao($model, $data);
+            $this->syncTable($model->className);
         }
 
         return $this->json([
             'errors' => $errors,
         ]);
-    }
-
-    private function writeDao(Model $model, array $data): void
-    {
-        $className = $model->className;
-        if (!preg_match('/^[A-Z][A-Za-z0-9]*$/', $className)) {
-            return;
-        }
-
-        $base = dirname(__DIR__, 3).'/Domain/Data/DAO/'.$className;
-        $generated = $base.'/Generated';
-        if (!is_dir($generated)) {
-            mkdir($generated, 0775, true);
-        }
-
-        $classFile = $base.'/'.$className.'.php';
-        if (!is_file($classFile)) {
-            file_put_contents($classFile, $this->classSource($className));
-        }
-
-        file_put_contents($generated.'/'.$className.'ORM.php', $this->ormSource($model));
-        file_put_contents(
-            $generated.'/'.$className.'.json',
-            json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)."\n"
-        );
-
-        $this->syncTable($className);
     }
 
     private function syncTable(string $className): void
@@ -107,86 +79,7 @@ class ModelController extends AbstractController
         if (!$sql->exists()) {
             $sql->create();
         }
-        $sql->sync($this->ormColumns($className));
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    private function ormColumns(string $className): array
-    {
-        $class = 'Pozo\\EvilWife\\Domain\\Data\\DAO\\'.$className.'\\Generated\\'.$className.'ORM';
-        $reflection = new \ReflectionClass($class);
-        $properties = [];
-        do {
-            $properties = array_merge($reflection->getProperties(), $properties);
-            $reflection = $reflection->getParentClass();
-        } while ($reflection);
-
-        $columns = [];
-        foreach ($properties as $property) {
-            $comment = $property->getDocComment();
-            if (!is_string($comment) || !preg_match('/#pz(\ )+(.*)/', $comment, $matches)) {
-                continue;
-            }
-            $columns[$property->getName()] = $matches[2];
-        }
-
-        return $columns;
-    }
-
-    private function classSource(string $className): string
-    {
-        return <<<PHP
-<?php
-
-namespace Pozo\\EvilWife\\Domain\\Data\\DAO\\{$className};
-
-use Pozo\\EvilWife\\Domain\\Data\\DAO\\{$className}\\Generated\\{$className}ORM;
-
-class {$className} extends {$className}ORM
-{
-}
-
-PHP;
-    }
-
-    private function ormSource(Model $model): string
-    {
-        $className = $model->className;
-        $properties = '';
-        $seen = [];
-        foreach ($model->fields as $field) {
-            if (!$field instanceof ModelField) {
-                continue;
-            }
-            $name = $field->field;
-            if (!preg_match('/^[a-z][A-Za-z0-9]*$/', $name) || isset($seen[$name])) {
-                continue;
-            }
-            $seen[$name] = true;
-            $properties .= <<<PHP
-
-    /**
-     * #pz text COLLATE utf8mb4_unicode_ci DEFAULT NULL
-     */
-    public \${$name};
-
-PHP;
-        }
-
-        return <<<PHP
-<?php
-
-namespace Pozo\\EvilWife\\Domain\\Data\\DAO\\{$className}\\Generated;
-
-use Pozo\\EvilWife\\Domain\\Repository\\DAO;
-
-class {$className}ORM extends DAO
-{{$properties}
-}
-
-PHP;
+        $sql->sync($this->models->ormColumns($className));
     }
 
     private function validate($data, $ignores = []): array
@@ -274,16 +167,5 @@ PHP;
         return $schema;
     }
 
-    private function modelFromClass(string $className): Model
-    {
-        $path = dirname(__DIR__, 3).'/Domain/Data/DAO/'.$className.'/Generated/'.$className.'.json';
-        if (!is_file($path)) {
-            $model = new Model();
-            $model->className = $className;
 
-            return $model;
-        }
-
-        return $this->serializer->deserialize((string) file_get_contents($path), Model::class, 'json');
-    }
 }
