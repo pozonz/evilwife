@@ -10,12 +10,11 @@ class ModelService
 {
     public function __construct(
         private readonly SerializerInterface $serializer,
-    ) {
-    }
+    ) {}
 
     public function modelFromClass(string $className): Model
     {
-        $path = $this->daoDir($className).'/Generated/'.$className.'.json';
+        $path = $this->daoDir($className) . '/Generated/' . $className . '.json';
         if (!is_file($path)) {
             $model = new Model();
             $model->className = $className;
@@ -34,20 +33,20 @@ class ModelService
         }
 
         $base = $this->daoDir($className);
-        $generated = $base.'/Generated';
+        $generated = $base . '/Generated';
         if (!is_dir($generated)) {
             mkdir($generated, 0775, true);
         }
 
-        $classFile = $base.'/'.$className.'.php';
+        $classFile = $base . '/' . $className . '.php';
         if (!is_file($classFile)) {
             file_put_contents($classFile, $this->classSource($className));
         }
 
-        file_put_contents($generated.'/'.$className.'ORM.php', $this->ormSource($model));
+        file_put_contents($generated . '/' . $className . 'ORM.php', $this->ormSource($model));
         file_put_contents(
-            $generated.'/'.$className.'.json',
-            json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)."\n"
+            $generated . '/' . $className . '.json',
+            json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n"
         );
     }
 
@@ -56,7 +55,7 @@ class ModelService
      */
     public function ormColumns(string $className): array
     {
-        $class = 'Pozo\\EvilWife\\Domain\\Data\\DAO\\'.$className.'\\Generated\\'.$className.'ORM';
+        $class = 'Pozo\\EvilWife\\Domain\\Data\\DAO\\' . $className . '\\Generated\\' . $className . 'ORM';
         $reflection = new \ReflectionClass($class);
         $properties = [];
         do {
@@ -78,7 +77,7 @@ class ModelService
 
     private function daoDir(string $className): string
     {
-        return dirname(__DIR__).'/Data/DAO/'.$className;
+        return dirname(__DIR__) . '/Data/DAO/' . $className;
     }
 
     private function classSource(string $className): string

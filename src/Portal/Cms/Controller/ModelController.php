@@ -24,8 +24,7 @@ class ModelController extends AbstractController
         private readonly ValidatorInterface $validator,
         private readonly Connection $connection,
         private readonly ModelService $models,
-    ) {
-    }
+    ) {}
 
     #[Route('/manage/model/{className}/schema', name: 'manage_model_schema', requirements: ['className' => '[A-Z][A-Za-z0-9]*'])]
     public function modelSchemas(string $className): Response
@@ -39,7 +38,7 @@ class ModelController extends AbstractController
             'data' => $this->models->modelFromClass($className),
         ]);
     }
-    
+
     #[Route('/manage/model/validate', name: 'manage_model_validate')]
     public function modelValidate(Request $request): Response
     {
@@ -100,7 +99,7 @@ class ModelController extends AbstractController
                     $ignored = true;
                 }
             }
-            
+
             if ($ignored) {
                 continue;
             }
@@ -166,6 +165,4 @@ class ModelController extends AbstractController
 
         return $schema;
     }
-
-
 }
