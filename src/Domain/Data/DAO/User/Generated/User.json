@@ -101,7 +101,7 @@
             "queryableInCmsSearch": false
         },
         {
-            "widget": "Hidden",
+            "widget": "Textarea",
             "label": "Backup Codes:",
             "field": "backupCodes",
             "constraints": [],

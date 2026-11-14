@@ -239,17 +239,17 @@ abstract class DAO implements \JsonSerializable
         foreach ($model ? $model->fields : [] as $columnJson) {
             if ($columnJson->field == $field) {
 
-                if (in_array($columnJson->widget, ModelService::getRelationalWidgets())) {
-                    $matches = ModelService::getModelMatchesFromQuery($columnJson->sqlQuery);
+                if (in_array($columnJson->widget, static::relationalWidgets())) {
+                    $matches = static::modelMatchesFromQuery($columnJson->sqlQuery);
                     if (count($matches) == 2 && strtolower($matches[0]) == 'from _model') {
-                        $result = ModelService::getResultModelsFromQuery($this->_connection, $columnJson->sqlQuery, $cmsService);
+                        $result = static::resultModelsFromQuery($this->_connection, $columnJson->sqlQuery, $cmsService);
                     } else if (count($matches) == 2) {
-                        $result = ModelService::getResultModelDataFromQuery($this->_connection, $columnJson->sqlQuery);
+                        $result = static::resultModelDataFromQuery($this->_connection, $columnJson->sqlQuery);
                     } else {
-                        $result = ModelService::getResultQueryDataFromQuery($this->_connection, $columnJson->sqlQuery);
+                        $result = static::resultQueryDataFromQuery($this->_connection, $columnJson->sqlQuery);
                     }
 
-                    if (in_array($columnJson->widget, ModelService::getRelationalJsonWidgets())) {
+                    if (in_array($columnJson->widget, static::relationalJsonWidgets())) {
                         $jsonValue = json_decode($this->$field ?: '[]');
                         $values = [];
                         foreach ($result as $itm) {
@@ -369,6 +369,87 @@ abstract class DAO implements \JsonSerializable
         }
 
         return $columns;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private static function relationalWidgets(): array
+    {
+        return ['Choice', 'Choice multi', 'Choice tree', 'Choice tree multi', 'Choice sortable'];
+    }
+
+    /**
+     * @return list<string>
+     */
+    private static function relationalJsonWidgets(): array
+    {
+        return ['Choice multi', 'Choice tree multi', 'Choice sortable'];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private static function modelMatchesFromQuery(?string $sqlQuery): array
+    {
+        preg_match('/\bfrom\b\s*(\w+)/i', (string) $sqlQuery, $matches);
+
+        return $matches;
+    }
+
+    /**
+     * @return list<object>
+     */
+    private static function resultQueryDataFromQuery($connection, $sqlQuery): array
+    {
+        if (!$sqlQuery) {
+            return [];
+        }
+
+        $rows = $connection->executeQuery($sqlQuery)->fetchAllAssociative();
+
+        return array_map(static fn (array $row) => (object) $row, $rows);
+    }
+
+    /**
+     * @return list<object>
+     */
+    private static function resultModelDataFromQuery($connection, $sqlQuery): array
+    {
+        $matches = static::modelMatchesFromQuery($sqlQuery);
+        if (count($matches) != 2) {
+            return [];
+        }
+
+        $tableName = (new Slugify(['trim' => false]))->slugify($matches[1]);
+        $sqlQuery = str_replace($matches[0], "FROM $tableName", $sqlQuery);
+
+        return static::resultQueryDataFromQuery($connection, $sqlQuery);
+    }
+
+    /**
+     * @return list<object>
+     */
+    private static function resultModelsFromQuery($connection, $sqlQuery, $cmsService): array
+    {
+        $matches = static::modelMatchesFromQuery($sqlQuery);
+        if (count($matches) != 2 || !$cmsService) {
+            return [];
+        }
+
+        UtilsService::getModelFromName($matches[1], $connection);
+        $result = array_map(static function ($model) {
+            return (object) [
+                'key' => $model->className,
+                'value' => $model->title,
+            ];
+        }, $cmsService->getModels());
+
+        usort($result, static function ($a, $b) {
+            return strcmp($a->value, $b->value) > 0 ? 1 : 0;
+        });
+
+        return $result;
     }
 
     /**
