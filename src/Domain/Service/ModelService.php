@@ -6,8 +6,12 @@ use Cocur\Slugify\Slugify;
 use Doctrine\DBAL\Connection;
 use Pozo\EvilWife\Domain\Model\DTO\Model;
 use Pozo\EvilWife\Domain\Model\DTO\ModelField;
+use Pozo\EvilWife\Domain\Model\Form\ModelForm;
 use Pozo\EvilWife\Domain\Repository\SQL;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
@@ -24,6 +28,8 @@ class ModelService
     public function __construct(
         private readonly SerializerInterface $serializer,
         private readonly ?Connection $connection = null,
+        private readonly ?FormFactoryInterface $forms = null,
+        private readonly ?ValidatorInterface $validator = null,
     ) {
         self::$instance = $this;
     }
@@ -56,6 +62,42 @@ class ModelService
         }
 
         return $this->serializer->deserialize($json, Model::class, 'json');
+    }
+
+    /**
+     * @param list<class-string> $ignores
+     * @return list<array{path: string, message: string}>
+     */
+    public function validate(mixed $data, array $ignores = []): array
+    {
+        $model = new Model();
+        $form = $this->forms->create(ModelForm::class, $model, [
+            'csrf_protection' => false,
+        ]);
+        $form->submit($data);
+
+        $violations = $this->validator->validate($model);
+
+        $errors = [];
+        foreach ($violations as $violation) {
+            $ignored = false;
+            foreach ($ignores as $ignore) {
+                if ($violation->getConstraint() instanceof NotBlank) {
+                    $ignored = true;
+                }
+            }
+
+            if ($ignored) {
+                continue;
+            }
+
+            $errors[] = [
+                'path' => $violation->getPropertyPath(),
+                'message' => $violation->getMessage(),
+            ];
+        }
+
+        return $errors;
     }
 
     /**

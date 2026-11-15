@@ -11,13 +11,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[AsController]
 class ModelController extends AbstractController
 {
     public function __construct(
-        private readonly ValidatorInterface $validator,
         private readonly ModelService $models,
     ) {}
 
@@ -38,7 +36,7 @@ class ModelController extends AbstractController
     public function modelValidate(Request $request): Response
     {
         $data = json_decode($request->getContent(), true);
-        $errors = $this->validate($data, [NotBlank::class]);
+        $errors = $this->models->validate($data, [NotBlank::class]);
 
         return $this->json([
             'errors' => $errors,
@@ -49,7 +47,7 @@ class ModelController extends AbstractController
     public function modelSave(Request $request): Response
     {
         $data = json_decode($request->getContent(), true);
-        $errors = $this->validate($data);
+        $errors = $this->models->validate($data);
 
         if (!$errors && is_array($data)) {
             $model = new Model();
@@ -65,37 +63,5 @@ class ModelController extends AbstractController
         return $this->json([
             'errors' => $errors,
         ]);
-    }
-
-    private function validate($data, $ignores = []): array
-    {
-        $model = new Model();
-        $form = $this->createForm(ModelForm::class, $model, [
-            'csrf_protection' => false,
-        ]);
-        $form->submit($data);
-
-        $violations = $this->validator->validate($model);
-
-        $errors = [];
-        foreach ($violations as $violation) {
-            $ignored = false;
-            foreach ($ignores as $ignore) {
-                if ($violation->getConstraint() instanceof NotBlank) {
-                    $ignored = true;
-                }
-            }
-
-            if ($ignored) {
-                continue;
-            }
-
-            $errors[] = [
-                'path' => $violation->getPropertyPath(),
-                'message' => $violation->getMessage(),
-            ];
-        }
-
-        return $errors;
     }
 }
