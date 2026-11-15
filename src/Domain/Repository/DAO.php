@@ -163,6 +163,20 @@ abstract class DAO implements \JsonSerializable
     }
 
     /**
+     * @param array<string, mixed> $data
+     */
+    public function unserialize(array $data): void
+    {
+        foreach (array_keys($this->_getReflectionData()->fields) as $field) {
+            if ($field === 'id' || !array_key_exists($field, $data)) {
+                continue;
+            }
+            $value = $data[$field];
+            $this->{$field} = is_array($value) ? json_encode(array_values($value)) : $value;
+        }
+    }
+
+    /**
      * @return array|null
      */
     public function _ormUser()
@@ -668,78 +682,5 @@ abstract class DAO implements \JsonSerializable
 
         $sql = "DELETE FROM `{$tableName}` WHERE id = ?";
         return $this->_connection->executeStatement($sql, [$this->id]);
-    }
-
-    /**
-     * @param $siteMapUrl
-     * @return string|string[]|null
-     */
-    public function getSiteMapUrlByCustomUrl($customUrl)
-    {
-        $model = static::getModel($this->_connection);
-        $fields = array_keys(static::tableColumns($model));
-        foreach ($fields as $field) {
-            $customUrl = str_replace("{{{$field}}}", $this->$field, $customUrl);
-        }
-        return $customUrl;
-    }
-
-    /**
-     * Return the front-end URL by replacing the value of the sitemap URL's variables
-     * @return string|string[]|null
-     */
-    public function getSiteMapUrl()
-    {
-        /** @var Model $model */
-        $model = static::getModel($this->_connection);
-        if ($model) {
-            $frontendUrl = $model->frontendUrl;
-            return $this->getSiteMapUrlByCustomUrl($frontendUrl);
-        }
-        return null;
-    }
-
-    /**
-     * @return bool
-     */
-    public function enabledVersioning()
-    {
-        return $this instanceof VersionInterface;
-    }
-
-    /**
-     * @return int
-     */
-    public function canBePreviewed()
-    {
-        return $this->enabledVersioning() && $this->getSiteMapUrl() ? 1 : 0;
-    }
-
-    /**
-     * @return array|null
-     */
-    public function objDrafts()
-    {
-        return static::data($this->_connection, [
-            'whereSql' => 'm._versionOrmId = ? AND m._isDraft = 1',
-            'params' => [$this->id],
-            'sort' => 'm.id',
-            'order' => 'DESC',
-            'includePreviousVersion' => 1,
-        ]);
-    }
-
-    /**
-     * @return array|null
-     */
-    public function objVersions()
-    {
-        return static::data($this->_connection, [
-            'whereSql' => 'm._versionOrmId = ? AND m._isDraft = 0',
-            'params' => [$this->id],
-            'sort' => 'm.id',
-			'order' => 'DESC',
-            'includePreviousVersion' => 1,
-        ]);
     }
 }

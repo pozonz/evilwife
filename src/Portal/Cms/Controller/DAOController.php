@@ -17,8 +17,7 @@ class DAOController extends AbstractController
 {
     public function __construct(
         private readonly Connection $connection,
-    ) {
-    }
+    ) {}
 
     #[Route('/manage/dao/{className}/{id}/schema', name: 'manage_dao_schema', requirements: ['className' => '[A-Z][A-Za-z0-9]*', 'id' => '\d+'])]
     public function schema(string $className, int $id): Response
@@ -54,7 +53,17 @@ class DAOController extends AbstractController
         $data = json_decode($request->getContent(), true);
         $errors = $this->errors($className, $data);
         if (!$errors && is_array($data)) {
-            $this->write($className, $data);
+            $class = UtilsService::getFullClassFromName($className);
+            if ($class) {
+                $id = $data['id'] ?? null;
+                $record = $id ? $class::getById($this->connection, $id) : null;
+                if (!$record) {
+                    $record = new $class($this->connection);
+                }
+
+                $record->unserialize($data);
+                $record->save();
+            }
         }
 
         return $this->json([
@@ -67,7 +76,7 @@ class DAOController extends AbstractController
      */
     private function fields(string $className): array
     {
-        $path = dirname(__DIR__, 3).'/Domain/Data/DAO/'.$className.'/Generated/'.$className.'.json';
+        $path = dirname(__DIR__, 3) . '/Domain/Data/DAO/' . $className . '/Generated/' . $className . '.json';
         $model = is_file($path) ? json_decode((string) file_get_contents($path), true) : [];
 
         return is_array($model['fields'] ?? null) ? $model['fields'] : [];
@@ -104,7 +113,7 @@ class DAOController extends AbstractController
             if (in_array('Required', $constraints, true) && $blank) {
                 $errors[] = [
                     'path' => $name,
-                    'message' => $label.' is required.',
+                    'message' => $label . ' is required.',
                 ];
             }
 
@@ -113,44 +122,13 @@ class DAOController extends AbstractController
                 if ($existing && (string) $existing->id !== (string) ($data['id'] ?? '')) {
                     $errors[] = [
                         'path' => $name,
-                        'message' => $label.' must be unique.',
+                        'message' => $label . ' must be unique.',
                     ];
                 }
             }
         }
 
         return $errors;
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    private function write(string $className, array $data): void
-    {
-        $class = UtilsService::getFullClassFromName($className);
-        if (!$class) {
-            return;
-        }
-
-        $id = $data['id'] ?? null;
-        $record = $id ? $class::getById($this->connection, $id) : null;
-        if (!$record) {
-            $record = new $class($this->connection);
-        }
-
-        foreach ($this->fields($className) as $field) {
-            if (!is_array($field) || !isset($field['field'])) {
-                continue;
-            }
-            $name = (string) $field['field'];
-            if (!preg_match('/^[a-z][A-Za-z0-9]*$/', $name) || !array_key_exists($name, $data)) {
-                continue;
-            }
-            $value = $data[$name];
-            $record->{$name} = is_array($value) ? json_encode(array_values($value)) : $value;
-        }
-
-        $record->save();
     }
 
     /**
