@@ -4,6 +4,7 @@ namespace Pozo\EvilWife\Domain\Service;
 
 use Pozo\EvilWife\Domain\Model\DTO\Model;
 use Pozo\EvilWife\Domain\Model\DTO\ModelField;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
@@ -41,6 +42,59 @@ class ModelService
         }
 
         return $this->serializer->deserialize($json, Model::class, 'json');
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function formToSchema(FormInterface $form): array
+    {
+        $config = $form->getConfig();
+        $schema = [
+            'name' => $form->getName(),
+            'type' => $config->getType()->getBlockPrefix(),
+            'label' => $config->getOption('label'),
+            'required' => $form->isRequired(),
+            'multiple' => (bool) $config->getOption('multiple'),
+            'disabled' => $form->isDisabled(),
+        ];
+
+        $attr = $config->getOption('attr');
+        if (is_array($attr) && $attr) {
+            $schema['attr'] = $attr;
+        }
+
+        $choices = $config->getOption('choices');
+        if (is_array($choices)) {
+            $schema['choices'] = [];
+            foreach ($choices as $label => $value) {
+                $schema['choices'][] = [
+                    'label' => $label,
+                    'value' => $value,
+                ];
+            }
+        }
+
+        if ('collection' === $schema['type']) {
+            $schema['allow_add'] = (bool) $config->getOption('allow_add');
+            $schema['allow_delete'] = (bool) $config->getOption('allow_delete');
+            $prototype = $form->getConfig()->getAttribute('prototype');
+            if ($prototype instanceof FormInterface) {
+                $schema['entry'] = $this->formToSchema($prototype);
+            }
+        }
+
+        if ('collection' !== $schema['type']) {
+            $children = [];
+            foreach ($form->all() as $child) {
+                $children[$child->getName()] = $this->formToSchema($child);
+            }
+            if ($children) {
+                $schema['fields'] = $children;
+            }
+        }
+
+        return $schema;
     }
 
     public function writeDao(Model $model, array $data): void

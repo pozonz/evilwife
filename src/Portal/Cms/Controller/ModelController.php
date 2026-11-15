@@ -9,7 +9,6 @@ use Pozo\EvilWife\Domain\Model\Form\ModelForm;
 use Pozo\EvilWife\Domain\Repository\SQL;
 use Pozo\EvilWife\Domain\Service\ModelService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\AsController;
@@ -40,7 +39,7 @@ class ModelController extends AbstractController
         }
 
         return $this->json([
-            'schema' => $this->formToSchema($form),
+            'schema' => $this->models->formToSchema($form),
             'data' => $model,
         ]);
     }
@@ -117,58 +116,5 @@ class ModelController extends AbstractController
         }
 
         return $errors;
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function formToSchema(FormInterface $form): array
-    {
-        $config = $form->getConfig();
-        $schema = [
-            'name' => $form->getName(),
-            'type' => $config->getType()->getBlockPrefix(),
-            'label' => $config->getOption('label'),
-            'required' => $form->isRequired(),
-            'multiple' => (bool) $config->getOption('multiple'),
-            'disabled' => $form->isDisabled(),
-        ];
-
-        $attr = $config->getOption('attr');
-        if (is_array($attr) && $attr) {
-            $schema['attr'] = $attr;
-        }
-
-        $choices = $config->getOption('choices');
-        if (is_array($choices)) {
-            $schema['choices'] = [];
-            foreach ($choices as $label => $value) {
-                $schema['choices'][] = [
-                    'label' => $label,
-                    'value' => $value,
-                ];
-            }
-        }
-
-        if ('collection' === $schema['type']) {
-            $schema['allow_add'] = (bool) $config->getOption('allow_add');
-            $schema['allow_delete'] = (bool) $config->getOption('allow_delete');
-            $prototype = $form->getConfig()->getAttribute('prototype');
-            if ($prototype instanceof FormInterface) {
-                $schema['entry'] = $this->formToSchema($prototype);
-            }
-        }
-
-        if ('collection' !== $schema['type']) {
-            $children = [];
-            foreach ($form->all() as $child) {
-                $children[$child->getName()] = $this->formToSchema($child);
-            }
-            if ($children) {
-                $schema['fields'] = $children;
-            }
-        }
-
-        return $schema;
     }
 }

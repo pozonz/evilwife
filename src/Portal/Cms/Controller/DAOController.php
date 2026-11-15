@@ -4,9 +4,9 @@ namespace Pozo\EvilWife\Portal\Cms\Controller;
 
 use Doctrine\DBAL\Connection;
 use Pozo\EvilWife\Domain\Model\Form\DAOForm;
+use Pozo\EvilWife\Domain\Service\ModelService;
 use Pozo\EvilWife\Domain\Service\UtilsService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
@@ -17,6 +17,7 @@ class DAOController extends AbstractController
 {
     public function __construct(
         private readonly Connection $connection,
+        private readonly ModelService $models,
     ) {}
 
     #[Route('/manage/dao/{className}/{id}/schema', name: 'manage_dao_schema', requirements: ['className' => '[A-Z][A-Za-z0-9]*', 'id' => '\d+'])]
@@ -32,7 +33,7 @@ class DAOController extends AbstractController
         $class = UtilsService::getFullClassFromName($className);
 
         return $this->json([
-            'schema' => $this->formToSchema($form),
+            'schema' => $this->models->formToSchema($form),
             'data' => $class ? $class::getById($this->connection, $id) : null,
         ]);
     }
@@ -129,47 +130,5 @@ class DAOController extends AbstractController
         }
 
         return $errors;
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function formToSchema(FormInterface $form): array
-    {
-        $config = $form->getConfig();
-        $schema = [
-            'name' => $form->getName(),
-            'type' => $config->getType()->getBlockPrefix(),
-            'label' => $config->getOption('label'),
-            'required' => $form->isRequired(),
-            'multiple' => (bool) $config->getOption('multiple'),
-            'disabled' => $form->isDisabled(),
-        ];
-
-        $attr = $config->getOption('attr');
-        if (is_array($attr) && $attr) {
-            $schema['attr'] = $attr;
-        }
-
-        $choices = $config->getOption('choices');
-        if (is_array($choices)) {
-            $schema['choices'] = [];
-            foreach ($choices as $label => $value) {
-                $schema['choices'][] = [
-                    'label' => $label,
-                    'value' => $value,
-                ];
-            }
-        }
-
-        $children = [];
-        foreach ($form->all() as $child) {
-            $children[$child->getName()] = $this->formToSchema($child);
-        }
-        if ($children) {
-            $schema['fields'] = $children;
-        }
-
-        return $schema;
     }
 }
