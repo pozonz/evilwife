@@ -2,11 +2,8 @@
 
 namespace Pozo\EvilWife\Portal\Cms\Controller;
 
-use Cocur\Slugify\Slugify;
-use Doctrine\DBAL\Connection;
 use Pozo\EvilWife\Domain\Model\DTO\Model;
 use Pozo\EvilWife\Domain\Model\Form\ModelForm;
-use Pozo\EvilWife\Domain\Repository\SQL;
 use Pozo\EvilWife\Domain\Service\ModelService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,7 +18,6 @@ class ModelController extends AbstractController
 {
     public function __construct(
         private readonly ValidatorInterface $validator,
-        private readonly Connection $connection,
         private readonly ModelService $models,
     ) {}
 
@@ -68,22 +64,12 @@ class ModelController extends AbstractController
             ]);
             $form->submit($data);
             $this->models->writeDao($model, $data);
-            $this->syncTable($model->className);
+            $this->models->syncTable($model->className);
         }
 
         return $this->json([
             'errors' => $errors,
         ]);
-    }
-
-    private function syncTable(string $className): void
-    {
-        $tableName = (new Slugify(['trim' => false]))->slugify($className, '_');
-        $sql = new SQL($this->connection, $tableName);
-        if (!$sql->exists()) {
-            $sql->create();
-        }
-        $sql->sync($this->models->ormColumns($className));
     }
 
     private function validate($data, $ignores = []): array

@@ -2,8 +2,11 @@
 
 namespace Pozo\EvilWife\Domain\Service;
 
+use Cocur\Slugify\Slugify;
+use Doctrine\DBAL\Connection;
 use Pozo\EvilWife\Domain\Model\DTO\Model;
 use Pozo\EvilWife\Domain\Model\DTO\ModelField;
+use Pozo\EvilWife\Domain\Repository\SQL;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
@@ -20,6 +23,7 @@ class ModelService
 
     public function __construct(
         private readonly SerializerInterface $serializer,
+        private readonly ?Connection $connection = null,
     ) {
         self::$instance = $this;
     }
@@ -145,6 +149,16 @@ class ModelService
         }
 
         return $columns;
+    }
+
+    public function syncTable(string $className): void
+    {
+        $tableName = (new Slugify(['trim' => false]))->slugify($className, '_');
+        $sql = new SQL($this->connection, $tableName);
+        if (!$sql->exists()) {
+            $sql->create();
+        }
+        $sql->sync($this->ormColumns($className));
     }
 
     private function daoDir(string $className): string

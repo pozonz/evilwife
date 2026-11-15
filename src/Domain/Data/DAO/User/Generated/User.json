@@ -110,6 +110,11 @@
             "listingWidth": null,
             "listingTitle": null,
             "queryableInCmsSearch": false
+        },
+        {
+            "label": "yyy",
+            "field": "yyy",
+            "widget": "Text"
         }
     ]
 }

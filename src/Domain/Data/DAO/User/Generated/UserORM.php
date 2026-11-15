@@ -51,4 +51,9 @@ class UserORM extends DAO
      */
     public $backupCodes;
 
+    /**
+     * #pz text COLLATE utf8mb4_unicode_ci DEFAULT NULL
+     */
+    public $yyy;
+
 }
