@@ -2,6 +2,7 @@
 
 namespace Pozo\EvilWife\Domain\Model\Form;
 
+use Pozo\EvilWife\Domain\Model\DTO\ModelField;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -15,12 +16,12 @@ class DAOForm extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         foreach ($options['fields'] as $field) {
-            if (!is_array($field) || !isset($field['field']) || !preg_match('/^[a-z][A-Za-z0-9]*$/', (string) $field['field'])) {
+            if (!$field instanceof ModelField || !preg_match('/^[a-z][A-Za-z0-9]*$/', $field->field)) {
                 continue;
             }
 
-            $widget = (string) ($field['widget'] ?? 'Text');
-            $builder->add((string) $field['field'], $this->fieldType($widget), $this->fieldOptions($field, $widget));
+            $widget = (string) ($field->widget ?? 'Text');
+            $builder->add($field->field, $this->fieldType($widget), $this->fieldOptions($field, $widget));
         }
     }
 
@@ -49,14 +50,12 @@ class DAOForm extends AbstractType
     }
 
     /**
-     * @param array<string, mixed> $field
      * @return array<string, mixed>
      */
-    private function fieldOptions(array $field, string $widget): array
+    private function fieldOptions(ModelField $field, string $widget): array
     {
-        $constraints = is_array($field['constraints'] ?? null) ? $field['constraints'] : [];
-        $required = in_array('Required', $constraints, true);
-        $label = (string) ($field['label'] ?? '');
+        $required = in_array('Required', $field->constraints, true);
+        $label = $field->label;
 
         if ($widget === 'Checkbox') {
             return [

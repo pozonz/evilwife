@@ -28,15 +28,9 @@ class ModelController extends AbstractController
             'csrf_protection' => false,
         ]);
 
-        $model = $this->models->modelFromClass($className);
-        if (!$model) {
-            $model = new Model();
-            $model->className = $className;
-        }
-
         return $this->json([
             'schema' => $this->models->formToSchema($form),
-            'data' => $model,
+            'data' => $this->models->modelFromClass($className),
         ]);
     }
 

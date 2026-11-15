@@ -23,10 +23,9 @@ class DAOController extends AbstractController
     #[Route('/manage/dao/{className}/{id}/schema', name: 'manage_dao_schema', requirements: ['className' => '[A-Z][A-Za-z0-9]*', 'id' => '\d+'])]
     public function schema(string $className, int $id): Response
     {
-        $fields = $this->fields($className);
-
+        $model = $this->models->modelFromClass($className);
         $form = $this->createForm(DAOForm::class, null, [
-            'fields' => $fields,
+            'fields' => $model->fields,
             'csrf_protection' => false,
         ]);
 
@@ -70,17 +69,6 @@ class DAOController extends AbstractController
         return $this->json([
             'errors' => $errors,
         ]);
-    }
-
-    /**
-     * @return list<array<string, mixed>>
-     */
-    private function fields(string $className): array
-    {
-        $path = dirname(__DIR__, 3) . '/Domain/Data/DAO/' . $className . '/Generated/' . $className . '.json';
-        $model = is_file($path) ? json_decode((string) file_get_contents($path), true) : [];
-
-        return is_array($model['fields'] ?? null) ? $model['fields'] : [];
     }
 
     /**

@@ -33,6 +33,16 @@ class ModelService
         return self::$instance ??= new self(self::serializer());
     }
 
+    private static function serializer(): SerializerInterface
+    {
+        $types = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
+
+        return new Serializer(
+            [new ArrayDenormalizer(), new ObjectNormalizer(null, null, null, $types)],
+            [new JsonEncoder()]
+        );
+    }
+
     public function modelFromClass(string $className): ?Model
     {
         $path = $this->daoDir($className) . '/Generated/' . $className . '.json';
@@ -46,6 +56,31 @@ class ModelService
         }
 
         return $this->serializer->deserialize($json, Model::class, 'json');
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function ormColumns(string $className): array
+    {
+        $class = 'Pozo\\EvilWife\\Domain\\Data\\DAO\\' . $className . '\\Generated\\' . $className . 'ORM';
+        $reflection = new \ReflectionClass($class);
+        $properties = [];
+        do {
+            $properties = array_merge($reflection->getProperties(), $properties);
+            $reflection = $reflection->getParentClass();
+        } while ($reflection);
+
+        $columns = [];
+        foreach ($properties as $property) {
+            $comment = $property->getDocComment();
+            if (!is_string($comment) || !preg_match('/#pz(\ )+(.*)/', $comment, $matches)) {
+                continue;
+            }
+            $columns[$property->getName()] = $matches[2];
+        }
+
+        return $columns;
     }
 
     /**
@@ -100,6 +135,16 @@ class ModelService
 
         return $schema;
     }
+    
+    public function syncTable(string $className): void
+    {
+        $tableName = (new Slugify(['trim' => false]))->slugify($className, '_');
+        $sql = new SQL($this->connection, $tableName);
+        if (!$sql->exists()) {
+            $sql->create();
+        }
+        $sql->sync($this->ormColumns($className));
+    }
 
     public function writeDao(Model $model, array $data): void
     {
@@ -116,7 +161,7 @@ class ModelService
 
         $classFile = $base . '/' . $className . '.php';
         if (!is_file($classFile)) {
-            file_put_contents($classFile, $this->classSource($className));
+            file_put_contents($classFile, $this->daoSource($className));
         }
 
         file_put_contents($generated . '/' . $className . 'ORM.php', $this->ormSource($model));
@@ -126,57 +171,12 @@ class ModelService
         );
     }
 
-    /**
-     * @return array<string, string>
-     */
-    public function ormColumns(string $className): array
-    {
-        $class = 'Pozo\\EvilWife\\Domain\\Data\\DAO\\' . $className . '\\Generated\\' . $className . 'ORM';
-        $reflection = new \ReflectionClass($class);
-        $properties = [];
-        do {
-            $properties = array_merge($reflection->getProperties(), $properties);
-            $reflection = $reflection->getParentClass();
-        } while ($reflection);
-
-        $columns = [];
-        foreach ($properties as $property) {
-            $comment = $property->getDocComment();
-            if (!is_string($comment) || !preg_match('/#pz(\ )+(.*)/', $comment, $matches)) {
-                continue;
-            }
-            $columns[$property->getName()] = $matches[2];
-        }
-
-        return $columns;
-    }
-
-    public function syncTable(string $className): void
-    {
-        $tableName = (new Slugify(['trim' => false]))->slugify($className, '_');
-        $sql = new SQL($this->connection, $tableName);
-        if (!$sql->exists()) {
-            $sql->create();
-        }
-        $sql->sync($this->ormColumns($className));
-    }
-
     private function daoDir(string $className): string
     {
         return dirname(__DIR__) . '/Data/DAO/' . $className;
     }
 
-    private static function serializer(): SerializerInterface
-    {
-        $types = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
-
-        return new Serializer(
-            [new ArrayDenormalizer(), new ObjectNormalizer(null, null, null, $types)],
-            [new JsonEncoder()]
-        );
-    }
-
-    private function classSource(string $className): string
+    private function daoSource(string $className): string
     {
         return <<<PHP
 <?php
