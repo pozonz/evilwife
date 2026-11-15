@@ -3,6 +3,7 @@
 namespace Pozo\EvilWife\Portal\Cms\Controller;
 
 use Doctrine\DBAL\Connection;
+use Pozo\EvilWife\Domain\Model\DTO\ModelField;
 use Pozo\EvilWife\Domain\Model\Form\DAOForm;
 use Pozo\EvilWife\Domain\Service\ModelService;
 use Pozo\EvilWife\Domain\Service\UtilsService;
@@ -83,30 +84,31 @@ class DAOController extends AbstractController
             ]];
         }
 
+        $model = $this->models->modelFromClass($className);
+        if (!$model) {
+            return [];
+        }
+
         $class = UtilsService::getFullClassFromName($className);
         $errors = [];
-        foreach ($this->fields($className) as $field) {
-            if (!is_array($field) || !isset($field['field'])) {
-                continue;
-            }
-            $name = (string) $field['field'];
-            if (!preg_match('/^[a-z][A-Za-z0-9]*$/', $name)) {
+        foreach ($model->fields as $field) {
+            if (!$field instanceof ModelField || !preg_match('/^[a-z][A-Za-z0-9]*$/', $field->field)) {
                 continue;
             }
 
+            $name = $field->field;
             $value = $data[$name] ?? null;
             $blank = $value === null || $value === '' || $value === [];
-            $constraints = is_array($field['constraints'] ?? null) ? $field['constraints'] : [];
-            $label = (string) ($field['label'] ?? $name);
+            $label = $field->label !== '' ? $field->label : $name;
 
-            if (in_array('Required', $constraints, true) && $blank) {
+            if (in_array('Required', $field->constraints, true) && $blank) {
                 $errors[] = [
                     'path' => $name,
                     'message' => $label . ' is required.',
                 ];
             }
 
-            if ($class && in_array('Unique', $constraints, true) && !$blank && !is_array($value)) {
+            if ($class && in_array('Unique', $field->constraints, true) && !$blank && !is_array($value)) {
                 $existing = $class::getByField($this->connection, $name, $value);
                 if ($existing && (string) $existing->id !== (string) ($data['id'] ?? '')) {
                     $errors[] = [
