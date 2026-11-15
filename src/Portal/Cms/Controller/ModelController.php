@@ -50,11 +50,7 @@ class ModelController extends AbstractController
         $errors = $this->models->validate($data);
 
         if (!$errors && is_array($data)) {
-            $model = new Model();
-            $form = $this->createForm(ModelForm::class, $model, [
-                'csrf_protection' => false,
-            ]);
-            $form->submit($data);
+            $model = $this->models->unserialize($data, Model::class);
             $this->models->writeDao($model, $data);
             sleep(10);
             $this->models->syncTable($model->className);

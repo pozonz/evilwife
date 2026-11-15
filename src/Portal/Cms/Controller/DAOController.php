@@ -57,12 +57,7 @@ class DAOController extends AbstractController
             $class = UtilsService::getFullClassFromName($className);
             if ($class) {
                 $id = $data['id'] ?? null;
-                $record = $id ? $class::getById($this->connection, $id) : null;
-                if (!$record) {
-                    $record = new $class($this->connection);
-                }
-
-                $record->unserialize($data);
+                $record = $this->models->unserialize($data, $class);
                 $record->save();
             }
         }

@@ -61,7 +61,14 @@ class ModelService
             return null;
         }
 
-        return $this->serializer->deserialize($json, Model::class, 'json');
+        return $this->unserialize($json, Model::class);
+    }
+
+    public function unserialize(array|string $data, $class): mixed
+    {
+        $json = is_array($data) ? (string) json_encode($data) : $data;
+
+        return $this->serializer->deserialize($json, $class, 'json');
     }
 
     /**
