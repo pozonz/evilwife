@@ -64,6 +64,7 @@ class ModelController extends AbstractController
             ]);
             $form->submit($data);
             $this->models->writeDao($model, $data);
+            sleep(10);
             $this->models->syncTable($model->className);
         }
 

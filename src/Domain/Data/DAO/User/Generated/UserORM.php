@@ -54,6 +54,6 @@ class UserORM extends DAO
     /**
      * #pz text COLLATE utf8mb4_unicode_ci DEFAULT NULL
      */
-    public $yyy;
+    public $eee;
 
 }

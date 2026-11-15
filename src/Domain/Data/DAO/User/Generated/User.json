@@ -112,8 +112,8 @@
             "queryableInCmsSearch": false
         },
         {
-            "label": "yyy",
-            "field": "yyy",
+            "label": "eee",
+            "field": "eee",
             "widget": "Text"
         }
     ]
