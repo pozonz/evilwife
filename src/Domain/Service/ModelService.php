@@ -7,6 +7,7 @@ use Doctrine\DBAL\Connection;
 use Pozo\EvilWife\Domain\Model\DTO\Model;
 use Pozo\EvilWife\Domain\Model\DTO\ModelField;
 use Pozo\EvilWife\Domain\Model\Form\ModelForm;
+use Pozo\EvilWife\Domain\Repository\DAO;
 use Pozo\EvilWife\Domain\Repository\SQL;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -16,6 +17,7 @@ use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -57,18 +59,30 @@ class ModelService
         }
 
         $json = file_get_contents($path);
-        if ($json === false || $json === '') {
+        $data = json_decode($json, true);
+        if (!is_array($data)) {
             return null;
         }
 
-        return $this->unserialize($json, Model::class);
+        return $this->unserialize($data, Model::class);
     }
 
-    public function unserialize(array|string $data, $class): mixed
+    public function unserialize(array $data, string $class): mixed
     {
-        $json = is_array($data) ? (string) json_encode($data) : $data;
+        $json = (string) json_encode($data);
 
-        return $this->serializer->deserialize($json, $class, 'json');
+        $context = [];
+        if ($class !== Model::class) {
+            $context = [
+                AbstractNormalizer::DEFAULT_CONSTRUCTOR_ARGUMENTS => [
+                    $class => [
+                        'connection' => $this->connection,
+                    ],
+                ],
+            ];
+        }
+
+        return $this->serializer->deserialize($json, $class, 'json', $context);
     }
 
     /**
