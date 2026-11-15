@@ -4,25 +4,43 @@ namespace Pozo\EvilWife\Domain\Service;
 
 use Pozo\EvilWife\Domain\Model\DTO\Model;
 use Pozo\EvilWife\Domain\Model\DTO\ModelField;
+use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
+use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
+use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class ModelService
 {
+    private static ?self $instance = null;
+
     public function __construct(
         private readonly SerializerInterface $serializer,
-    ) {}
+    ) {
+        self::$instance = $this;
+    }
 
-    public function modelFromClass(string $className): Model
+    public static function service(): self
+    {
+        return self::$instance ??= new self(self::serializer());
+    }
+
+    public function modelFromClass(string $className): ?Model
     {
         $path = $this->daoDir($className) . '/Generated/' . $className . '.json';
         if (!is_file($path)) {
-            $model = new Model();
-            $model->className = $className;
-
-            return $model;
+            return null;
         }
 
-        return $this->serializer->deserialize((string) file_get_contents($path), Model::class, 'json');
+        $json = file_get_contents($path);
+        if ($json === false || $json === '') {
+            return null;
+        }
+
+        return $this->serializer->deserialize($json, Model::class, 'json');
     }
 
     public function writeDao(Model $model, array $data): void
@@ -78,6 +96,16 @@ class ModelService
     private function daoDir(string $className): string
     {
         return dirname(__DIR__) . '/Data/DAO/' . $className;
+    }
+
+    private static function serializer(): SerializerInterface
+    {
+        $types = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
+
+        return new Serializer(
+            [new ArrayDenormalizer(), new ObjectNormalizer(null, null, null, $types)],
+            [new JsonEncoder()]
+        );
     }
 
     private function classSource(string $className): string

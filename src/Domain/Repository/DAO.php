@@ -6,6 +6,7 @@ use Cocur\Slugify\Slugify;
 use Doctrine\DBAL\Connection;
 use Pozo\EvilWife\Domain\Model\DTO\Model;
 use Pozo\EvilWife\Domain\Model\DTO\ModelField;
+use Pozo\EvilWife\Domain\Service\ModelService;
 use Pozo\EvilWife\Domain\Service\UtilsService;
 use Ramsey\Uuid\Uuid;
 
@@ -215,48 +216,11 @@ abstract class DAO implements \JsonSerializable
      * @param $connection
      * @return mixed
      */
-    static public function getModel($connection)
+    public static function getModel($connection)
     {
         $className = UtilsService::basename(get_called_class());
-        $path = dirname(__DIR__).'/Data/DAO/'.$className.'/Generated/'.$className.'.json';
-        if (!is_file($path)) {
-            return null;
-        }
 
-        $data = json_decode((string) file_get_contents($path), true);
-        if (!is_array($data)) {
-            return null;
-        }
-
-        $model = new Model();
-        $model->title = (string) ($data['title'] ?? '');
-        $model->className = (string) ($data['className'] ?? $className);
-        $model->modelCategory = $data['modelCategory'] ?? null;
-        $model->listingType = $data['listingType'] ?? null;
-        $model->accesses = is_array($data['accesses'] ?? null) ? $data['accesses'] : [];
-        $model->frontendUrl = $data['frontendUrl'] ?? null;
-        $model->searchableInCms = (bool) ($data['searchableInCms'] ?? false);
-        $model->searchableInFrontend = (bool) ($data['searchableInFrontend'] ?? false);
-        $model->enableVersioning = (bool) ($data['enableVersioning'] ?? false);
-        $model->fields = [];
-        foreach ($data['fields'] ?? [] as $item) {
-            if (!is_array($item)) {
-                continue;
-            }
-            $field = new ModelField();
-            $field->widget = $item['widget'] ?? 'Text';
-            $field->label = (string) ($item['label'] ?? '');
-            $field->field = (string) ($item['field'] ?? '');
-            $field->constraints = is_array($item['constraints'] ?? null) ? $item['constraints'] : [];
-            $field->sqlQuery = $item['sqlQuery'] ?? null;
-            $field->showInListingTable = (bool) ($item['showInListingTable'] ?? false);
-            $field->listingWidth = isset($item['listingWidth']) && $item['listingWidth'] !== '' ? (int) $item['listingWidth'] : null;
-            $field->listingTitle = $item['listingTitle'] ?? null;
-            $field->queryableInCmsSearch = (bool) ($item['queryableInCmsSearch'] ?? false);
-            $model->fields[] = $field;
-        }
-
-        return $model;
+        return ModelService::service()->modelFromClass($className);
     }
 
     private static function tableName(Model $model): string
@@ -777,37 +741,5 @@ abstract class DAO implements \JsonSerializable
 			'order' => 'DESC',
             'includePreviousVersion' => 1,
         ]);
-    }
-
-    /**
-     * @param $contentBlocksContent
-     * @return string
-     */
-    protected function _ContentBlocksContent($contentBlocksContent)
-    {
-        $result = [];
-        $sections = json_decode($contentBlocksContent);
-        foreach ($sections as $section) {
-            foreach ($section->blocks as $block) {
-                foreach ($block->values as $key => $value) {
-                    if (is_numeric($value)) {
-                        continue;
-                    } else if (!$value) {
-                        continue;
-                    } else if (gettype($value) !== 'string') {
-                        continue;
-                    } else if (strpos(strtolower($key), 'youtube') !== false) {
-                        continue;
-                    } else if (json_decode($value)) {
-                        continue;
-                    }
-
-                    $value = strip_tags($value);
-                    $value = str_replace("\n", '', $value);
-                    $result[] = $value;
-                }
-            }
-        }
-        return implode(' ', $result);
     }
 }

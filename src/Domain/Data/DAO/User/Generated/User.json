@@ -90,7 +90,7 @@
             "queryableInCmsSearch": false
         },
         {
-            "widget": "Hidden",
+            "widget": "Checkbox",
             "label": "TOTP Enabled:",
             "field": "totpEnabled",
             "constraints": [],
