@@ -21,20 +21,20 @@ class DAOController extends AbstractController
         private readonly ModelService $models,
     ) {}
 
-    #[Route('/manage/dao/{className}/{id}/schema', name: 'manage_dao_schema', requirements: ['className' => '[A-Z][A-Za-z0-9]*', 'id' => '\d+'])]
-    public function schema(string $className, int $id): Response
+    #[Route('/manage/dao/{modelId}/{daoId}/schema', name: 'manage_dao_schema', requirements: ['modelId' => '[a-z0-9]*', 'id' => '\d+'])]
+    public function schema(string $modelId, int $daoId): Response
     {
-        $model = $this->models->modelFromClass($className);
+        $model = $this->models->getModelById($modelId);
         $form = $this->createForm(DAOForm::class, null, [
             'fields' => $model->fields,
             'csrf_protection' => false,
         ]);
 
-        $class = UtilsService::getFullClassFromName($className);
+        $class = UtilsService::getFullClassFromName($model->className);
 
         return $this->json([
             'schema' => $this->models->formToSchema($form),
-            'data' => $class ? $class::getById($this->connection, $id) : null,
+            'data' => $class ? $class::getById($this->connection, $daoId) : null,
         ]);
     }
 
