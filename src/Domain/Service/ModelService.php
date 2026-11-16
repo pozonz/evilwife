@@ -51,6 +51,19 @@ class ModelService
         );
     }
 
+    public function getModels(): array
+    {
+        $models = [];
+        foreach (glob($this->daoDir('*') . '/Generated/*.json') as $path) {
+            $data = json_decode(file_get_contents($path), true);
+            if (!is_array($data)) {
+                continue;
+            }
+            $models[] = $this->unserialize($data, Model::class);
+        }
+        return $models;
+    }
+
     public function modelFromClass(string $className): ?Model
     {
         $path = $this->daoDir($className) . '/Generated/' . $className . '.json';
@@ -198,7 +211,7 @@ class ModelService
 
         return $schema;
     }
-    
+
     public function syncTable(string $className): void
     {
         $tableName = (new Slugify(['trim' => false]))->slugify($className, '_');

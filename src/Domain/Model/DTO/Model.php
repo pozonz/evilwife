@@ -2,11 +2,13 @@
 
 namespace Pozo\EvilWife\Domain\Model\DTO;
 
+use Pozo\EvilWife\Domain\Model\Form\Constraints\ContraintUnqiue;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class Model
 {
     #[Assert\NotBlank(message: 'Title is required.')]
+    #[ContraintUnqiue(message: 'Title must be unique.')]
     public string $title = '';
 
     #[Assert\NotBlank(message: 'Class name is required.')]
@@ -14,6 +16,7 @@ class Model
         pattern: '/^[A-Z][A-Za-z0-9]*$/',
         message: 'Class name must be PascalCase, e.g. NewsArticle.',
     )]
+    #[ContraintUnqiue(message: 'Class name must be unique.')]
     public string $className = '';
 
     #[Assert\NotBlank]
