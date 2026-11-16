@@ -21,7 +21,7 @@ class DAOController extends AbstractController
         private readonly ModelService $models,
     ) {}
 
-    #[Route('/manage/dao/{modelId}/{daoId}/schema', name: 'manage_dao_schema', requirements: ['modelId' => '[a-z0-9]*', 'id' => '\d+'])]
+    #[Route('/manage/dao/{modelId}/{daoId}/schema', name: 'manage_dao_schema', requirements: ['modelId' => '[a-z0-9-]*', 'id' => '\d+'])]
     public function schema(string $modelId, int $daoId): Response
     {
         $model = $this->models->getModelById($modelId);
@@ -38,25 +38,25 @@ class DAOController extends AbstractController
         ]);
     }
 
-    #[Route('/manage/dao/{className}/validate', name: 'manage_dao_validate', requirements: ['className' => '[A-Z][A-Za-z0-9]*'])]
-    public function validate(string $className, Request $request): Response
+    #[Route('/manage/dao/{modelId}/validate', name: 'manage_dao_validate', requirements: ['modelId' => '[a-z0-9-]*'])]
+    public function validate(string $modelId, Request $request): Response
     {
         $data = json_decode($request->getContent(), true);
 
         return $this->json([
-            'errors' => $this->errors($className, $data),
+            'errors' => $this->errors($modelId, $data),
         ]);
     }
 
-    #[Route('/manage/dao/{className}/save', name: 'manage_dao_save', requirements: ['className' => '[A-Z][A-Za-z0-9]*'])]
-    public function save(string $className, Request $request): Response
+    #[Route('/manage/dao/{modelId}/save', name: 'manage_dao_save', requirements: ['modelId' => '[a-z0-9-]*'])]
+    public function save(string $modelId, Request $request): Response
     {
         $data = json_decode($request->getContent(), true);
-        $errors = $this->errors($className, $data);
+        $errors = $this->errors($modelId, $data);
         if (!$errors && is_array($data)) {
-            $class = UtilsService::getFullClassFromName($className);
+            $model = $this->models->getModelById($modelId);
+            $class = $model ? UtilsService::getFullClassFromName($model->className) : null;
             if ($class) {
-                $id = $data['id'] ?? null;
                 $record = $this->models->unserialize($data, $class);
                 $record->save();
             }
@@ -70,7 +70,7 @@ class DAOController extends AbstractController
     /**
      * @return list<array{path: string, message: string}>
      */
-    private function errors(string $className, mixed $data): array
+    private function errors(string $modelId, mixed $data): array
     {
         if (!is_array($data)) {
             return [[
@@ -79,12 +79,12 @@ class DAOController extends AbstractController
             ]];
         }
 
-        $model = $this->models->modelFromClass($className);
+        $model = $this->models->getModelById($modelId);
         if (!$model) {
             return [];
         }
 
-        $class = UtilsService::getFullClassFromName($className);
+        $class = UtilsService::getFullClassFromName($model->className);
         $errors = [];
         foreach ($model->fields as $field) {
             if (!$field instanceof ModelField || !preg_match('/^[a-z][A-Za-z0-9]*$/', $field->field)) {

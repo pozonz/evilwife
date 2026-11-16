@@ -20,7 +20,7 @@ class ModelController extends AbstractController
         private readonly ModelService $models,
     ) {}
 
-    #[Route('/manage/model/{modelId}/schema', name: 'manage_model_schema', requirements: ['className' => '[a-z0-9]*'])]
+    #[Route('/manage/model/{modelId}/schema', name: 'manage_model_schema', requirements: ['modelId' => '[a-z0-9-]*'])]
     public function modelSchemas(string $modelId): Response
     {
         $form = $this->createForm(ModelForm::class, new Model(), [
