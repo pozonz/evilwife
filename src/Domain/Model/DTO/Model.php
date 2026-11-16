@@ -7,6 +7,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class Model
 {
+    #[Assert\NotBlank]
+    #[Assert\Uuid]
+    public string $id;
+
     #[Assert\NotBlank(message: 'Title is required.')]
     #[ContraintUnqiue(message: 'Title must be unique.')]
     public string $title = '';

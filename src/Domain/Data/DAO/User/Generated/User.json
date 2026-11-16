@@ -113,9 +113,15 @@
             "queryableInCmsSearch": false
         },
         {
-            "label": "eee",
-            "field": "eee",
-            "widget": "Text"
+            "widget": "Text",
+            "label": "rrr",
+            "field": "rrr",
+            "constraints": [],
+            "sqlQuery": null,
+            "showInListingTable": false,
+            "listingWidth": null,
+            "listingTitle": null,
+            "queryableInCmsSearch": false
         }
     ]
 }

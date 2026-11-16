@@ -19,8 +19,8 @@ class ModelController extends AbstractController
         private readonly ModelService $models,
     ) {}
 
-    #[Route('/manage/model/{className}/schema', name: 'manage_model_schema', requirements: ['className' => '[A-Z][A-Za-z0-9]*'])]
-    public function modelSchemas(string $className): Response
+    #[Route('/manage/model/{modelId}/schema', name: 'manage_model_schema', requirements: ['className' => '[a-z0-9]*'])]
+    public function modelSchemas(string $modelId): Response
     {
         $form = $this->createForm(ModelForm::class, new Model(), [
             'csrf_protection' => false,
@@ -28,7 +28,7 @@ class ModelController extends AbstractController
 
         return $this->json([
             'schema' => $this->models->formToSchema($form),
-            'data' => $this->models->modelFromClass($className),
+            'data' => $this->models->getModelById($modelId),
         ]);
     }
 
@@ -47,12 +47,11 @@ class ModelController extends AbstractController
     public function modelSave(Request $request): Response
     {
         $data = json_decode($request->getContent(), true);
-        $errors = $this->models->validate($data);
+        $errors = $this->models->validate($data, Model::class);
 
         if (!$errors && is_array($data)) {
             $model = $this->models->unserialize($data, Model::class);
             $this->models->writeDao($model, $data);
-            sleep(10);
             $this->models->syncTable($model->className);
         }
 

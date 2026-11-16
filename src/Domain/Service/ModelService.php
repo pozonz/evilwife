@@ -51,6 +51,17 @@ class ModelService
         );
     }
 
+    public function getModelById(string $id): ?Model
+    {
+        $models = $this->getModels();
+        foreach ($models as $model) {
+            if ($model->id === $id) {
+                return $model;
+            }
+        }
+        return null;
+    }
+
     public function getModels(): array
     {
         $models = [];
@@ -102,15 +113,11 @@ class ModelService
      * @param list<class-string> $ignores
      * @return list<array{path: string, message: string}>
      */
-    public function validate(mixed $data, array $ignores = []): array
+    public function validate(mixed $data, $class, array $ignores = []): array
     {
-        $model = new Model();
-        $form = $this->forms->create(ModelForm::class, $model, [
-            'csrf_protection' => false,
-        ]);
-        $form->submit($data);
-
-        $violations = $this->validator->validate($model);
+        $json = (string) json_encode($data);
+        $data = $this->serializer->deserialize($json, $class, 'json');
+        $violations = $this->validator->validate($data);
 
         $errors = [];
         foreach ($violations as $violation) {
