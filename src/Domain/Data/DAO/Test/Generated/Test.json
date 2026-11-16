@@ -1,0 +1,25 @@
+{
+    "id": "6289ddb1-a03e-4370-86ab-97308112765e",
+    "title": "Tests",
+    "className": "Test",
+    "modelCategory": "Customised",
+    "listingType": "Drag & Drop",
+    "accesses": [],
+    "frontendUrl": null,
+    "searchableInCms": false,
+    "searchableInFrontend": false,
+    "enableVersioning": false,
+    "fields": [
+        {
+            "widget": "Text",
+            "label": "Title",
+            "field": "title",
+            "constraints": [],
+            "sqlQuery": null,
+            "showInListingTable": false,
+            "listingWidth": null,
+            "listingTitle": null,
+            "queryableInCmsSearch": false
+        }
+    ]
+}

@@ -16,6 +16,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
+use Symfony\Component\Serializer\Encoder\JsonEncode;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
@@ -229,7 +230,7 @@ class ModelService
         $sql->sync($this->ormColumns($className));
     }
 
-    public function writeDao(Model $model, array $data): void
+    public function writeDao(Model $model): void
     {
         $className = $model->className;
         if (!preg_match('/^[A-Z][A-Za-z0-9]*$/', $className)) {
@@ -250,7 +251,9 @@ class ModelService
         file_put_contents($generated . '/' . $className . 'ORM.php', $this->ormSource($model));
         file_put_contents(
             $generated . '/' . $className . '.json',
-            json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n"
+            $this->serializer->serialize($model, 'json', [
+                JsonEncode::OPTIONS => JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES,
+            ]) . "\n"
         );
     }
 
