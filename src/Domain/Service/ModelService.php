@@ -116,8 +116,7 @@ class ModelService
      */
     public function validate(mixed $data, $class, array $ignores = []): array
     {
-        $json = (string) json_encode($data);
-        $data = $this->serializer->deserialize($json, $class, 'json');
+        $data = $this->unserialize($data, $class);
         $violations = $this->validator->validate($data);
 
         $errors = [];
@@ -283,6 +282,8 @@ PHP;
         $className = $model->className;
         $properties = '';
         $seen = [];
+        $notBlank = false;
+        $unique = false;
         foreach ($model->fields as $field) {
             if (!$field instanceof ModelField) {
                 continue;
@@ -292,14 +293,31 @@ PHP;
                 continue;
             }
             $seen[$name] = true;
+            $attributes = '';
+            if (in_array('Required', $field->constraints, true)) {
+                $notBlank = true;
+                $attributes .= "    #[Assert\\NotBlank]\n";
+            }
+            if (in_array('Unique', $field->constraints, true)) {
+                $unique = true;
+                $attributes .= "    #[ContraintUnqiue]\n";
+            }
             $properties .= <<<PHP
 
     /**
      * #pz text COLLATE utf8mb4_unicode_ci DEFAULT NULL
      */
-    public \${$name};
+{$attributes}    public \${$name};
 
 PHP;
+        }
+
+        $uses = "use Pozo\\EvilWife\\Domain\\Repository\\DAO;\n";
+        if ($unique) {
+            $uses .= "use Pozo\\EvilWife\\Domain\\Model\\Form\\Constraints\\ContraintUnqiue;\n";
+        }
+        if ($notBlank) {
+            $uses .= "use Symfony\\Component\\Validator\\Constraints as Assert;\n";
         }
 
         return <<<PHP
@@ -307,8 +325,7 @@ PHP;
 
 namespace Pozo\\EvilWife\\Domain\\Data\\DAO\\{$className}\\Generated;
 
-use Pozo\\EvilWife\\Domain\\Repository\\DAO;
-
+{$uses}
 class {$className}ORM extends DAO
 {{$properties}
 }

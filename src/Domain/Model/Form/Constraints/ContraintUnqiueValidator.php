@@ -2,46 +2,52 @@
 
 namespace Pozo\EvilWife\Domain\Model\Form\Constraints;
 
-use Pozo\EvilWife\Domain\Model\DTO\Model;
+use Pozo\EvilWife\Domain\Service\ModelService;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Pozo\EvilWife\Domain\Model\DTO\Model;
+use Pozo\EvilWife\Domain\Repository\DAO;
 
 class ContraintUnqiueValidator extends ConstraintValidator
 {
     public function validate(mixed $value, Constraint $constraint): void
     {
-        if (!$constraint instanceof ContraintUnqiue) {
-            throw new UnexpectedTypeException($constraint, ContraintUnqiue::class);
-        }
         if ($value === null || $value === '') {
             return;
         }
 
-        $model = $this->context->getObject();
-        if (!$model instanceof Model) {
-            return;
+        $object = $this->context->getObject();
+        if ($object instanceof Model) {
+            $this->validateModel($value, $constraint);
+        } elseif ($object instanceof DAO) {
+            $this->validateDAO($value, $constraint);
         }
+    }
 
+    public function validateModel(mixed $value, Constraint $constraint): void
+    {
         $property = (string) $this->context->getPropertyName();
-        $root = dirname(__DIR__, 3).'/Data/DAO';
-        foreach (glob($root.'/*/Generated/*.json') ?: [] as $path) {
-            $data = json_decode((string) file_get_contents($path), true);
-            if (!is_array($data)) {
-                continue;
-            }
+        foreach (ModelService::service()->getModels() as $model) {
 
-            $className = (string) ($data['className'] ?? basename(dirname($path, 2)));
-            if ($className === $model->className) {
-                continue;
-            }
-
-            $stored = $property === 'className' ? $className : (string) ($data[$property] ?? '');
-            if ($stored !== '' && $stored === (string) $value) {
+            if ((string) $model->{$property} === (string) $value && (string) $model->id !== (string) $this->context->getObject()->id) {
                 $this->context->buildViolation($constraint->message)->addViolation();
-
-                return;
             }
+        }
+    }
+
+    public function validateDAO(mixed $value, Constraint $constraint): void
+    {
+        $property = (string) $this->context->getPropertyName();
+        $object = $this->context->getObject();
+        $class = $object::class;
+        $dao = $class::data($object->_connection, [
+            'whereSql' => "m.title = ? AND m.id != ?",
+            'params' => [$value, $object->id],
+            'limit' => 1,
+            'oneOrNull' => 1,
+        ]);
+        if ($dao) {
+            $this->context->buildViolation($constraint->message)->addViolation();
         }
     }
 }

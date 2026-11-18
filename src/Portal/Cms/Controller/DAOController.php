@@ -41,79 +41,41 @@ class DAOController extends AbstractController
     #[Route('/manage/dao/{modelId}/validate', name: 'manage_dao_validate', requirements: ['modelId' => '[a-z0-9-]*'])]
     public function validate(string $modelId, Request $request): Response
     {
-        $data = json_decode($request->getContent(), true);
-
-        return $this->json([
-            'errors' => $this->errors($modelId, $data),
-        ]);
-    }
-
-    #[Route('/manage/dao/{modelId}/save', name: 'manage_dao_save', requirements: ['modelId' => '[a-z0-9-]*'])]
-    public function save(string $modelId, Request $request): Response
-    {
-        $data = json_decode($request->getContent(), true);
-        $errors = $this->errors($modelId, $data);
-        if (!$errors && is_array($data)) {
-            $model = $this->models->getModelById($modelId);
-            $class = $model ? UtilsService::getFullClassFromName($model->className) : null;
-            if ($class) {
-                $record = $this->models->unserialize($data, $class);
-                $record->save();
-            }
+        $model = $this->models->getModelById($modelId);
+        $class = $model ? UtilsService::getFullClassFromName($model->className) : null;
+        if (!$class) {
+            throw new \Exception('Model not found');
         }
+
+        $data = json_decode($request->getContent(), true);
+
+        $errors = $this->models->validate($data, $class, [NotBlank::class]);
 
         return $this->json([
             'errors' => $errors,
         ]);
     }
 
-    /**
-     * @return list<array{path: string, message: string}>
-     */
-    private function errors(string $modelId, mixed $data): array
+    #[Route('/manage/dao/{modelId}/save', name: 'manage_dao_save', requirements: ['modelId' => '[a-z0-9-]*'])]
+    public function save(string $modelId, Request $request): Response
     {
-        if (!is_array($data)) {
-            return [[
-                'path' => '',
-                'message' => 'Invalid JSON.',
-            ]];
-        }
-
         $model = $this->models->getModelById($modelId);
-        if (!$model) {
-            return [];
+        $class = $model ? UtilsService::getFullClassFromName($model->className) : null;
+        if (!$class) {
+            throw new \Exception('Model not found');
         }
 
-        $class = UtilsService::getFullClassFromName($model->className);
-        $errors = [];
-        foreach ($model->fields as $field) {
-            if (!$field instanceof ModelField || !preg_match('/^[a-z][A-Za-z0-9]*$/', $field->field)) {
-                continue;
-            }
+        $data = json_decode($request->getContent(), true);      
 
-            $name = $field->field;
-            $value = $data[$name] ?? null;
-            $blank = $value === null || $value === '' || $value === [];
-            $label = $field->label !== '' ? $field->label : $name;
+        $errors = $this->models->validate($data, $class);
 
-            if (in_array('Required', $field->constraints, true) && $blank) {
-                $errors[] = [
-                    'path' => $name,
-                    'message' => $label . ' is required.',
-                ];
-            }
-
-            if ($class && in_array('Unique', $field->constraints, true) && !$blank && !is_array($value)) {
-                $existing = $class::getByField($this->connection, $name, $value);
-                if ($existing && (string) $existing->id !== (string) ($data['id'] ?? '')) {
-                    $errors[] = [
-                        'path' => $name,
-                        'message' => $label . ' must be unique.',
-                    ];
-                }
-            }
+        if (!$errors && is_array($data)) {
+            $dao = $this->models->unserialize($data, $class);
+            $dao->save();
         }
 
-        return $errors;
+        return $this->json([
+            'errors' => $errors,
+        ]);
     }
 }
