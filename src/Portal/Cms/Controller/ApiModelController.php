@@ -2,7 +2,7 @@
 
 namespace Pozo\EvilWife\Portal\Cms\Controller;
 
-use Pozo\EvilWife\Domain\Model\DTO\Model;
+use Pozo\EvilWife\Domain\Model\Dto\Model;
 use Pozo\EvilWife\Domain\Model\Form\ModelForm;
 use Pozo\EvilWife\Domain\Service\ModelService;
 use Ramsey\Uuid\Uuid;
@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 #[AsController]
-class ModelController extends AbstractController
+class ApiModelController extends AbstractController
 {
     public function __construct(
         private readonly ModelService $models,

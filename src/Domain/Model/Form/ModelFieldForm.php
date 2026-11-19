@@ -2,7 +2,7 @@
 
 namespace Pozo\EvilWife\Domain\Model\Form;
 
-use Pozo\EvilWife\Domain\Model\DTO\ModelField;
+use Pozo\EvilWife\Domain\Model\Dto\ModelField;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;

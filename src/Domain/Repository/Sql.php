@@ -4,7 +4,7 @@ namespace Pozo\EvilWife\Domain\Repository;
 
 use Doctrine\DBAL\Connection;
 
-class SQL
+class Sql
 {
     const OLD_COLUMN_PREFIX = '____';
 

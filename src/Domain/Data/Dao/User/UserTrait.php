@@ -1,6 +1,6 @@
 <?php
 
-namespace Pozo\EvilWife\Domain\Data\DAO\User;
+namespace Pozo\EvilWife\Domain\Data\Dao\User;
 
 use Pozo\EvilWife\Domain\Service\UtilsService;
 use Scheb\TwoFactorBundle\Model\Totp\TotpConfiguration;

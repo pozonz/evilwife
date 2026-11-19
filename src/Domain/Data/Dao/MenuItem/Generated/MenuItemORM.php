@@ -1,10 +1,10 @@
 <?php
 
-namespace Pozo\EvilWife\Domain\Data\DAO\MenuItem\Generated;
+namespace Pozo\EvilWife\Domain\Data\Dao\MenuItem\Generated;
 
-use Pozo\EvilWife\Domain\Repository\DAO;
+use Pozo\EvilWife\Domain\Repository\Dao;
 
-class MenuItemORM extends DAO
+class MenuItemORM extends Dao
 {
     /**
      * #pz text COLLATE utf8mb4_unicode_ci DEFAULT NULL

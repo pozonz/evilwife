@@ -5,8 +5,8 @@ namespace Pozo\EvilWife\Domain\Model\Form\Constraints;
 use Pozo\EvilWife\Domain\Service\ModelService;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Pozo\EvilWife\Domain\Model\DTO\Model;
-use Pozo\EvilWife\Domain\Repository\DAO;
+use Pozo\EvilWife\Domain\Model\Dto\Model;
+use Pozo\EvilWife\Domain\Repository\Dao;
 
 class ContraintUnqiueValidator extends ConstraintValidator
 {
@@ -19,7 +19,7 @@ class ContraintUnqiueValidator extends ConstraintValidator
         $object = $this->context->getObject();
         if ($object instanceof Model) {
             $this->validateModel($value, $constraint);
-        } elseif ($object instanceof DAO) {
+        } elseif ($object instanceof Dao) {
             $this->validateDAO($value, $constraint);
         }
     }

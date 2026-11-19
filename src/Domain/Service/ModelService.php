@@ -4,11 +4,11 @@ namespace Pozo\EvilWife\Domain\Service;
 
 use Cocur\Slugify\Slugify;
 use Doctrine\DBAL\Connection;
-use Pozo\EvilWife\Domain\Model\DTO\Model;
-use Pozo\EvilWife\Domain\Model\DTO\ModelField;
+use Pozo\EvilWife\Domain\Model\Dto\Model;
+use Pozo\EvilWife\Domain\Model\Dto\ModelField;
 use Pozo\EvilWife\Domain\Model\Form\ModelForm;
-use Pozo\EvilWife\Domain\Repository\DAO;
-use Pozo\EvilWife\Domain\Repository\SQL;
+use Pozo\EvilWife\Domain\Repository\Dao;
+use Pozo\EvilWife\Domain\Repository\Sql;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -146,7 +146,7 @@ class ModelService
      */
     public function ormColumns(string $className): array
     {
-        $class = 'Pozo\\EvilWife\\Domain\\Data\\DAO\\' . $className . '\\Generated\\' . $className . 'ORM';
+        $class = 'Pozo\\EvilWife\\Domain\\Data\\Dao\\' . $className . '\\Generated\\' . $className . 'ORM';
         $reflection = new \ReflectionClass($class);
         $properties = [];
         do {
@@ -222,7 +222,7 @@ class ModelService
     public function syncTable(string $className): void
     {
         $tableName = (new Slugify(['trim' => false]))->slugify($className, '_');
-        $sql = new SQL($this->connection, $tableName);
+        $sql = new Sql($this->connection, $tableName);
         if (!$sql->exists()) {
             $sql->create();
         }
@@ -258,7 +258,7 @@ class ModelService
 
     private function daoDir(string $className): string
     {
-        return dirname(__DIR__) . '/Data/DAO/' . $className;
+        return dirname(__DIR__) . '/Data/Dao/' . $className;
     }
 
     private function daoSource(string $className): string
@@ -266,9 +266,9 @@ class ModelService
         return <<<PHP
 <?php
 
-namespace Pozo\\EvilWife\\Domain\\Data\\DAO\\{$className};
+namespace Pozo\\EvilWife\\Domain\\Data\\Dao\\{$className};
 
-use Pozo\\EvilWife\\Domain\\Data\\DAO\\{$className}\\Generated\\{$className}ORM;
+use Pozo\\EvilWife\\Domain\\Data\\Dao\\{$className}\\Generated\\{$className}ORM;
 
 class {$className} extends {$className}ORM
 {
@@ -312,7 +312,7 @@ PHP;
 PHP;
         }
 
-        $uses = "use Pozo\\EvilWife\\Domain\\Repository\\DAO;\n";
+        $uses = "use Pozo\\EvilWife\\Domain\\Repository\\Dao;\n";
         if ($unique) {
             $uses .= "use Pozo\\EvilWife\\Domain\\Model\\Form\\Constraints\\ContraintUnqiue;\n";
         }
@@ -323,10 +323,10 @@ PHP;
         return <<<PHP
 <?php
 
-namespace Pozo\\EvilWife\\Domain\\Data\\DAO\\{$className}\\Generated;
+namespace Pozo\\EvilWife\\Domain\\Data\\Dao\\{$className}\\Generated;
 
 {$uses}
-class {$className}ORM extends DAO
+class {$className}ORM extends Dao
 {{$properties}
 }
 

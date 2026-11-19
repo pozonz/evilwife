@@ -11,8 +11,8 @@ class UtilsService
     static public function getFullClassFromName($className)
     {
         $fullClassNames = [
-            "\\App\\Domain\\Data\\DAO\\{$className}\\{$className}",
-            "\\Pozo\\EvilWife\\Domain\\Data\\DAO\\{$className}\\{$className}",
+            "\\App\\Domain\\Data\\Dao\\{$className}\\{$className}",
+            "\\Pozo\\EvilWife\\Domain\\Data\\Dao\\{$className}\\{$className}",
         ];
         foreach ($fullClassNames as $fullClassName) {
             if (class_exists($fullClassName)) {
@@ -42,8 +42,8 @@ class UtilsService
     static public function getModelFromName($className, $connection)
     {
         $fullClassNames = [
-            "\\App\\Domain\\Data\\DAO\\{$className}\\Generated\\{$className}CMS",
-            "\\Pozo\\EvilWife\\Domain\\Data\\DAO\\{$className}\\Generated\\{$className}CMS",
+            "\\App\\Domain\\Data\\Dao\\{$className}\\Generated\\{$className}CMS",
+            "\\Pozo\\EvilWife\\Domain\\Data\\Dao\\{$className}\\Generated\\{$className}CMS",
         ];
         foreach ($fullClassNames as $fullClassName) {
             if (class_exists($fullClassName)) {

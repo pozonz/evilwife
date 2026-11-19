@@ -1,6 +1,6 @@
 <?php
 
-namespace Pozo\EvilWife\Domain\Model\DTO;
+namespace Pozo\EvilWife\Domain\Model\Dto;
 
 use Pozo\EvilWife\Domain\Model\Form\Constraints\ContraintUnqiue;
 use Symfony\Component\Validator\Constraints as Assert;

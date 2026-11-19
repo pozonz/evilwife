@@ -3,7 +3,7 @@
 namespace Pozo\EvilWife\Portal\Cms\Controller;
 
 use Doctrine\DBAL\Connection;
-use Pozo\EvilWife\Domain\Model\DTO\ModelField;
+use Pozo\EvilWife\Domain\Model\Dto\ModelField;
 use Pozo\EvilWife\Domain\Model\Form\DAOForm;
 use Pozo\EvilWife\Domain\Service\ModelService;
 use Pozo\EvilWife\Domain\Service\UtilsService;
@@ -14,7 +14,7 @@ use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[AsController]
-class DAOController extends AbstractController
+class ApiDaoController extends AbstractController
 {
     public function __construct(
         private readonly Connection $connection,

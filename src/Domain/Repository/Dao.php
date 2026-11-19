@@ -4,13 +4,13 @@ namespace Pozo\EvilWife\Domain\Repository;
 
 use Cocur\Slugify\Slugify;
 use Doctrine\DBAL\Connection;
-use Pozo\EvilWife\Domain\Model\DTO\Model;
-use Pozo\EvilWife\Domain\Model\DTO\ModelField;
+use Pozo\EvilWife\Domain\Model\Dto\Model;
+use Pozo\EvilWife\Domain\Model\Dto\ModelField;
 use Pozo\EvilWife\Domain\Service\ModelService;
 use Pozo\EvilWife\Domain\Service\UtilsService;
 use Ramsey\Uuid\Uuid;
 
-abstract class DAO implements \JsonSerializable
+abstract class Dao implements \JsonSerializable
 {
 
     /**

@@ -1,12 +1,12 @@
 <?php
 
-namespace Pozo\EvilWife\Domain\Data\DAO\User\Generated;
+namespace Pozo\EvilWife\Domain\Data\Dao\User\Generated;
 
-use Pozo\EvilWife\Domain\Repository\DAO;
+use Pozo\EvilWife\Domain\Repository\Dao;
 use Pozo\EvilWife\Domain\Model\Form\Constraints\ContraintUnqiue;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class UserORM extends DAO
+class UserORM extends Dao
 {
     /**
      * #pz text COLLATE utf8mb4_unicode_ci DEFAULT NULL
