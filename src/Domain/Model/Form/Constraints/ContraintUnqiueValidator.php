@@ -41,7 +41,7 @@ class ContraintUnqiueValidator extends ConstraintValidator
         $object = $this->context->getObject();
         $class = $object::class;
         $dao = $class::data($object->_connection, [
-            'whereSql' => "m.title = ? AND m.id != ?",
+            'whereSql' => "m.{$property} = ? AND m.id != ?",
             'params' => [$value, $object->id],
             'limit' => 1,
             'oneOrNull' => 1,
