@@ -9,7 +9,18 @@ import { ComponentType } from 'react';
 
 export const getType = (field: any) => {
     const type = field?.type === 'collection' ? field.entry?.type : field?.type;
-    const types = { choice: Choice, checkbox: Checkbox, textarea: Textarea, model_field_form: ModelFieldCollection };
+    const types = {
+        text: Text,
+        choice: Choice,
+        checkbox: Checkbox,
+        textarea: Textarea,
+        email: Text,
+        password: Text,
+        hidden: Text,
+        date: Text,
+        datetime: Text,
+        model_field_form: ModelFieldCollection,
+    };
     return (types[type as keyof typeof types] || Text) as ComponentType<{ keys: Array<string> }>;
 };
 

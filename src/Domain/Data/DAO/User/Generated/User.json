@@ -94,7 +94,7 @@
             "queryableInCmsSearch": false
         },
         {
-            "widget": "Checkbox",
+            "widget": "Hidden",
             "label": "TOTP Enabled:",
             "field": "totpEnabled",
             "constraints": [],
@@ -105,7 +105,7 @@
             "queryableInCmsSearch": false
         },
         {
-            "widget": "Textarea",
+            "widget": "Hidden",
             "label": "Backup Codes:",
             "field": "backupCodes",
             "constraints": [],

@@ -31,10 +31,14 @@ export const Form = ({ schemaUrl, saveUrl, validateUrl }: { schemaUrl: string; s
     return (
         <div id={schema.name} className="row g-3">
             {Object.keys(fields).map((key) => {
+                const type = fields[key].type;
+                if (type === 'hidden') {
+                    return null;
+                }
+                
                 const Component = getType(fields[key]);
-
                 return (
-                    <div key={key} className={fields[key].type === 'collection' ? 'col-12' : 'col-md-6'}>
+                    <div key={key} className={type === 'collection' ? 'col-12' : 'col-md-6'}>
                         <Component keys={[key]} />
                     </div>
                 );

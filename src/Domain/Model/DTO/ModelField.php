@@ -20,7 +20,6 @@ class ModelField
         'Date picker',
         'Email',
         'Hidden',
-        'Multiple key value pair',
         'Password',
         'Text',
         'Textarea',

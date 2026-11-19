@@ -6,6 +6,12 @@ use Pozo\EvilWife\Domain\Model\DTO\ModelField;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -36,17 +42,19 @@ class DAOForm extends AbstractType
 
     private function fieldType(string $widget): string
     {
-        if ($widget === 'Checkbox') {
-            return CheckboxType::class;
-        }
-        if (in_array($widget, ['Textarea', 'Wysiwyg'], true)) {
-            return TextareaType::class;
-        }
-        if (str_starts_with($widget, 'Choice')) {
-            return ChoiceType::class;
-        }
-
-        return TextType::class;
+        return match ($widget) {
+            'Content blocks' => CollectionType::class,
+            'Asset files picker', 'Asset picker', 'Text' => TextType::class,
+            'Checkbox' => CheckboxType::class,
+            'Choice', 'Choice multi', 'Choice sortable', 'Choice tree', 'Choice tree multi' => ChoiceType::class,
+            'Date & time picker' => DateTimeType::class,
+            'Date picker' => DateType::class,
+            'Email' => EmailType::class,
+            'Hidden' => HiddenType::class,
+            'Password' => PasswordType::class,
+            'Textarea', 'Wysiwyg' => TextareaType::class,
+            default => TextType::class,
+        };
     }
 
     /**
@@ -64,8 +72,43 @@ class DAOForm extends AbstractType
             ];
         }
 
+        if ($widget === 'Hidden') {
+            return [
+                'label' => false,
+                'required' => false,
+                'empty_data' => '',
+            ];
+        }
+
+        if (in_array($widget, ['Asset files picker', 'Content blocks', 'Multiple key value pair'], true)) {
+            return [
+                'label' => $label,
+                'required' => false,
+                'allow_add' => true,
+                'allow_delete' => true,
+                'entry_type' => TextType::class,
+                'entry_options' => [
+                    'label' => false,
+                    'required' => false,
+                    'empty_data' => '',
+                ],
+            ];
+        }
+
+        if ($widget === 'Date picker' || $widget === 'Date & time picker') {
+            return [
+                'label' => $label,
+                'required' => $required,
+                'widget' => 'single_text',
+                'html5' => true,
+                'input' => 'string',
+                'empty_data' => '',
+                'attr' => ['class' => 'form-control'],
+            ];
+        }
+
         if (str_starts_with($widget, 'Choice')) {
-            $multiple = str_contains($widget, 'multi');
+            $multiple = str_contains($widget, 'multi') || $widget === 'Choice sortable';
             $options = [
                 'label' => $label,
                 'required' => $required && !$multiple,

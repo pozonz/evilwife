@@ -4,7 +4,7 @@ export const Text = ({ keys = [] }: { keys: Array<string> }) => {
     const { schema, id, name, value, errors } = getInfo(keys);
 
     const cls = (schema.attr && schema.attr.class) || 'form-control';
-    const type = schema.type === 'integer' ? 'number' : 'text';
+    const type = { integer: 'number', email: 'email', password: 'password', hidden: 'hidden', date: 'date', datetime: 'datetime-local' }[schema.type as string] || 'text';
 
     return (
         <div className="mb-0">
