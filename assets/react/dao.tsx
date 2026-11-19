@@ -3,9 +3,9 @@ import '../core/css/model.less';
 import { Form } from './form/Form';
 
 export const Dao = ({ className, id }: { className: string; id: string }) => {
-    const schemaUrl = `/manage/dao/${className}/${id}/schema`;
-    const saveUrl = `/manage/dao/${className}/save`;
-    const validateUrl = `/manage/dao/${className}/validate`;
+    const schemaUrl = `/manage/api/dao/${className}/${id}/schema`;
+    const saveUrl = `/manage/api/dao/${className}/save`;
+    const validateUrl = `/manage/api/dao/${className}/validate`;
 
     return (
         <div className="model-builder d-flex align-items-start gap-3">

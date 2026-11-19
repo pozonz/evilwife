@@ -3,9 +3,9 @@ import '../core/css/model.less';
 import { Form } from './form/Form';
 
 export const Model = ({ className }: { className: string }) => {
-    const schemaUrl = `/manage/model/${className}/schema`;
-    const saveUrl = '/manage/model/save';
-    const validateUrl = '/manage/model/validate';
+    const schemaUrl = `/manage/api/model/${className}/schema`;
+    const saveUrl = '/manage/api/model/save';
+    const validateUrl = '/manage/api/model/validate';
 
     return (
         <div className="model-builder d-flex align-items-start gap-3">

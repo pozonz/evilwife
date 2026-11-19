@@ -21,7 +21,7 @@ class DAOController extends AbstractController
         private readonly ModelService $models,
     ) {}
 
-    #[Route('/manage/dao/{modelId}/{daoId}/schema', name: 'manage_dao_schema', requirements: ['modelId' => '[a-z0-9-]*', 'id' => '\d+'])]
+    #[Route('/manage/api/dao/{modelId}/{daoId}/schema', name: 'manage_dao_schema', requirements: ['modelId' => '[a-z0-9-]*', 'id' => '\d+'])]
     public function schema(string $modelId, int $daoId): Response
     {
         $model = $this->models->getModelById($modelId);
@@ -38,7 +38,7 @@ class DAOController extends AbstractController
         ]);
     }
 
-    #[Route('/manage/dao/{modelId}/validate', name: 'manage_dao_validate', requirements: ['modelId' => '[a-z0-9-]*'])]
+    #[Route('/manage/api/dao/{modelId}/validate', name: 'manage_dao_validate', requirements: ['modelId' => '[a-z0-9-]*'])]
     public function validate(string $modelId, Request $request): Response
     {
         $model = $this->models->getModelById($modelId);
@@ -56,7 +56,7 @@ class DAOController extends AbstractController
         ]);
     }
 
-    #[Route('/manage/dao/{modelId}/save', name: 'manage_dao_save', requirements: ['modelId' => '[a-z0-9-]*'])]
+    #[Route('/manage/api/dao/{modelId}/save', name: 'manage_dao_save', requirements: ['modelId' => '[a-z0-9-]*'])]
     public function save(string $modelId, Request $request): Response
     {
         $model = $this->models->getModelById($modelId);
