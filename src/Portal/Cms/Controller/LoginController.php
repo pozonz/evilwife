@@ -35,6 +35,17 @@ class LoginController extends AbstractController
         throw new \LogicException('This route is handled by the firewall.');
     }
 
+    #[Route('/manage/api/me', name: 'manage_api_me', methods: ['GET'])]
+    public function me(): Response
+    {
+        $authenticated = $this->isGranted('ROLE_ADMIN');
+
+        return $this->json([
+            'authenticated' => $authenticated,
+            'username' => $authenticated ? $this->getUser()?->getUserIdentifier() : null,
+        ]);
+    }
+
     #[Route('/manage/dashboard', name: 'manage_dashboard')]
     public function dashboard(): Response
     {

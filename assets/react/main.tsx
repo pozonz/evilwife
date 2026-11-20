@@ -5,7 +5,9 @@ import '../core/css/main.less';
 
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Route, Routes, useParams } from 'react-router-dom';
+import { RequireAuth } from './auth';
 import { Dao } from './dao';
+import { Login } from './login';
 import { Model } from './model';
 
 const ModelRoute = () => {
@@ -29,8 +31,11 @@ if (root) {
     createRoot(root).render(
         <BrowserRouter future={{ v7_relativeSplatPath: true }}>
             <Routes>
-                <Route path="/manage/model/:className" element={<ModelRoute />} />
-                <Route path="/manage/dao/:className/:id" element={<DaoRoute />} />
+                <Route path="/manage/login" element={<Login />} />
+                <Route element={<RequireAuth />}>
+                    <Route path="/manage/model/:className" element={<ModelRoute />} />
+                    <Route path="/manage/dao/:className/:id" element={<DaoRoute />} />
+                </Route>
             </Routes>
         </BrowserRouter>
     );
